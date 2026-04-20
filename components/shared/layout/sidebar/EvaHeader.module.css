@@ -1,0 +1,77 @@
+/* EvaHeader.module.css */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px 10px;
+  border-bottom: none;
+  flex-shrink: 0;
+  min-width: 300px; /* prevents collapse during panel width animation */
+}
+
+/* Circular "E" avatar in terracotta */
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--fur-accent, #f24a12);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+
+.meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fur-text-primary, #1a1a1a);
+  line-height: 1.2;
+}
+
+.role {
+  font-size: 10px;
+  color: var(--fur-text-muted, #9e8d84);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.expandBtn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--fur-panel-border, #e8dcd0);
+  background: transparent;
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fur-text-secondary, #6b5b52);
+  flex-shrink: 0;
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
+}
+
+.expandBtn:hover {
+  background: var(--fur-accent-light, #fef0ea);
+  color: var(--fur-accent, #f24a12);
+  border-color: transparent;
+}

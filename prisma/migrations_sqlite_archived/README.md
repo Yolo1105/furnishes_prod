@@ -1,0 +1,1 @@
+Pre–studio-merge SQLite migrations were moved here. The active datasource is PostgreSQL; apply `prisma/migrations/20260416180000_merged_postgres_init` against a Postgres instance (`npm run db:migrate` / `db:migrate:deploy`).

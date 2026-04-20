@@ -1,0 +1,31 @@
+/* ContentWrapper.module.css
+   Rail stays fixed with no flow width; the drawer is fixed too, but when it opens
+   we reserve horizontal space so the page column compresses instead of sitting under it.
+
+   Close path: `.mainPanelClosing` animates margin → 0 over the same 450ms / easing as
+   `RightSidebar` `.panel` transform so the white sheet and main column move as one —
+   not “tab slides, then margin snaps / background appears”. */
+
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 100%;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Match `RightSidebar` `.panel` transform — opening: grow inset with drawer. */
+.mainPanelOpen {
+  margin-right: var(--fur-panel-width);
+  transition: margin-right var(--fur-panel-slide-ms) var(--fur-panel-slide-ease);
+}
+
+/* Closing: shrink inset with drawer (panelOpen false, panelClosing true). */
+.mainPanelClosing {
+  margin-right: 0;
+  transition: margin-right var(--fur-panel-slide-ms) var(--fur-panel-slide-ease);
+}

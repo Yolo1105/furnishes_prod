@@ -1,0 +1,1665 @@
+// Merged Eva + Studio account (PostgreSQL).
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum HomeType {
+  HDB
+  Condo
+  Landed
+  Rental
+  Other
+}
+
+enum PreferenceGroup {
+  style
+  room
+  budget
+  materials
+  musthaves // maps to "must-haves"
+  dealbreakers // maps to "deal-breakers"
+}
+
+enum PreferenceStatus {
+  potential
+  confirmed
+}
+
+enum Currency {
+  SGD
+  MYR
+  USD
+}
+
+enum ConversationStatus {
+  active
+  archived
+  shared
+}
+
+enum SharePermission {
+  read
+  comment
+  edit
+}
+
+enum PlaybookAuthor {
+  eva
+  user
+}
+
+enum ProjectStatus {
+  planning
+  sourcing
+  in_progress
+  done
+  archived
+}
+
+/** Persistent design workflow for a Project — drives assistant behavior and UI. */
+enum DesignWorkflowStage {
+  intake
+  preference_capture
+  clarification
+  recommendation_generation
+  refinement
+  decision_handoff
+}
+
+enum MemberRole {
+  owner
+  editor
+  viewer
+}
+
+/** Project-scoped shortlist row — execution / handoff (Phase 6A). */
+enum ProjectShortlistStatus {
+  considering
+  primary
+  backup
+  rejected
+}
+
+/** Phase 6C — execution orchestration lifecycle (distinct from Project.status). */
+enum ProjectExecutionLifecycle {
+  not_started
+  planning
+  in_progress
+  blocked
+  ready_handoff
+  completed
+}
+
+enum ProjectExecutionTaskStatus {
+  open
+  in_progress
+  done
+  cancelled
+}
+
+enum ProjectExecutionTaskPriority {
+  low
+  medium
+  high
+  urgent
+}
+
+enum ProjectBlockerStatus {
+  active
+  resolved
+}
+
+/** Phase 6D — accepted collaborators only (invites use ProjectInvitation). */
+enum ProjectMemberStatus {
+  active
+  removed
+}
+
+enum ProjectInviteStatus {
+  pending
+  accepted
+  revoked
+  expired
+}
+
+enum ProjectCommentTargetType {
+  project
+  recommendation
+  shortlist_item
+  artifact
+  execution_task
+  execution_blocker
+}
+
+enum ProjectApprovalTargetType {
+  preferred_direction
+  shortlist
+  execution_package
+  handoff_export
+}
+
+enum ProjectApprovalDecisionStatus {
+  pending
+  approved
+  rejected
+  revoked
+}
+
+enum ProjectTimelineKind {
+  invitation_sent
+  member_joined
+  member_removed
+  role_changed
+  preferred_direction_updated
+  shortlist_updated
+  blocker_resolved
+  execution_lifecycle_changed
+  comment_created
+  comment_resolved
+  approval_updated
+}
+
+/** Phase 7 — canonical project audit / automation event type (timeline + notifications). */
+enum ProjectEventType {
+  project_created
+  preferred_direction_changed
+  /** Reserved / legacy alias — new writes should use `preferred_direction_changed`. */
+  preferred_direction_updated
+  shortlist_item_added
+  shortlist_item_removed
+  shortlist_updated
+  blocker_added
+  blocker_resolved
+  execution_task_created
+  execution_task_updated
+  execution_lifecycle_changed
+  approval_requested
+  approval_granted
+  approval_rejected
+  approval_updated
+  comment_added
+  comment_created
+  comment_resolved
+  execution_package_updated
+  handoff_sent
+  item_status_changed
+  substitution_made
+  invitation_sent
+  member_joined
+  member_removed
+  role_changed
+}
+
+/** Phase 7 — real-world procurement / execution state per shortlist row (distinct from design role `ProjectShortlistStatus`). */
+enum ShortlistItemExternalLifecycle {
+  proposed
+  shortlisted
+  approved
+  sourcing
+  quoted
+  ordered
+  delivered
+  unavailable
+  replaced
+  rejected
+}
+
+enum ProjectPacketKind {
+  project_summary
+  approval_review
+  execution_package
+}
+
+enum ProjectPacketDeliveryChannel {
+  recorded_download
+  email
+  link_share
+}
+
+enum DigestFrequency {
+  instant
+  daily
+  weekly
+}
+
+enum SecurityEventKind {
+  login
+  login_failed
+  two_factor_enabled
+  two_factor_disabled
+  password_change
+  session_revoked
+  new_device
+}
+
+enum InvoiceStatus {
+  paid
+  due
+  refunded
+  failed
+}
+
+enum ActivityCategory {
+  sign_in // maps to "sign-in"
+  profile
+  preferences
+  project
+  upload
+  conversation
+  security
+  billing
+  shortlist
+}
+
+enum ExportStatus {
+  queued
+  processing
+  ready
+  failed
+}
+
+enum FurnitureGenerationStatus {
+  running
+  completed
+  failed
+}
+
+enum AddressLabel {
+  Home
+  Work
+  Other
+}
+
+enum PaymentKind {
+  card
+  paynow
+}
+
+enum OrderStatus {
+  placed
+  paid
+  processing
+  shipped
+  delivered
+  cancelled
+  refunded
+}
+
+enum DeliveryMethod {
+  standard
+  scheduled
+  white_glove
+}
+
+enum DeliveryStatus {
+  scheduled
+  in_transit
+  arrived
+  failed
+  rescheduled
+}
+
+enum UserRole {
+  user // default — regular customer
+  staff // can reply to support tickets
+  admin // full access incl. user management
+}
+
+enum SupportKind {
+  HELP
+  FEEDBACK
+}
+
+enum SupportStatus {
+  open // help: waiting on Furnishes team
+  awaiting_user // help: waiting on user reply
+  resolved // help: closed
+
+  received // feedback: logged
+  under_review // feedback: being looked at
+  shipped // feedback: done
+  wont_ship // feedback: passed on, with rationale
+  declined // feedback: out of scope
+}
+
+enum SupportMessageRole {
+  user
+  staff
+}
+
+model Conversation {
+  id                String             @id @default(cuid())
+  title             String             @default("New Chat")
+  userId            String?
+  user              User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  /** Anonymous/guest sessions: must match signed cookie; never rely on userId=null alone. */
+  guestSessionId    String?
+  currentNodeId     String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  messages          Message[]
+  preferences       Preference[]
+  preferenceChanges PreferenceChange[]
+  files             File[]
+  costLogs          CostLog[]
+  sharedProjects    SharedProject[]
+  nodeTransitions   NodeTransition[]
+
+  snippet            String?             @db.Text
+  /** Eva dashboard assistant persona (catalog id, e.g. eva-style). */
+  assistantId        String?
+  /** User-starred for quick access; distinct from ordinary persistence. */
+  isSaved            Boolean             @default(false)
+  savedAt            DateTime?
+  status             ConversationStatus  @default(active)
+  messageCount       Int                 @default(0)
+  projectId          String?
+  project            Project?            @relation("ConversationProject", fields: [projectId], references: [id], onDelete: SetNull)
+  /** When set, this conversation is the focused thread for that project shell. */
+  activeForProject   Project?           @relation("ProjectActiveConversation")
+  userPreferences    UserPreference[]
+  conversationShares ConversationShare[]
+
+  @@index([userId])
+  @@index([guestSessionId])
+  @@index([projectId])
+}
+
+/// Log of playbook node transitions per conversation (for Decision Trace).
+model NodeTransition {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  fromNodeId     String?
+  toNodeId       String
+  edgeId         String?
+  reason         String?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+}
+
+model SharedProject {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  shareId        String       @unique
+  createdAt      DateTime     @default(now())
+  expiresAt      DateTime?
+
+  @@index([shareId])
+}
+
+model CostLog {
+  id               String       @id @default(cuid())
+  conversationId   String
+  conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  model            String
+  promptTokens     Int
+  completionTokens Int
+  costUsd          Float
+  category         String       @default("chat")
+  createdAt        DateTime     @default(now())
+
+  @@index([conversationId])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expires])
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  name                String?
+  email               String?   @unique
+  emailVerified       DateTime?
+  image               String?
+  password            String?
+  /** Increment to invalidate JWT sessions (password reset/change). */
+  sessionVersion      Int       @default(0)
+  role                UserRole  @default(user)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  deletionScheduledAt DateTime?
+
+  accounts      Account[]
+  sessions      Session[]
+  conversations Conversation[]
+
+  profile                    UserProfile?
+  styleProfile               StyleProfileRecord?
+  userPreferences            UserPreference[]
+  budget                     Budget?
+  designPlaybooks            DesignPlaybook[]
+  shortlistItems             ShortlistItem[]
+  projects                   Project[]
+  projectMembers             ProjectMember[]
+  projectMembersInvited      ProjectMember[]           @relation("ProjectMemberInvitedBy")
+  projectInvitationsSent     ProjectInvitation[]       @relation("ProjectInvitationInviter")
+  projectComments            ProjectComment[]
+  uploads                    Upload[]
+  notificationPrefs          NotificationPrefs?
+  userDevices                UserDevice[]
+  securityEvents             SecurityEvent[]
+  invoices                   Invoice[]
+  consents                   Consent[]
+  activityEvents             ActivityEvent[]
+  passwordResets             PasswordReset[]
+  dataExports                DataExport[]
+  cart                       Cart?
+  addresses                  Address[]
+  paymentMethods             PaymentMethod[]
+  contactPrefs               ContactPrefs?
+  orders                     Order[]
+  supportThreads             SupportThread[]
+  conversationSharesReceived ConversationShare[]   @relation("ConversationShareRecipient")
+  furnitureGenerations       FurnitureGeneration[]
+  furnitureStudioPieces      FurnitureStudioPiece[]
+
+  projectPacketSends ProjectPacketSend[] @relation("ProjectPacketSender")
+  inAppNotifications InAppNotification[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@index([expires])
+}
+
+model Message {
+  id             String            @id @default(cuid())
+  conversationId String
+  conversation   Conversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String
+  content        String            @db.Text
+  extractions    Json?
+  createdAt      DateTime          @default(now())
+  feedback       MessageFeedback[]
+
+  @@index([conversationId])
+}
+
+model MessageFeedback {
+  id        String   @id @default(cuid())
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  rating    String
+  comment   String?
+  createdAt DateTime @default(now())
+
+  @@index([messageId])
+}
+
+model Preference {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  field          String
+  value          String       @db.Text
+  confidence     Float        @default(0.5)
+  status         String       @default("potential")
+  source         String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([conversationId, field])
+  @@index([conversationId])
+}
+
+model PreferenceChange {
+  id              String       @id @default(cuid())
+  conversationId  String
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  field           String
+  oldValue        String?
+  newValue        String
+  confidence      Float        @default(0.5)
+  changeType      String       @default("set")
+  confirmed       Boolean      @default(false)
+  sourceMessageId String?
+  createdAt       DateTime     @default(now())
+
+  @@index([conversationId])
+}
+
+model File {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  filename       String
+  url            String
+  type           String?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+}
+
+model DesignDoc {
+  id         String   @id @default(cuid())
+  source     String
+  chunkIndex Int
+  content    String   @db.Text
+  embedding  Json?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([source])
+}
+
+model CalibrationLog {
+  id                  String   @id @default(cuid())
+  conversationId      String
+  field               String
+  predictedConfidence Float
+  accepted            Boolean
+  createdAt           DateTime @default(now())
+
+  @@index([conversationId])
+  @@index([field])
+}
+
+model Playbook {
+  id        String   @id @default(cuid())
+  nodes     Json
+  edges     Json
+  updatedAt DateTime @updatedAt
+}
+
+model ConversationShare {
+  id               String          @id @default(cuid())
+  conversationId   String
+  conversation     Conversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sharedWithUserId String
+  sharedWithUser   User            @relation("ConversationShareRecipient", fields: [sharedWithUserId], references: [id], onDelete: Cascade)
+  permission       SharePermission @default(read)
+  createdAt        DateTime        @default(now())
+
+  @@unique([conversationId, sharedWithUserId])
+}
+
+// Prisma schema for Furnishes Studio account module.
+//
+// This file extends (or replaces) the schema in your existing repo. Every
+// model here corresponds to exactly one view in the /account route tree, so wiring is
+// 1:1 predictable — see docs/migration.md for the step-by-step playbook.
+//
+// Conventions:
+//   - All IDs are cuid() (sortable, URL-safe)
+//   - All timestamps are @default(now()) and @updatedAt
+//   - Money stored as Int (cents) + Currency enum (SGD default)
+//   - Soft deletes use `deletedAt` nullable; hard deletes cascade from User
+//   - Every user-scoped model has `userId` + an index on it for RLS-style
+//     authorization in application code
+//   - Project-scoped tables additionally index `(projectId, userId)` so
+//     "my items in this project" queries stay fast
+
+// ─────────────────────────────────────────────────────────────
+// Core — User, Session (existing NextAuth tables, extended)
+// ─────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────
+// Auth.js v5 — Account / Session / VerificationToken
+// Required shape for @auth/prisma-adapter. Do NOT rename these
+// fields; Auth.js expects this exact schema.
+// ─────────────────────────────────────────────────────────────
+
+// Extended profile — home context, measurements, etc. Separate from User
+// because NextAuth owns the User table.
+
+model UserProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  phone         String?
+  phoneVerified Boolean       @default(false)
+  homeType      HomeType      @default(Other)
+  roomCount     Int           @default(1)
+  householdSize Int           @default(1)
+  hasPets       Boolean       @default(false)
+  hasKids       Boolean       @default(false)
+  locale        String        @default("en-SG")
+  timeZone      String        @default("Asia/Singapore")
+  measurements  Measurement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Measurement {
+  id        String      @id @default(cuid())
+  profileId String
+  profile   UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  room      String
+  widthCm   Int
+  heightCm  Int
+  ceilingCm Int
+  doorwayCm Int
+  createdAt DateTime    @default(now())
+
+  @@index([profileId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Identity — Style profile + inferred preferences + budget
+// ─────────────────────────────────────────────────────────────
+
+model StyleProfileRecord {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  styleKey    String // "minimal" | "maximalist" | "organic" | "industrial" | "artisan"
+  name        String
+  tagline     String
+  description String   @db.Text
+  palette     String[] // hex codes
+  keywords    String[]
+  takenAt     DateTime
+  updatedAt   DateTime @updatedAt
+}
+
+model UserPreference {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  group                PreferenceGroup
+  field                String // free-text label: e.g. "room", "palette"
+  value                String           @db.Text
+  status               PreferenceStatus @default(potential)
+  confidence           Float // 0..1
+  sourceConversationId String?
+  sourceConversation   Conversation?    @relation(fields: [sourceConversationId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, group])
+  @@index([userId, status])
+}
+
+model Budget {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  minCents Int
+  maxCents Int
+  currency Currency     @default(SGD)
+  rooms    RoomBudget[]
+
+  updatedAt DateTime @updatedAt
+}
+
+model RoomBudget {
+  id              String @id @default(cuid())
+  budgetId        String
+  budget          Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  room            String
+  allocationCents Int
+  percentage      Float  @default(0)
+
+  @@index([budgetId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Design — Conversations, Playbooks, Shortlist, Projects, Uploads
+// ─────────────────────────────────────────────────────────────
+
+/// INTEGRATION-TODO: delete this model during main-site merge.
+/// Replace all references with main site's `Message` model.
+/// See INTEGRATION_DECISIONS.md.
+model DesignPlaybook {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title          String
+  summary        String                  @db.Text
+  author         PlaybookAuthor
+  coverHue       Int // 0..360
+  tags           String[]
+  sections       DesignPlaybookSection[]
+  estReadMinutes Int                     @default(5)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model DesignPlaybookSection {
+  id         String         @id @default(cuid())
+  playbookId String
+  playbook   DesignPlaybook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+
+  heading    String
+  body       String   @db.Text
+  accent     String[] // hex codes
+  orderIndex Int
+
+  @@index([playbookId, orderIndex])
+}
+
+model ShortlistItem {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // External product reference — joins to your product catalog
+
+  productId       String
+  productName     String
+  productCategory String
+  priceCents      Int
+  currency        Currency @default(SGD)
+  coverHue        Int
+
+  // Rich detail captured at save time for the PDP-style detail view
+
+  description String?  @db.Text
+  materials   String[]
+  widthCm     Int?
+  depthCm     Int?
+  heightCm    Int?
+  rationale   String?  @db.Text
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  /** When the row was added from a recommendations run (conversation + rec row id). */
+  sourceConversationId   String?
+  sourceRecommendationId String?
+
+  /** Snapshot from recommendation card (optional). */
+  summary String? @db.Text
+
+  /** Why this item is on the project shortlist (defaults from reasonWhyItFits when adding from recs). */
+  reasonSelected String? @db.Text
+
+  /** User notes for execution / handoff. */
+  notes String? @db.Text
+
+  status ProjectShortlistStatus @default(considering)
+
+  /** Phase 7 — procurement / real-world execution state (orthogonal to design role above). */
+  externalLifecycle ShortlistItemExternalLifecycle @default(shortlisted)
+
+  executionTasks ProjectExecutionTask[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([userId, projectId, productId])
+}
+
+model Project {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String        @db.Text
+  /** Display label, e.g. "Living room" */
+  room        String
+  /** Optional normalized slug for analytics (e.g. living_room) */
+  roomType    String?
+  status      ProjectStatus @default(planning)
+  budgetCents Int           @default(0)
+  currency    Currency      @default(SGD)
+  coverHue    Int
+  progress    Int           @default(0) // 0..100
+  isShared    Boolean       @default(false)
+
+  workflowStage DesignWorkflowStage @default(intake)
+  /** Latest brief / preference snapshot for project hub (JSON). */
+  briefSnapshot Json?
+  /** Keys satisfied for workflow gates, e.g. { "room": true, "budget": true } */
+  workflowSatisfied Json @default("{}")
+  /** Last time workflow stage or satisfied-keys were updated (Playbook / evaluator). */
+  playbookUpdatedAt DateTime?
+
+  /**
+   * Phase 5 — project-scoped decision context (preferred path, compare set, notes).
+   * Validated with Zod on write; do not store conversation-only state here.
+   */
+  decisionContext Json?
+  /**
+   * Last successful recommendations payload from a project chat (for summary/compare without re-running LLM).
+   * Set by client after GET .../recommendations succeeds, or omitted until then.
+   */
+  recommendationsSnapshot Json?
+
+  /** Phase 6C — execution orchestration (tasks, blockers, logs live in related rows + JSON). */
+  executionLifecycle ProjectExecutionLifecycle @default(not_started)
+  executionState     Json                      @default("{}")
+  executionNotes     String?                   @db.Text
+
+  activeConversationId String?      @unique
+  activeConversation   Conversation? @relation("ProjectActiveConversation", fields: [activeConversationId], references: [id], onDelete: SetNull)
+
+  members        ProjectMember[]
+  invitations    ProjectInvitation[]
+  comments       ProjectComment[]
+  approvals      ProjectApproval[]
+  timelineEvents ProjectTimelineEvent[]
+  conversations  Conversation[]      @relation("ConversationProject")
+  workflowEvents ProjectWorkflowEvent[]
+  shortlistItems ShortlistItem[]
+  uploads        Upload[]
+  /** Eva Studio — saved 3D room drafts (arranged generated pieces). */
+  studioRoomSaves ProjectStudioRoomSave[]
+  executionTasks    ProjectExecutionTask[]
+  executionBlockers ProjectExecutionBlocker[]
+
+  packetSends       ProjectPacketSend[]
+  inAppNotifications InAppNotification[]
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  archivedAt DateTime?
+
+  @@index([userId, status])
+}
+
+/**
+ * Phase 6C — actionable execution tasks tied to the design path (not generic PM).
+ */
+model ProjectExecutionTask {
+  id          String                       @id @default(cuid())
+  projectId   String
+  project     Project                      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String?                      @db.Text
+  status      ProjectExecutionTaskStatus     @default(open)
+  priority    ProjectExecutionTaskPriority @default(medium)
+
+  linkedBlockerId          String?
+  linkedBlocker            ProjectExecutionBlocker? @relation(fields: [linkedBlockerId], references: [id], onDelete: SetNull)
+  linkedShortlistItemId    String?
+  linkedShortlistItem      ShortlistItem? @relation(fields: [linkedShortlistItemId], references: [id], onDelete: SetNull)
+  linkedConstraintLabel    String?
+  sourceRecommendationId   String?
+
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId, status])
+  @@index([projectId, updatedAt(sort: Desc)])
+}
+
+/**
+ * Phase 6C — resolvable blockers with suggestions (extends passive “open items” strings).
+ */
+model ProjectExecutionBlocker {
+  id          String             @id @default(cuid())
+  projectId   String
+  project     Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String?            @db.Text
+  status      ProjectBlockerStatus @default(active)
+  notes       String?            @db.Text
+  resolutionSuggestion String?   @db.Text
+  resolutionNotes      String?   @db.Text
+  resolvedAt  DateTime?
+  linkedConstraintKey String?
+  /** user | system */
+  source      String             @default("user")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks ProjectExecutionTask[]
+
+  @@index([projectId, status])
+  @@index([projectId, updatedAt(sort: Desc)])
+}
+
+/**
+ * One saved room layout from Eva Studio (Generate → Arrange) attached to a project.
+ */
+model ProjectStudioRoomSave {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  roomShapeId String
+  widthM      Float
+  depthM      Float
+  environment String
+
+  /** e.g. eva_studio — for provenance if other sources write layouts later */
+  source String @default("eva_studio")
+
+  placements ProjectStudioPlacement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId, createdAt(sort: Desc)])
+}
+
+/**
+ * A single placed generated piece within a `ProjectStudioRoomSave`.
+ */
+model ProjectStudioPlacement {
+  id     String @id @default(cuid())
+  saveId String
+  save   ProjectStudioRoomSave @relation(fields: [saveId], references: [id], onDelete: Cascade)
+
+  furnitureStudioPieceId String
+  piece                    FurnitureStudioPiece @relation(fields: [furnitureStudioPieceId], references: [id], onDelete: Restrict)
+
+  orderIndex Int
+  positionX  Float
+  positionZ  Float
+  rotationY  Float @default(0)
+
+  @@unique([saveId, orderIndex])
+  @@index([furnitureStudioPieceId])
+}
+
+model ProjectWorkflowEvent {
+  id        String @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  fromStage DesignWorkflowStage?
+  toStage   DesignWorkflowStage
+  reason    String?
+  trigger   String @default("auto")
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([projectId, createdAt])
+}
+
+model ProjectMember {
+  id        String     @id @default(cuid())
+  projectId String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      MemberRole @default(viewer)
+  status    ProjectMemberStatus @default(active)
+  invitedByUserId String?
+  invitedBy       User?   @relation("ProjectMemberInvitedBy", fields: [invitedByUserId], references: [id], onDelete: SetNull)
+  joinedAt  DateTime   @default(now())
+
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@index([projectId, status])
+}
+
+/**
+ * Phase 6D — email invite before the user has a membership row.
+ * Accept: matching signed-in user email must equal invite email.
+ */
+model ProjectInvitation {
+  id              String             @id @default(cuid())
+  projectId       String
+  project         Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  email           String
+  role            MemberRole
+  tokenHash       String             @unique
+  status          ProjectInviteStatus @default(pending)
+  invitedByUserId String
+  invitedBy       User               @relation("ProjectInvitationInviter", fields: [invitedByUserId], references: [id], onDelete: Cascade)
+  invitedAt       DateTime           @default(now())
+  expiresAt       DateTime
+  acceptedAt      DateTime?
+  acceptedUserId  String?
+
+  @@index([projectId, status])
+  @@index([email])
+}
+
+model ProjectComment {
+  id             String                  @id @default(cuid())
+  projectId      String
+  project        Project                 @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  authorUserId   String
+  author         User                    @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+  targetType     ProjectCommentTargetType
+  targetId       String
+  body           String                  @db.Text
+  parentId       String?
+  parent         ProjectComment?         @relation("ProjectCommentThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies        ProjectComment[]        @relation("ProjectCommentThread")
+  resolvedAt     DateTime?
+  resolverUserId String?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  @@index([projectId, targetType, targetId])
+  @@index([projectId, createdAt(sort: Desc)])
+}
+
+model ProjectApproval {
+  id               String                     @id @default(cuid())
+  projectId        String
+  project          Project                    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  targetType       ProjectApprovalTargetType
+  targetId         String
+  status           ProjectApprovalDecisionStatus @default(pending)
+  note             String?                    @db.Text
+  createdByUserId  String?
+  decidedByUserId  String?
+  decidedAt        DateTime?
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @updatedAt
+
+  @@unique([projectId, targetType, targetId])
+  @@index([projectId, status])
+}
+
+model ProjectTimelineEvent {
+  id          String             @id @default(cuid())
+  projectId   String
+  project     Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  actorUserId String?
+  kind        ProjectTimelineKind
+  /// Canonical Phase 7 event type (precise); `kind` retained for backwards compatibility in filters/UI.
+  eventType   ProjectEventType
+  targetType  String?
+  targetId    String?
+  summary     String?            @db.Text
+  label       String             @db.Text
+  metadata    Json?
+  createdAt   DateTime           @default(now())
+
+  inAppNotifications InAppNotification[]
+
+  @@index([projectId, createdAt(sort: Desc)])
+  @@index([projectId, eventType])
+}
+
+/// Phase 7 — recorded handoff / packet delivery (export or email — always persisted, never UI-only).
+model ProjectPacketSend {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  kind      ProjectPacketKind
+  channel   ProjectPacketDeliveryChannel
+  recipientEmail String?
+  sentByUserId String?
+  sentBy    User?    @relation("ProjectPacketSender", fields: [sentByUserId], references: [id], onDelete: SetNull)
+  sentAt    DateTime @default(now())
+  /// Snapshot markers: fingerprints, shortlist version hash, approval ids, etc.
+  stateSnapshot Json
+  createdAt DateTime @default(now())
+
+  @@index([projectId, sentAt(sort: Desc)])
+}
+
+/// Phase 7 — in-app notifications tied to real project events (optional FK to timeline row).
+model InAppNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sourceTimelineEventId String?
+  sourceTimelineEvent   ProjectTimelineEvent? @relation(fields: [sourceTimelineEventId], references: [id], onDelete: SetNull)
+  category  String
+  title     String
+  body      String   @db.Text
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, readAt, createdAt(sort: Desc)])
+  @@index([projectId, createdAt(sort: Desc)])
+}
+
+model Upload {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // R2 / Supabase Storage key. Never a data URL.
+
+  storageKey           String
+  filename             String
+  width                Int
+  height               Int
+  coverHue             Int
+  room                 String
+  analysis             String  @db.Text
+  linkedConversationId String?
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  uploadedAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Account — Notifications, Security, Privacy, Billing, Activity
+// ─────────────────────────────────────────────────────────────
+
+model NotificationPrefs {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // JSON column: { [category]: { email: bool, sms: bool, push: bool } }
+
+  matrix          Json
+  digestFrequency DigestFrequency @default(weekly)
+  quietHoursStart String          @default("22:00")
+  quietHoursEnd   String          @default("07:00")
+
+  updatedAt DateTime @updatedAt
+}
+
+// UserDevice — tracks devices a user has signed in from, for the
+// "Sessions & devices" security UI. Distinct from Auth.js Session
+// (which is the actual session token). Auth.js Session is the
+// authoritative source for "is this session valid"; UserDevice is
+// the user-facing audit log of where they've signed in from.
+// Updated by the Auth.js signIn event in auth.ts.
+
+model UserDevice {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  deviceLabel String
+  browser     String
+  ip          String
+  city        String?
+  country     String?
+  current     Boolean  @default(false)
+  lastActive  DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@index([userId, lastActive(sort: Desc)])
+}
+
+model SecurityEvent {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  kind        SecurityEventKind
+  ok          Boolean
+  description String            @db.Text
+  city        String?
+  country     String?
+  at          DateTime          @default(now())
+
+  @@index([userId, at(sort: Desc)])
+}
+
+model PasswordReset {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Hashed token. Never store the plaintext.
+
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Invoice {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  number      String        @unique
+  description String        @db.Text
+  amountCents Int
+  currency    Currency      @default(SGD)
+  status      InvoiceStatus
+
+  // External reference, e.g. Stripe invoice id
+
+  externalRef String?
+
+  // Signed URL or object-storage key for the PDF
+
+  pdfKey String?
+
+  issuedAt DateTime @default(now())
+
+  @@index([userId, issuedAt(sort: Desc)])
+}
+
+model Consent {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  kind      String // "marketing-email", "pdpa-analytics", "terms-v2", etc.
+  source    String // "signup", "preferences-page", "cookie-banner"
+  active    Boolean   @default(true)
+  grantedAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  @@index([userId, kind])
+}
+
+model ActivityEvent {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  category    ActivityCategory
+  label       String
+  description String?          @db.Text
+  href        String?
+  at          DateTime         @default(now())
+
+  @@index([userId, at(sort: Desc)])
+  @@index([userId, category, at(sort: Desc)])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Privacy — Data export pipeline
+// ─────────────────────────────────────────────────────────────
+
+model DataExport {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status ExportStatus @default(queued)
+
+  // Object-storage key for the generated ZIP. NULL until status=ready.
+
+  storageKey String?
+  sizeBytes  Int?
+
+  // Expiry — we delete the ZIP and rotate this row 14 days after ready.
+
+  expiresAt DateTime?
+
+  requestedAt DateTime  @default(now())
+  readyAt     DateTime?
+
+  @@index([userId, requestedAt(sort: Desc)])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Commerce — Cart, Addresses, Payment, Orders, Deliveries
+// 11 models + 2 enums. All user-scoped relations with cascade
+// deletes enforced via @relation.
+// ─────────────────────────────────────────────────────────────
+
+model Cart {
+  id         String  @id @default(cuid())
+  userId     String? @unique // nullable for guest carts
+  user       User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionKey String? @unique // cookie-based key for anonymous visitors
+
+  items CartItem[]
+
+  // Applied gift code if any
+
+  giftCode          String?
+  giftDiscountCents Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id     String @id @default(cuid())
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  productId String
+  variantId String?
+  qty       Int     @default(1)
+
+  // Snapshot of price at add time — protects against mid-session price changes
+
+  unitPriceCents Int
+  currency       Currency @default(SGD)
+  savedForLater  Boolean  @default(false)
+
+  // Optional link to the project this piece belongs to
+
+  projectId String?
+
+  addedAt DateTime @default(now())
+
+  @@index([cartId])
+  @@index([productId])
+}
+
+model Address {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  label         AddressLabel @default(Home)
+  recipientName String
+  phone         String
+  postalCode    String
+  street        String
+  unit          String?
+  landmark      String?
+  hasLiftAccess Boolean      @default(true)
+  isDefault     Boolean      @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, isDefault])
+}
+
+model PaymentMethod {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  kind PaymentKind
+
+  // Stripe payment method id for cards; null for PayNow
+
+  stripePmId String?
+  last4      String?
+  brand      String? // "visa" | "mastercard" | "amex"
+  expMonth   Int?
+  expYear    Int?
+  holderName String?
+  isDefault  Boolean @default(false)
+
+  billingAddressId String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, isDefault])
+}
+
+model ContactPrefs {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  marketingEmailOptIn Boolean @default(false)
+  marketingSmsOptIn   Boolean @default(false)
+  deliverySmsOptIn    Boolean @default(true)
+
+  // Always true by policy — rendered as locked in UI
+
+  transactionalEmailRequired Boolean @default(true)
+
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Human-facing order number, e.g. "ORD-123456"
+
+  number String      @unique
+  status OrderStatus @default(placed)
+
+  subtotalCents Int
+  deliveryCents Int
+  discountCents Int      @default(0)
+  totalCents    Int
+  currency      Currency @default(SGD)
+
+  shippingAddressId String
+  /** Optional when payment is collected only via Stripe (no saved wallet row). */
+  paymentMethodId String?
+  deliveryMethod  DeliveryMethod
+
+  /** Immutable shipping fields at order time (address edits must not rewrite history). */
+  shippingSnapshot Json @default("{}")
+  /** Post-confirmation payment display hints (e.g. card brand/last4 from Stripe). */
+  paymentSummary Json?
+
+  // Stripe payment intent id — for reconciliation + refunds
+
+  stripePaymentIntentId String?
+
+  items    OrderItem[]
+  delivery Delivery?
+
+  placedAt    DateTime  @default(now())
+  paidAt      DateTime?
+  cancelledAt DateTime?
+
+  @@index([userId, placedAt(sort: Desc)])
+  @@index([status])
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId      String
+  variantId      String?
+  qty            Int
+  unitPriceCents Int
+
+  // Full snapshot at order time — name, image, category, subline — so
+  // we don't need to re-fetch the product (and survive catalogue changes)
+
+  snapshot Json
+
+  @@index([orderId])
+}
+
+model Delivery {
+  id      String @id @default(cuid())
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  method         DeliveryMethod
+  etaFrom        DateTime
+  etaTo          DateTime
+  courier        String?
+  trackingNumber String?
+  status         DeliveryStatus @default(scheduled)
+
+  scheduledAt  DateTime?
+  dispatchedAt DateTime?
+  arrivedAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Support — Help tickets + feedback threads
+// ─────────────────────────────────────────────────────────────
+
+model SupportThread {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  number   String        @unique // "FH-00234"
+  kind     SupportKind
+  category String // "order" | "billing" | "access" | "other" | "bug" | "feature" | "general"
+  title    String
+  body     String        @db.Text
+  status   SupportStatus @default(open)
+
+  // JSON — bug reports capture user agent, reproduction frequency, etc.
+
+  metadata Json?
+
+  linkedConversationId String?
+  linkedProjectId      String?
+
+  messages    SupportMessage[]
+  attachments SupportAttachment[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  closedAt  DateTime?
+
+  @@index([userId, kind, status])
+  @@index([userId, updatedAt(sort: Desc)])
+}
+
+model SupportMessage {
+  id       String        @id @default(cuid())
+  threadId String
+  thread   SupportThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  // 'user' for the account holder, 'staff' for Furnishes team replies
+
+  role      SupportMessageRole
+  staffName String? // populated when role=staff
+  content   String             @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@index([threadId, createdAt])
+}
+
+model SupportAttachment {
+  id       String        @id @default(cuid())
+  threadId String
+  thread   SupportThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  // Object-storage key (R2)
+
+  storageKey String
+  filename   String
+  sizeBytes  Int
+  mimeType   String
+
+  createdAt DateTime @default(now())
+
+  @@index([threadId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Studio — furniture image→3D generation audit (API route + future queue)
+// ─────────────────────────────────────────────────────────────
+
+model FurnitureGeneration {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /**
+   * Correlates with `x-request-id` response header / logs.
+   */
+  requestId String @unique
+  prompt    String @db.Text
+  options   Json?
+
+  status       FurnitureGenerationStatus @default(running)
+  imageUrl     String?                   @db.Text
+  glbUrl       String?                   @db.Text
+  errorMessage String?                   @db.Text
+
+  durationMs  Int?
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  /** Durable studio piece created when generation completes (1:1). */
+  studioPiece FurnitureStudioPiece?
+
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+enum FurnitureStudioPieceStatus {
+  completed
+  failed
+}
+
+/**
+ * Durable generated furniture piece (R2-backed URLs + provider audit).
+ * Separate from `FurnitureGeneration` audit row — this is the product record.
+ */
+model FurnitureStudioPiece {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  prompt String @db.Text
+  /** Short label for lists — derived from prompt, editable later. */
+  title  String @db.VarChar(200)
+
+  /**
+   * Studio quality context: tier + image/mesh quality + primary model.
+   * Mirrors generation options JSON shape.
+   */
+  quality Json
+
+  status FurnitureStudioPieceStatus @default(completed)
+
+  providerImageUrl String? @db.Text
+  providerGlbUrl   String? @db.Text
+  storedImageUrl   String? @db.Text
+  storedGlbUrl     String? @db.Text
+
+  /** Lineage: "new variation" sets this to the parent piece id. */
+  sourcePieceId String?
+  sourcePiece   FurnitureStudioPiece?  @relation("StudioPieceLineage", fields: [sourcePieceId], references: [id], onDelete: SetNull)
+  childPieces   FurnitureStudioPiece[] @relation("StudioPieceLineage")
+
+  furnitureGenerationId String?             @unique
+  furnitureGeneration   FurnitureGeneration? @relation(fields: [furnitureGenerationId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([sourcePieceId])
+
+  projectPlacements ProjectStudioPlacement[]
+}

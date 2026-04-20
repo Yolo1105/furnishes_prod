@@ -1,0 +1,72 @@
+/**
+ * Shared Tailwind-token bridge for `.eva-dashboard-root` (semantic info/review/success).
+ * Imported by `eva-dashboard-theme.css` (/chatbot) and `account-theme.css` (/account)
+ * so rules stay single-sourced.
+ */
+
+.eva-dashboard-root .bg-info {
+  background-color: var(--info);
+}
+.eva-dashboard-root .bg-review {
+  background-color: var(--review);
+}
+.eva-dashboard-root .bg-success {
+  background-color: var(--success);
+}
+.eva-dashboard-root .bg-success-solid {
+  background-color: var(--success-solid);
+}
+.eva-dashboard-root .bg-review-solid {
+  background-color: var(--review-solid);
+}
+.eva-dashboard-root .text-info-foreground {
+  color: var(--info-foreground);
+}
+.eva-dashboard-root .text-review-foreground {
+  color: var(--review-foreground);
+}
+.eva-dashboard-root .text-review-muted {
+  color: var(--review-muted);
+}
+.eva-dashboard-root .text-success-foreground {
+  color: var(--success-foreground);
+}
+.eva-dashboard-root .text-success-solid {
+  color: var(--success-solid);
+}
+.eva-dashboard-root .border-info-border {
+  border-color: var(--info-border);
+}
+.eva-dashboard-root .hover\:border-info-border:hover {
+  border-color: var(--info-border);
+}
+.eva-dashboard-root .border-review-border {
+  border-color: var(--review-border);
+}
+.eva-dashboard-root .border-review-border\/50 {
+  border-color: color-mix(in oklab, var(--review-border) 50%, transparent);
+}
+.eva-dashboard-root .bg-review\/35 {
+  background-color: color-mix(in oklab, var(--review) 35%, var(--background));
+}
+.eva-dashboard-root .border-success-border {
+  border-color: var(--success-border);
+}
+.eva-dashboard-root .bg-destructive\/10 {
+  background-color: color-mix(in oklab, var(--destructive) 10%, transparent);
+}
+.eva-dashboard-root .border-destructive\/20 {
+  border-color: color-mix(in oklab, var(--destructive) 20%, transparent);
+}
+.eva-dashboard-root .border-destructive\/25 {
+  border-color: color-mix(in oklab, var(--destructive) 25%, transparent);
+}
+.eva-dashboard-root .bg-primary\/8 {
+  background-color: color-mix(in oklab, var(--primary) 8%, transparent);
+}
+.eva-dashboard-root .bg-primary\/12 {
+  background-color: color-mix(in oklab, var(--primary) 12%, transparent);
+}
+.eva-dashboard-root .border-primary\/25 {
+  border-color: color-mix(in oklab, var(--primary) 25%, transparent);
+}

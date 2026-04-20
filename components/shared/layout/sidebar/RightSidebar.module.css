@@ -1,0 +1,299 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   RightSidebar.module.css — tokens live in app/globals.css (`--fur-*`).
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Sidebar host — zero width in flex row; rail + panel are fixed positioned. */
+/*
+ * When the drawer is open, `ContentWrapper` adds matching right margin so the
+ * main column compresses; the rail stays an overlay when the panel is closed.
+ */
+.sidebar {
+  width: 0;
+  flex-shrink: 0;
+  position: relative;
+  font-family:
+    var(--font-inter-tight), var(--font-inter), ui-sans-serif, system-ui;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PANEL — fixed drawer, slides from the RIGHT viewport edge
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.panel {
+  position: fixed;
+  /* Below utility bar + main nav; full height of the remaining viewport. */
+  top: var(--fur-header-height);
+  /* Flush to the viewport edge — no `--fur-rail-edge-inset` gap beside the drawer. */
+  right: 0;
+  width: var(--fur-panel-width);
+  height: calc(100vh - var(--fur-header-height));
+  /*
+   * Closed: no surface chrome (avoids subpixel bleed / “cream bar” at the viewport edge).
+   * Open: `.panelOpen` adds bg, border, shadow — only while the drawer is meant to show.
+   */
+  background: transparent;
+  border-left: 1px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  /* Fully clear the right edge (extra px past 100% width). */
+  transform: translateX(calc(100% + 16px));
+  transition: transform var(--fur-panel-slide-ms) var(--fur-panel-slide-ease);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/*
+ * White surface while open OR during slide-out (`.panelSurfaceExit` without `.panelOpen`).
+ * Removing `.panelOpen` alone used to snap `background` to transparent while `transform`
+ * was still animating — that caused a flash of page/cream behind the drawer.
+ */
+.panelOpen,
+.panelSurfaceExit {
+  background: #ffffff;
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.panelOpen {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Slide-out only: shell stays white until transform finishes; no accidental hits. */
+.panelSurfaceExit:not(.panelOpen) {
+  pointer-events: none;
+}
+
+/*
+ * Align the drawer with the rail: start the white sheet at the same vertical offset as
+ * `--fur-header-height` (utility + main nav). Do not add extra padding-top — that duplicated
+ * the nav height and left a large empty band above Eva; content should begin just under the
+ * fixed chrome (cart / profile row).
+ */
+.panelSurfaceExit.panelOneSheet {
+  top: var(--fur-header-height);
+  height: calc(100vh - var(--fur-header-height));
+  padding-top: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* One inner surface — no nested “header + scroll” split. */
+.panelSurfaceExit.panelOneSheet .panelTab {
+  pointer-events: auto;
+  min-height: 0;
+  flex: 1;
+  background: transparent;
+  overflow: hidden;
+}
+
+.panel:not(.panelOpen) .panelTab {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.panelTab {
+  min-width: var(--fur-panel-width);
+  width: 100%;
+}
+
+/* Flex column so Eva header + scrollable panel bodies fill the drawer. */
+.panelBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RAIL — position:fixed, no layout footprint, floats over page
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.rail {
+  position: fixed;
+  top: var(--fur-header-height);
+  right: var(--fur-rail-edge-inset);
+  width: var(--fur-rail-width);
+  height: calc(100vh - var(--fur-header-height));
+  z-index: 90; /* panel (z-index:100) covers it when open */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 12px 0;
+  box-sizing: border-box;
+  /*
+   * Icon tone matches marketing header: dark glyphs by default, cream on home hero
+   * when the first landing section reports “light” (see `RightSidebar.tsx`).
+   */
+  --rail-fg: var(--color-primary);
+  --rail-fg-hover: var(--color-primary);
+  --rail-fg-active: var(--color-accent);
+  opacity: 1;
+  transition:
+    color 320ms ease,
+    opacity 180ms ease;
+  /*
+   * Base: nav does not steal events once icons are revealed (buttons handle hits).
+   * When icons are still hidden, see `.rail:not(:has(.railButtonRevealed))` below.
+   */
+  pointer-events: none;
+  background: transparent;
+}
+
+/*
+ * Dock idle (no `.railButtonRevealed` yet): transparent hit column only.
+ * Hidden `<button>`s must use pointer-events:none — otherwise OS/UI paints a
+ * persistent grey “thumb” on the right edge (looks like an expand handle).
+ */
+.rail:not(:has(.railButtonRevealed)) {
+  pointer-events: auto;
+}
+
+/*
+ * Dock fully dismissed: invisible (no strip), but the column still receives pointer
+ * events so hover-from-edge can reveal — opacity does not disable hit-testing.
+ */
+.railHidden {
+  opacity: 0;
+}
+
+/* Home hero / light nav band — same tokens as `Header` cart & profile icons */
+.railHeroLight {
+  --rail-fg: var(--color-light-text);
+  --rail-fg-hover: var(--color-light-text);
+  --rail-fg-active: var(--color-accent);
+}
+
+/*
+ * Panel open: rail must not read as “still hovered” — no revealed glyphs, no hits.
+ * (!important beats `:not(:has(.railButtonRevealed))` which would re-enable the column.)
+ */
+.railCollapsed,
+.railCollapsed * {
+  pointer-events: none !important;
+}
+
+/*
+ * railInstantHide — applied ONLY during the F transition (trigger collapses
+ * everything from state 3). Forces ALL buttons to their hidden state with
+ * NO CSS transition, so there is zero stagger-exit animation visible as
+ * the panel slides out. Without this, bottom icons (stagger delay ~540ms)
+ * would still be fading out after the panel has fully exited at 450ms.
+ */
+.railInstantHide .railButton {
+  opacity: 0 !important;
+  transform: translateX(16px) !important;
+  transition: none !important;
+  pointer-events: none !important;
+}
+
+/* Summary → Report (8 icons): shifted up; Cart/Profile use .railGroupBottom only. */
+.railUpper {
+  display: flex;
+  flex-direction: column;
+  margin-top: -38px;
+}
+
+.railGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  width: 100%;
+}
+.railGroupBottom {
+  margin-top: auto;
+}
+
+/* ── Rail button ────────────────────────────────────────────────────────── */
+
+.railButton {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-height: 48px;
+  border: none;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  border-radius: var(--fur-radius-sm);
+  padding: 0;
+  color: var(--rail-fg);
+  pointer-events: none;
+  /* Buttons often inherit `text-align: start` from the page — force centered captions. */
+  text-align: center;
+
+  /* State 1 default: fully hidden */
+  opacity: 0;
+  transform: translateX(16px);
+
+  /*
+   * Transition on BOTH enter and exit.
+   * Enter (.railButtonRevealed added):  slides left + fades in, staggered.
+   * Exit  (.railButtonRevealed removed): slides right + fades out, same stagger.
+   * railInstantHide overrides this entirely (transition:none !important).
+   */
+  transition:
+    opacity 320ms cubic-bezier(0.22, 1, 0.36, 1) var(--stagger-delay, 0ms),
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1) var(--stagger-delay, 0ms),
+    color 150ms ease;
+}
+
+.railButtonRevealed:hover {
+  color: var(--rail-fg-hover);
+  background: transparent;
+}
+
+/* Revealed state — visible, interactive */
+.railButtonRevealed {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Active — accent color only, no background */
+.railButtonActive {
+  color: var(--rail-fg-active);
+}
+
+/*
+ * One column = rail width. Icon + label share the same horizontal center so the caption
+ * sits in the middle under the glyph (not hugging the icon’s right edge).
+ */
+.railButtonCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.railIcon {
+  flex-shrink: 0;
+  display: block;
+}
+
+.railLabel {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  color: currentColor;
+  user-select: none;
+  font-family: inherit;
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  white-space: normal;
+  overflow-wrap: break-word;
+}

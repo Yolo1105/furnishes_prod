@@ -1,0 +1,44 @@
+/* Scoped to Style Explorer — quiz motion + vertical label (see reference Interior Style Quiz). */
+@keyframes style-explorer-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes style-explorer-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+.style-explorer-root .quiz-enter {
+  animation: style-explorer-fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
+}
+
+.style-explorer-root .quiz-exit {
+  animation: style-explorer-fade-out 0.3s cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
+}
+
+.style-explorer-root .writing-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .style-explorer-root .quiz-enter,
+  .style-explorer-root .quiz-exit {
+    animation: none;
+  }
+}

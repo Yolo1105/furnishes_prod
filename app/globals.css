@@ -1,0 +1,294 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+:root {
+  --background: #fcf2e8;
+  --foreground: #171717;
+  /** shadcn-style tokens (Eva dashboard + utilities); `.eva-dashboard-root` overrides for chat UI */
+  --radius: 0.375rem;
+  --primary: #1a1a1a;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #171717;
+  --muted: #f4f4f5;
+  --muted-foreground: #6b7280;
+  /** Brand orange — aligned with chatbot_v3 / Eva shell (`#e7551a`) */
+  --accent: #e7551a;
+  --accent-foreground: #ffffff;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: #ffffff;
+  /**
+   * Marketing `/login` / `/signup` fields — near-white on cream panel (readable edge vs page bg).
+   */
+  --auth-field-fill: color-mix(in srgb, #ffffff 78%, var(--background) 22%);
+  --auth-field-border: rgba(43, 31, 24, 0.14);
+  --ring: #e7551a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /** Aligned with furnishes_v2/app/globals.css — solid hex so color-mix() resolves reliably */
+  --color-primary: #1a1a1a;
+  --color-secondary-muted: #6b7280;
+  /** Shared by `html` canvas + `.architectural-grid` + sticky marketing surfaces */
+  --architectural-grid-size: 40px 40px;
+  --architectural-grid-image:
+    linear-gradient(to right, rgba(23, 23, 23, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(23, 23, 23, 0.03) 1px, transparent 1px);
+  --color-accent: #e7551a;
+  /**
+   * Eva Studio (furniture / image-gen) — fallbacks when `.eva-studio` is not under `.eva-dashboard-root`.
+   * In account, `.eva-dashboard-root .eva-studio` inherits shell tokens so UI matches nav + Eva chat.
+   */
+  --eva-studio-radius: 0px;
+  --eva-studio-primary: var(--color-accent);
+  --eva-studio-surface: var(--background);
+  --eva-studio-card: var(--card);
+  --eva-studio-muted: var(--muted);
+  --eva-studio-muted-fg: var(--muted-foreground);
+  --eva-studio-border: var(--border);
+  --eva-studio-fg: var(--foreground);
+  --eva-studio-grid-line: rgba(23, 23, 23, 0.04);
+  /** High-contrast label on `--color-accent` (CTAs, selected chips on accent). */
+  --color-on-accent-fg: #ffffff;
+  /** Footer on accent — cream text (matches furnishes_v2) */
+  --color-cream: #f9e9c2;
+  /**
+   * Hero / light-nav copy on imagery — same cream as page bg (`--background`), not #fff.
+   * Use this token for nav-on-hero and similar (avoid mixing raw `var(--background)` in those spots).
+   */
+  --color-light-text: var(--background);
+  /** Cream page surface (matches furnishes_v2 — bento / inspiration pages) */
+  --color-surface: var(--background);
+  /** Tag/line accent for page headers — same orange as nav / utility bar */
+  --color-page-header-accent: var(--color-accent);
+  /**
+   * Horizontal orange rule above listing / inspiration / about intros — one source for length
+   * (matches former `w-12` / `md:w-16`; use `PageHeaderAccentRule` everywhere).
+   */
+  --page-header-accent-rule-height: 2px;
+  --page-header-accent-rule-width: 3rem;
+  /** Horizontal page gutter — Header / UtilityBar / filter bar (slightly tighter than legacy `px-6`) */
+  --site-inline-gutter: 1.25rem;
+  /** Utility bar above main nav — height only; bar uses `--color-accent` in `UtilityBar` */
+  --utility-bar-height: 2rem;
+  /**
+   * Main nav row — tuned to `Header` vertical padding + one line of nav type
+   * (`pt-4 pb-5` default, `md:pt-5 md:pb-6` at 768px+).
+   */
+  --header-bar-height: 4.75rem;
+  --site-fixed-underlay-top: calc(
+    var(--utility-bar-height) + var(--header-bar-height)
+  );
+  /** Inner pages — clear fixed utility + header (listing, inspiration) */
+  --site-content-pt: calc(3rem + var(--utility-bar-height));
+  --site-content-pt-md: calc(4rem + var(--utility-bar-height));
+  /** Inspiration — very slightly tighter top than default inner pages */
+  --site-content-pt-inspiration: calc(var(--site-content-pt) - 0.25rem);
+  --site-content-pt-md-inspiration: calc(var(--site-content-pt-md) - 0.25rem);
+  /** About — a little less top air than listing / inspiration (not as tight as −2rem) */
+  --site-content-pt-about: calc(var(--site-content-pt) - 1.25rem);
+  --site-content-pt-md-about: calc(var(--site-content-pt-md) - 1.25rem);
+  /** PDP — extra space under chrome (breadcrumb / title block) */
+  --site-pdp-content-pt: calc(4.5rem + var(--utility-bar-height));
+  --site-pdp-content-pt-md: calc(5rem + var(--utility-bar-height));
+
+  /**
+   * Furnishes workspace rail / Eva panel (Telegram package tokens).
+   * `--fur-header-height` aligns the fixed rail + drawer under the marketing chrome.
+   */
+  --fur-accent: #e7551a;
+  --fur-accent-hover: #c94a15;
+  --fur-accent-light: #fff1e8;
+  /** Workspace drawer — single flat white sheet (panels + scrollbars). */
+  --fur-panel-bg: #ffffff;
+  --fur-text-primary: #1a1a1a;
+  --fur-text-secondary: #6b5b52;
+  --fur-text-muted: #9e8d84;
+  --fur-separator: #e8dcd0;
+  --fur-card: #fcf2e8;
+  --fur-card-border: #e8dcd0;
+  --fur-rail-icon: #6b5b52;
+  --fur-rail-icon-active: #e7551a;
+  --fur-radius-sm: 8px;
+  --fur-radius-md: 12px;
+  --fur-panel-width: 300px;
+  /** Workspace drawer slide + main-column margin — keep in sync across `RightSidebar` + `ContentWrapper`. */
+  --fur-panel-slide-ms: 450ms;
+  --fur-panel-slide-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --fur-rail-width: 68px;
+  --fur-header-height: var(--site-fixed-underlay-top);
+  /**
+   * Right inset for workspace rail + panel — smaller than `--site-inline-gutter`
+   * so the gap to the viewport edge isn’t as wide, while staying near the profile column.
+   */
+  --fur-rail-edge-inset: max(4px, calc(var(--site-inline-gutter) * 0.28));
+
+  /**
+   * Semantic surfaces — chat / product workflow (defaults on cream canvas).
+   * `.eva-dashboard-root` refines these; see `eva-dashboard-theme.css`.
+   * - info*     — brand-tinted extraction / structured chips (not warning)
+   * - review*   — pending confirmation / needs attention (amber)
+   * - success*  — accepted / approved / confirmed (green)
+   */
+  --info: oklch(0.97 0.028 52);
+  --info-foreground: oklch(0.4 0.11 45);
+  --info-border: oklch(0.88 0.055 52);
+  --review: oklch(0.97 0.055 78);
+  --review-foreground: oklch(0.32 0.09 55);
+  --review-muted: oklch(0.52 0.11 68);
+  --review-border: oklch(0.87 0.09 72);
+  --review-solid: oklch(0.62 0.14 72);
+  --success: oklch(0.96 0.045 148);
+  --success-foreground: oklch(0.38 0.13 148);
+  --success-border: oklch(0.84 0.09 148);
+  --success-solid: oklch(0.52 0.14 148);
+}
+
+@media (min-width: 768px) {
+  :root {
+    /** ~`md:px-8` */
+    --site-inline-gutter: 2rem;
+    --header-bar-height: 5.5rem;
+    --page-header-accent-rule-width: 4rem;
+  }
+}
+
+/**
+ * Collections / inspiration: `SiteChrome` hides the utility + nav bar while scrolling down.
+ * Collapse top padding and sticky offsets so content rises with the animation.
+ */
+html[data-site-chrome-collapsed="true"] {
+  --site-content-pt: max(0px, env(safe-area-inset-top, 0px));
+  --site-content-pt-md: max(0px, env(safe-area-inset-top, 0px));
+  --site-content-pt-inspiration: max(0px, env(safe-area-inset-top, 0px));
+  --site-content-pt-md-inspiration: max(0px, env(safe-area-inset-top, 0px));
+  --site-content-pt-about: max(0px, env(safe-area-inset-top, 0px));
+  --site-content-pt-md-about: max(0px, env(safe-area-inset-top, 0px));
+  /** Keep air below the viewport edge when the fixed header scrolls away */
+  --site-pdp-content-pt: max(1.5rem, env(safe-area-inset-top, 0px));
+  --site-pdp-content-pt-md: max(1.75rem, env(safe-area-inset-top, 0px));
+  --site-fixed-underlay-top: max(0px, env(safe-area-inset-top, 0px));
+}
+
+/** Smooth padding when chrome collapses (collections / inspiration / PDP). */
+.site-chrome-pad {
+  /** Match `SiteChrome.module.css` shell transition (~0.38s) */
+  transition: padding-top 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-chrome-pad {
+    transition: none;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-surface: var(--background);
+  --color-secondary-muted: #6b7280;
+  --color-page-header-accent: var(--color-accent);
+  --color-cream: #f9e9c2;
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-border: var(--info-border);
+  --color-review: var(--review);
+  --color-review-foreground: var(--review-foreground);
+  --color-review-muted: var(--review-muted);
+  --color-review-border: var(--review-border);
+  --color-review-solid: var(--review-solid);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-border: var(--success-border);
+  --color-success-solid: var(--success-solid);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-nav: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+html {
+  background-color: var(--background);
+  background-size: var(--architectural-grid-size);
+  background-image: var(--architectural-grid-image);
+  /** Framer Motion `useScroll` needs a non-static offset ancestor (see motion #2880). */
+  position: relative;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  /** Opaque page fill + grid live on `html` so one canvas shows through transparent regions site-wide */
+  background: transparent;
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-weight: 375;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/** Collections filter dropdown — global names so staggered delays work with inline `animation`. */
+@keyframes listing-filter-drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes listing-filter-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .architectural-grid {
+    background-size: var(--architectural-grid-size);
+    background-image: var(--architectural-grid-image);
+  }
+}

@@ -1,0 +1,283 @@
+/* ProfileContent.module.css */
+.root {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 300px;
+}
+
+/* Skeleton while hydrating */
+.skeleton {
+  min-height: 200px;
+  min-width: 300px;
+  background: var(--fur-card, #fcf2e8);
+}
+
+/* ── Logged out ────────────────────────────────────────────────────────────── */
+.anonHero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px 4px;
+  text-align: center;
+}
+.anonAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--fur-accent-light, #fef0ea);
+  color: var(--fur-accent, #f24a12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.heroTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fur-text-primary, #1a1a1a);
+  margin: 0;
+}
+.heroSub {
+  font-size: 12px;
+  color: var(--fur-text-secondary, #6b5b52);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.authBtns {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.loginBtn {
+  width: 100%;
+  padding: 10px;
+  background: var(--fur-text-primary, #1a1a1a);
+  color: #faf6f1;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: background 150ms ease;
+}
+.loginBtn:hover {
+  background: #333;
+}
+.createBtn {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  color: var(--fur-accent, #f24a12);
+  border: 1.5px solid var(--fur-accent, #f24a12);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: background 150ms ease;
+}
+.createBtn:hover {
+  background: var(--fur-accent-light, #fef0ea);
+}
+
+.benefitsCard {
+  background: var(--fur-card, #fcf2e8);
+  border: 1px solid var(--fur-card-border, #e8dcd0);
+  border-radius: 12px;
+  padding: 13px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.benefitsTitle {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fur-text-muted, #9e8d84);
+  margin: 0 0 2px;
+}
+.benefit {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.benefitIcon {
+  color: var(--fur-accent, #f24a12);
+  flex-shrink: 0;
+}
+.benefitText {
+  font-size: 12px;
+  color: var(--fur-text-secondary, #6b5b52);
+}
+
+/* ── Logged in ─────────────────────────────────────────────────────────────── */
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--fur-accent, #f24a12);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+}
+.profileMeta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.profileName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--fur-text-primary, #1a1a1a);
+  margin: 0;
+}
+.profileTitle {
+  font-size: 11px;
+  color: var(--fur-text-muted, #9e8d84);
+  margin: 0;
+}
+
+/* Style section */
+.styleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.miniLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fur-text-muted, #9e8d84);
+  margin: 0;
+}
+.styleTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.styleTag {
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--fur-accent-light, #fef0ea);
+  color: var(--fur-accent, #f24a12);
+  border: 1px solid rgba(242, 74, 18, 0.15);
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  background: var(--fur-card, #fcf2e8);
+  border: 1px solid var(--fur-card-border, #e8dcd0);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 8px;
+  border-right: 1px solid var(--fur-card-border, #e8dcd0);
+}
+.stat:last-child {
+  border-right: none;
+}
+.statVal {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--fur-text-primary, #1a1a1a);
+  letter-spacing: -0.02em;
+}
+.statLabel {
+  font-size: 9px;
+  color: var(--fur-text-muted, #9e8d84);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Nav */
+.navList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.navItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  color: var(--fur-text-primary, #1a1a1a);
+  text-decoration: none;
+  font-weight: 450;
+  transition: background 150ms ease;
+}
+.navItem:hover {
+  background: var(--fur-card, #fcf2e8);
+}
+.navAccent {
+  color: var(--fur-accent, #f24a12);
+  font-weight: 600;
+}
+.navChev {
+  color: var(--fur-text-muted, #9e8d84);
+  flex-shrink: 0;
+}
+
+.signOutBtn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: 1px solid var(--fur-card-border, #e8dcd0);
+  color: var(--fur-text-secondary, #6b5b52);
+  font-size: 12px;
+  font-family: inherit;
+  padding: 9px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  width: 100%;
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
+}
+.signOutBtn:hover {
+  background: rgba(192, 57, 43, 0.06);
+  color: #c0392b;
+  border-color: rgba(192, 57, 43, 0.2);
+}

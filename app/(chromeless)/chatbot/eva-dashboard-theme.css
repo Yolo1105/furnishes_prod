@@ -1,0 +1,126 @@
+/**
+ * Matches `chatbot_v3/src/app/globals.css` design tokens for the Eva dashboard shell.
+ * Scoped to `.eva-dashboard-root` so marketing pages keep existing `:root` tokens.
+ */
+@import "tw-animate-css";
+@import "./eva-semantic-bridge.css";
+
+.eva-dashboard-root {
+  --background: oklch(0.98 0.02 65);
+  --foreground: oklch(0.2 0.05 40);
+
+  --card: oklch(1 0.01 60);
+  --card-foreground: oklch(0.2 0.05 40);
+
+  --popover: oklch(1 0.01 60);
+  --popover-foreground: oklch(0.2 0.05 40);
+
+  --primary: oklch(0.63 0.2 42);
+  --primary-foreground: oklch(1 0.01 60);
+
+  --secondary: oklch(0.92 0.06 50);
+  --secondary-foreground: oklch(0.2 0.05 40);
+
+  --muted: oklch(0.96 0.03 55);
+  --muted-foreground: oklch(0.55 0.08 45);
+
+  --accent: oklch(0.68 0.22 44);
+  --accent-foreground: oklch(1 0.01 60);
+
+  --destructive: oklch(0.58 0.2 30);
+  --destructive-foreground: oklch(1 0.01 60);
+
+  --border: oklch(0.92 0.04 55);
+  --input: oklch(1 0.01 60);
+  --ring: oklch(0.63 0.2 42);
+
+  --chart-1: oklch(0.63 0.2 42);
+  --chart-2: oklch(0.68 0.22 44);
+  --chart-3: oklch(0.73 0.18 46);
+  --chart-4: oklch(0.66 0.19 43);
+  --chart-5: oklch(0.6 0.18 40);
+
+  --radius: 0.375rem;
+
+  --sidebar: oklch(1 0.01 60);
+  --sidebar-foreground: oklch(0.2 0.05 40);
+  --sidebar-primary: oklch(0.63 0.2 42);
+  --sidebar-primary-foreground: oklch(1 0.01 60);
+  --sidebar-accent: oklch(0.96 0.03 55);
+  --sidebar-accent-foreground: oklch(0.2 0.05 40);
+  --sidebar-border: oklch(0.92 0.04 55);
+  --sidebar-ring: oklch(0.63 0.2 42);
+
+  /* Semantic — chat/product (see app/globals.css :root) */
+  --info: oklch(0.97 0.028 52);
+  --info-foreground: oklch(0.4 0.11 45);
+  --info-border: oklch(0.88 0.055 52);
+  --review: oklch(0.97 0.055 78);
+  --review-foreground: oklch(0.32 0.09 55);
+  --review-muted: oklch(0.52 0.11 68);
+  --review-border: oklch(0.87 0.09 72);
+  --review-solid: oklch(0.62 0.14 72);
+  --success: oklch(0.96 0.045 148);
+  --success-foreground: oklch(0.38 0.13 148);
+  --success-border: oklch(0.84 0.09 148);
+  --success-solid: oklch(0.52 0.14 148);
+}
+
+/* Dark mode — align with chatbot_v3 `.dark` tokens */
+.eva-dashboard-root.dark,
+.dark .eva-dashboard-root {
+  --background: oklch(0.18 0.02 40);
+  --foreground: oklch(0.98 0.02 65);
+  --card: oklch(0.22 0.02 40);
+  --card-foreground: oklch(0.98 0.02 65);
+  --popover: oklch(0.22 0.02 40);
+  --popover-foreground: oklch(0.98 0.02 65);
+  --primary: oklch(0.68 0.22 44);
+  --primary-foreground: oklch(0.18 0.02 40);
+  --secondary: oklch(0.58 0.18 46);
+  --secondary-foreground: oklch(0.98 0.02 65);
+  --muted: oklch(0.3 0.03 42);
+  --muted-foreground: oklch(0.7 0.12 50);
+  --accent: oklch(0.73 0.24 46);
+  --accent-foreground: oklch(0.98 0.02 65);
+  --destructive: oklch(0.58 0.2 30);
+  --destructive-foreground: oklch(0.98 0.02 65);
+  --border: oklch(0.28 0.03 42);
+  --input: oklch(0.3 0.03 42);
+  --ring: oklch(0.68 0.22 44);
+  --chart-1: oklch(0.68 0.22 44);
+  --chart-2: oklch(0.73 0.24 46);
+  --chart-3: oklch(0.63 0.18 42);
+  --chart-4: oklch(0.73 0.18 46);
+  --chart-5: oklch(0.6 0.18 40);
+  --sidebar: oklch(0.22 0.02 40);
+  --sidebar-foreground: oklch(0.98 0.02 65);
+  --sidebar-primary: oklch(0.68 0.22 44);
+  --sidebar-primary-foreground: oklch(0.18 0.02 40);
+  --sidebar-accent: oklch(0.3 0.03 42);
+  --sidebar-accent-foreground: oklch(0.98 0.02 65);
+  --sidebar-border: oklch(0.28 0.03 42);
+  --sidebar-ring: oklch(0.68 0.22 44);
+
+  --info: oklch(0.3 0.04 48);
+  --info-foreground: oklch(0.93 0.04 62);
+  --info-border: oklch(0.42 0.06 50);
+  --review: oklch(0.32 0.06 68);
+  --review-foreground: oklch(0.93 0.06 78);
+  --review-muted: oklch(0.72 0.1 72);
+  --review-border: oklch(0.45 0.08 72);
+  --review-solid: oklch(0.68 0.14 72);
+  --success: oklch(0.32 0.06 150);
+  --success-foreground: oklch(0.88 0.08 150);
+  --success-border: oklch(0.45 0.08 150);
+  --success-solid: oklch(0.58 0.14 150);
+}
+
+.eva-dashboard-root * {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.eva-dashboard-root *::-webkit-scrollbar {
+  display: none;
+}

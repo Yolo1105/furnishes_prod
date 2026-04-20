@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      # Valid Postgres-style URL for `prisma generate` / build (no DB server required for client codegen).
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci?schema=public
+      # `next build` runs with NODE_ENV=production; getAuthSecret() requires a non-empty secret.
+      # Use a real secret in deployed environments — this value is only for CI compilation.
+      AUTH_SECRET: "ci-build-only-not-for-production-use-32chars-min!!"
+      # Avoid localhost fallback warnings during `next build` / getPublicOrigin().
+      NEXTAUTH_URL: "https://ci.invalid"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        env:
+          HUSKY: "0"
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Prettier
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Production build
+        run: npm run build

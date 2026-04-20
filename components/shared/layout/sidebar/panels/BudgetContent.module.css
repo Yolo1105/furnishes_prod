@@ -1,0 +1,201 @@
+/* BudgetContent.module.css */
+.root {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 300px;
+}
+
+/* Summary */
+.summary {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.summaryLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fur-text-muted, #9e8d84);
+  margin: 0;
+}
+.totalFig {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--fur-text-primary, #1a1a1a);
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--fur-accent-light, #fef0ea);
+  color: var(--fur-accent, #f24a12);
+}
+.pillDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--fur-accent, #f24a12);
+}
+
+/* Main track */
+.mainTrack {
+  width: 100%;
+  height: 7px;
+  border-radius: 4px;
+  background: rgba(242, 74, 18, 0.1);
+  overflow: hidden;
+}
+.mainFill {
+  height: 100%;
+  background: var(--fur-accent, #f24a12);
+  border-radius: 4px;
+  transition: width 800ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.mainFillOver {
+  background: #c0392b;
+}
+
+.trackLabels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -6px;
+}
+.spentLabel {
+  font-size: 11px;
+  color: var(--fur-text-secondary, #6b5b52);
+}
+.remLabel {
+  font-size: 11px;
+  color: var(--fur-text-muted, #9e8d84);
+}
+.overLabel {
+  font-size: 11px;
+  color: #c0392b;
+  font-weight: 600;
+}
+
+/* Breakdown */
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.miniLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fur-text-muted, #9e8d84);
+  margin: 0 0 3px;
+}
+
+.catRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.catMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.catName {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fur-text-primary, #1a1a1a);
+}
+.catAmt {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fur-text-primary, #1a1a1a);
+}
+.catOver {
+  color: #c0392b;
+}
+.catAlloc {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--fur-text-muted, #9e8d84);
+}
+
+.catTrack {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--fur-card-border, #e8dcd0);
+  overflow: hidden;
+}
+.catFill {
+  height: 100%;
+  background: var(--fur-accent, #f24a12);
+  border-radius: 2px;
+  transition: width 700ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.catFillOver {
+  background: #c0392b;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 7px;
+  padding-top: 2px;
+}
+.logBtn {
+  flex: 1;
+  padding: 9px;
+  border: 1px solid var(--fur-card-border, #e8dcd0);
+  background: var(--fur-card, #fcf2e8);
+  color: var(--fur-text-secondary, #6b5b52);
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition:
+    background 150ms ease,
+    color 150ms ease;
+}
+.logBtn:hover {
+  background: var(--fur-accent-light, #fef0ea);
+  color: var(--fur-accent, #f24a12);
+  border-color: transparent;
+}
+.fullBtn {
+  flex: 1;
+  padding: 9px;
+  background: var(--fur-text-primary, #1a1a1a);
+  color: #faf6f1;
+  border: none;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 150ms ease;
+}
+.fullBtn:hover {
+  background: #333;
+}

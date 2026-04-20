@@ -1,0 +1,181 @@
+/* RoomPlannerContent.module.css */
+.root {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  min-width: 300px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.headerIcon {
+  color: var(--fur-accent, #f24a12);
+  flex-shrink: 0;
+}
+.headerMeta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fur-text-muted, #9e8d84);
+  margin: 0;
+}
+.roomName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fur-text-primary, #1a1a1a);
+  margin: 0;
+}
+.badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 3px 9px;
+  border-radius: 100px;
+  background: var(--fur-accent-light, #fef0ea);
+  color: var(--fur-accent, #f24a12);
+}
+
+/* SVG floor plan */
+.planWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fdf7f2;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--fur-card-border, #e8dcd0);
+}
+.plan {
+  display: block;
+}
+
+/* Dimensions */
+.dimRow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.dimPill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  background: var(--fur-card, #fcf2e8);
+  border: 1px solid var(--fur-card-border, #e8dcd0);
+}
+.dimVal {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--fur-text-primary, #1a1a1a);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.dimUnit {
+  font-size: 9px;
+  color: var(--fur-text-muted, #9e8d84);
+  letter-spacing: 0.03em;
+}
+.dimX {
+  font-size: 16px;
+  color: var(--fur-text-muted, #9e8d84);
+  font-weight: 300;
+}
+
+/* Tip */
+.tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--fur-card, #fcf2e8);
+  border: 1px solid var(--fur-card-border, #e8dcd0);
+}
+.tipDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fur-accent, #f24a12);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.tipText {
+  font-size: 11px;
+  color: var(--fur-text-secondary, #6b5b52);
+  margin: 0;
+  line-height: 1.5;
+}
+.tipText strong {
+  color: var(--fur-text-primary, #1a1a1a);
+  font-weight: 600;
+}
+.chatLink {
+  color: var(--fur-accent, #f24a12);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+
+/* Actions (unused — kept for potential future affordances) */
+.actions {
+  display: flex;
+  gap: 7px;
+}
+.addBtn {
+  flex: 1;
+  padding: 9px;
+  border: 1px solid var(--fur-card-border, #e8dcd0);
+  background: var(--fur-card, #fcf2e8);
+  color: var(--fur-text-secondary, #6b5b52);
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition:
+    background 150ms ease,
+    color 150ms ease;
+}
+.addBtn:hover {
+  background: var(--fur-accent-light, #fef0ea);
+  color: var(--fur-accent, #f24a12);
+  border-color: transparent;
+}
+.fullBtn {
+  flex: 1;
+  padding: 9px;
+  background: var(--fur-text-primary, #1a1a1a);
+  color: #faf6f1;
+  border: none;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 150ms ease;
+}
+.fullBtn:hover {
+  background: #333;
+}

@@ -1,0 +1,486 @@
+/**
+ * Furnishes Studio — Account theme
+ *
+ * Light/dark surfaces and borders match `chatbot/eva-dashboard-theme.css` so
+ * Studio and Chat share one shell. Studio-only: typography ladder, card-soft,
+ * border-strong, primary-hover.
+ *
+ * Scoped to `.eva-dashboard-root` so marketing pages keep their own tokens.
+ */
+
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "../chatbot/eva-semantic-bridge.css";
+
+.eva-dashboard-root {
+  /* ── Chat shell tokens (eva-dashboard-theme.css light) ───── */
+  --background: oklch(0.98 0.02 65);
+  --foreground: oklch(0.2 0.05 40);
+
+  --card: oklch(1 0.01 60);
+  --card-foreground: oklch(0.2 0.05 40);
+
+  --popover: oklch(1 0.01 60);
+  --popover-foreground: oklch(0.2 0.05 40);
+
+  --primary: oklch(0.63 0.2 42);
+  --primary-foreground: oklch(1 0.01 60);
+
+  --secondary: oklch(0.92 0.06 50);
+  --secondary-foreground: oklch(0.2 0.05 40);
+
+  --muted: oklch(0.96 0.03 55);
+  --muted-foreground: oklch(0.55 0.08 45);
+
+  --accent: oklch(0.68 0.22 44);
+  --accent-foreground: oklch(1 0.01 60);
+
+  --destructive: oklch(0.58 0.2 30);
+  --destructive-foreground: oklch(1 0.01 60);
+
+  --border: oklch(0.92 0.04 55);
+  --input: oklch(1 0.01 60);
+  --ring: oklch(0.63 0.2 42);
+
+  --chart-1: oklch(0.63 0.2 42);
+  --chart-2: oklch(0.68 0.22 44);
+  --chart-3: oklch(0.73 0.18 46);
+  --chart-4: oklch(0.66 0.19 43);
+  --chart-5: oklch(0.6 0.18 40);
+
+  --radius: 0.375rem;
+
+  --sidebar: oklch(1 0.01 60);
+  --sidebar-foreground: oklch(0.2 0.05 40);
+  --sidebar-primary: oklch(0.63 0.2 42);
+  --sidebar-primary-foreground: oklch(1 0.01 60);
+  --sidebar-accent: oklch(0.96 0.03 55);
+  --sidebar-accent-foreground: oklch(0.2 0.05 40);
+  --sidebar-border: oklch(0.92 0.04 55);
+  --sidebar-ring: oklch(0.63 0.2 42);
+
+  /* Semantic — chat/product (see app/globals.css) */
+  --info: oklch(0.97 0.028 52);
+  --info-foreground: oklch(0.4 0.11 45);
+  --info-border: oklch(0.88 0.055 52);
+  --review: oklch(0.97 0.055 78);
+  --review-foreground: oklch(0.32 0.09 55);
+  --review-muted: oklch(0.52 0.11 68);
+  --review-border: oklch(0.87 0.09 72);
+  --review-solid: oklch(0.62 0.14 72);
+  --success: oklch(0.96 0.045 148);
+  --success-foreground: oklch(0.38 0.13 148);
+  --success-border: oklch(0.84 0.09 148);
+  --success-solid: oklch(0.52 0.14 148);
+
+  /* ── Studio extras ───────────────────────────────────────── */
+  --card-soft: color-mix(in oklab, var(--muted) 30%, var(--card));
+  --accent-soft: var(--card-soft);
+  --primary-hover: oklch(0.56 0.2 40);
+  --border-strong: oklch(0.86 0.05 52);
+
+  /* ── Typography ladder — THREE weights total ──────────────
+     300 light     → body, helper/muted, eyebrow text
+     500 medium    → UI labels, buttons, sidebar, nav, metadata, H2/H3
+     600 semibold  → H1 only, display numbers
+  */
+  --font-weight-body: 300;
+  --font-weight-ui: 500;
+  --font-weight-display: 600;
+
+  /* Root font — ensure Manrope loads, fall back to system sans never serif */
+  font-family:
+    var(--font-manrope),
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  /* Prevent ugly synthesized bold when a weight file didn't load */
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/**
+ * Eva Studio — furniture image-gen workspace (`components/ui/*` + `.eva-studio` wrapper).
+ * Zero-radius panels; colors inherit the account shell (same cream + orange as nav + Eva chat).
+ * Inter / Inter Tight only.
+ */
+.eva-dashboard-root .eva-studio {
+  --radius: 0;
+  --background: inherit;
+  --foreground: inherit;
+  --card: inherit;
+  --card-foreground: inherit;
+  --muted: inherit;
+  --muted-foreground: inherit;
+  --primary: inherit;
+  --primary-foreground: inherit;
+  --border: inherit;
+  --input: inherit;
+  --ring: inherit;
+  --secondary: inherit;
+  --secondary-foreground: inherit;
+  --accent: inherit;
+  --accent-foreground: inherit;
+  --popover: inherit;
+  --popover-foreground: inherit;
+  --destructive: inherit;
+  --destructive-foreground: inherit;
+
+  /** Legacy names — alias inherited tokens for components that reference `--eva-studio-*` */
+  --eva-studio-surface: var(--background);
+  --eva-studio-fg: var(--foreground);
+  --eva-studio-card: var(--card);
+  --eva-studio-muted: var(--muted);
+  --eva-studio-muted-fg: var(--muted-foreground);
+  --eva-studio-border: var(--border);
+  --eva-studio-primary: var(--primary);
+  /**
+   * Selection / chip tints — single source (replaces repeated color-mix in workspace).
+   */
+  --eva-studio-tint-strong: color-mix(in srgb, var(--primary) 8%, white);
+  --eva-studio-tint-soft: color-mix(in srgb, var(--primary) 6%, white);
+  --eva-studio-canvas-scrim: color-mix(in srgb, var(--card) 88%, transparent);
+  /**
+   * Inspect / room hero field — same warm surface as the studio shell (no cool grey cast).
+   */
+  --eva-studio-hero-canvas: var(--eva-studio-surface);
+  /** Grid behind reference + 3D — warm brown hairlines, not neutral grey. */
+  --eva-studio-grid-line: rgba(43, 31, 24, 0.065);
+  /** Filmstrip corner badges on thumbnails — not pure black/white. */
+  --eva-studio-thumb-badge-bg: color-mix(
+    in srgb,
+    var(--eva-studio-fg) 70%,
+    transparent
+  );
+  --eva-studio-thumb-badge-fg: var(--eva-studio-card);
+  /** Reference image / hero SVG elevation — single shadow language. */
+  --eva-studio-media-shadow: 0 10px 28px
+    color-mix(in oklab, var(--eva-studio-fg) 12%, transparent);
+  /** Small floating chrome (mesh status chip, etc.). */
+  --eva-studio-overlay-shadow: 0 2px 10px
+    color-mix(in oklab, var(--eva-studio-fg) 8%, transparent);
+  --eva-studio-svg-lift: drop-shadow(
+    0 8px 20px color-mix(in oklab, var(--eva-studio-fg) 10%, transparent)
+  );
+  /** Placed-piece row tint — srgb so it stays in the warm family */
+  --eva-studio-row-placed: color-mix(
+    in srgb,
+    var(--eva-studio-muted) 38%,
+    transparent
+  );
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-synthesis: none;
+}
+
+.eva-dashboard-root .eva-studio kbd {
+  font-family: var(--font-inter-tight), ui-sans-serif, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.eva-dashboard-root .eva-studio .font-ui {
+  font-family: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.eva-dashboard-root .eva-studio .font-body {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+/* Dark mode — align with chat `eva-dashboard-theme.css` */
+.eva-dashboard-root.dark,
+.dark .eva-dashboard-root {
+  --background: oklch(0.18 0.02 40);
+  --foreground: oklch(0.98 0.02 65);
+  --card: oklch(0.22 0.02 40);
+  --card-foreground: oklch(0.98 0.02 65);
+  --popover: oklch(0.22 0.02 40);
+  --popover-foreground: oklch(0.98 0.02 65);
+  --primary: oklch(0.68 0.22 44);
+  --primary-foreground: oklch(0.18 0.02 40);
+  --secondary: oklch(0.58 0.18 46);
+  --secondary-foreground: oklch(0.98 0.02 65);
+  --muted: oklch(0.3 0.03 42);
+  --muted-foreground: oklch(0.7 0.12 50);
+  --accent: oklch(0.73 0.24 46);
+  --accent-foreground: oklch(0.98 0.02 65);
+  --destructive: oklch(0.58 0.2 30);
+  --destructive-foreground: oklch(0.98 0.02 65);
+  --border: oklch(0.28 0.03 42);
+  --input: oklch(0.3 0.03 42);
+  --ring: oklch(0.68 0.22 44);
+  --chart-1: oklch(0.68 0.22 44);
+  --chart-2: oklch(0.73 0.24 46);
+  --chart-3: oklch(0.63 0.18 42);
+  --chart-4: oklch(0.73 0.18 46);
+  --chart-5: oklch(0.6 0.18 40);
+  --sidebar: oklch(0.22 0.02 40);
+  --sidebar-foreground: oklch(0.98 0.02 65);
+  --sidebar-primary: oklch(0.68 0.22 44);
+  --sidebar-primary-foreground: oklch(0.18 0.02 40);
+  --sidebar-accent: oklch(0.3 0.03 42);
+  --sidebar-accent-foreground: oklch(0.98 0.02 65);
+  --sidebar-border: oklch(0.28 0.03 42);
+  --sidebar-ring: oklch(0.68 0.22 44);
+
+  --info: oklch(0.3 0.04 48);
+  --info-foreground: oklch(0.93 0.04 62);
+  --info-border: oklch(0.42 0.06 50);
+  --review: oklch(0.32 0.06 68);
+  --review-foreground: oklch(0.93 0.06 78);
+  --review-muted: oklch(0.72 0.1 72);
+  --review-border: oklch(0.45 0.08 72);
+  --review-solid: oklch(0.68 0.14 72);
+  --success: oklch(0.32 0.06 150);
+  --success-foreground: oklch(0.88 0.08 150);
+  --success-border: oklch(0.45 0.08 150);
+  --success-solid: oklch(0.58 0.14 150);
+
+  --card-soft: color-mix(in oklab, var(--muted) 30%, var(--card));
+  --accent-soft: var(--card-soft);
+  --primary-hover: oklch(0.62 0.2 44);
+  --border-strong: oklch(0.34 0.04 44);
+}
+
+/* Hide scrollbars but keep scrolling (studio chrome + nested panels) */
+.eva-dashboard-root * {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.eva-dashboard-root *::-webkit-scrollbar {
+  display: none;
+}
+
+/* Explicit: left account nav (flex child) — some engines need min-h-0 + overflow for scroll */
+.eva-dashboard-root .account-sidebar-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Right-hand main panel — scroll content; scrollbars hidden via rules above */
+.eva-dashboard-root .account-main-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* ── Typography utility classes ─────────────────────────────── */
+.eva-dashboard-root .font-body {
+  font-weight: var(--font-weight-body);
+  line-height: 1.7;
+}
+.eva-dashboard-root .font-ui {
+  font-weight: var(--font-weight-ui);
+  line-height: 1.55;
+}
+.eva-dashboard-root .font-display {
+  font-weight: var(--font-weight-display);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+/* ── Eyebrow — single-bracket pattern ───────────────────────
+   Usage: <span class="eyebrow">STYLE PROFILE</span>
+   CSS adds the brackets automatically. Call sites pass RAW text.
+*/
+.eva-dashboard-root .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 10.5px;
+  font-weight: var(--font-weight-ui);
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.eva-dashboard-root .eyebrow::before {
+  content: "[ ";
+  color: var(--primary);
+  white-space: pre;
+}
+.eva-dashboard-root .eyebrow::after {
+  content: " ]";
+  color: var(--primary);
+  white-space: pre;
+}
+
+/* ── Focus rings — orange, consistent everywhere ──────────── */
+.eva-dashboard-root :focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Skeleton loaders ───────────────────────────────────────── */
+.eva-dashboard-root .skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    var(--accent-soft) 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  /* LTR sweep — matches PageSkeleton `furnishes-shimmer` (not RTL 200% → -200%). */
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eva-dashboard-root .skeleton {
+    animation: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Tailwind token bridge
+ *   Many components use Tailwind utility classes like `bg-card`,
+ *   `border-border`, `text-muted-foreground` as shorthand. In a
+ *   stock Tailwind setup without a configured theme extension,
+ *   these classes don't resolve to anything — so we provide a
+ *   direct bridge here scoped to .eva-dashboard-root so every
+ *   existing class works correctly.
+ * ───────────────────────────────────────────────────────────── */
+
+/* Background colors */
+.eva-dashboard-root .bg-background {
+  background-color: var(--background);
+}
+.eva-dashboard-root .bg-card {
+  background-color: var(--card);
+}
+.eva-dashboard-root .bg-card-soft {
+  background-color: var(--card-soft);
+}
+.eva-dashboard-root .bg-popover {
+  background-color: var(--popover);
+}
+.eva-dashboard-root .bg-muted {
+  background-color: var(--muted);
+}
+.eva-dashboard-root .bg-primary {
+  background-color: var(--primary);
+}
+.eva-dashboard-root .bg-secondary {
+  background-color: var(--secondary);
+}
+.eva-dashboard-root .bg-accent {
+  background-color: var(--accent);
+}
+.eva-dashboard-root .bg-accent-soft {
+  background-color: var(--accent-soft);
+}
+.eva-dashboard-root .bg-destructive {
+  background-color: var(--destructive);
+}
+.eva-dashboard-root .bg-input {
+  background-color: var(--input);
+}
+
+.eva-dashboard-root .bg-muted\/30 {
+  background-color: color-mix(in oklab, var(--muted) 30%, transparent);
+}
+.eva-dashboard-root .bg-muted\/50 {
+  background-color: color-mix(in oklab, var(--muted) 50%, transparent);
+}
+.eva-dashboard-root .bg-primary\/10 {
+  background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+}
+.eva-dashboard-root .bg-primary\/20 {
+  background-color: color-mix(in oklab, var(--primary) 20%, transparent);
+}
+.eva-dashboard-root .bg-destructive\/5 {
+  background-color: color-mix(in oklab, var(--destructive) 5%, transparent);
+}
+
+/* Hover states */
+.eva-dashboard-root .hover\:bg-muted:hover {
+  background-color: var(--muted);
+}
+.eva-dashboard-root .hover\:bg-accent-soft:hover {
+  background-color: var(--accent-soft);
+}
+.eva-dashboard-root .hover\:bg-primary\/10:hover {
+  background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+}
+.eva-dashboard-root .hover\:bg-destructive\/5:hover {
+  background-color: color-mix(in oklab, var(--destructive) 5%, transparent);
+}
+.eva-dashboard-root .hover\:border-primary\/40:hover {
+  border-color: color-mix(in oklab, var(--primary) 40%, transparent);
+}
+.eva-dashboard-root .hover\:text-destructive:hover {
+  color: var(--destructive);
+}
+
+/* Borders */
+.eva-dashboard-root .border-border {
+  border-color: var(--border);
+}
+.eva-dashboard-root .border-border-strong {
+  border-color: var(--border-strong);
+}
+.eva-dashboard-root .border-primary {
+  border-color: var(--primary);
+}
+.eva-dashboard-root .border-destructive {
+  border-color: var(--destructive);
+}
+
+/* Divide — `divide-y` alone inherits border-color as currentColor (reads as black).
+   Pair with `divide-border` so row separators match SectionCard / panel borders. */
+.eva-dashboard-root .divide-border > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border);
+}
+
+/* Text colors */
+.eva-dashboard-root .text-foreground {
+  color: var(--foreground);
+}
+.eva-dashboard-root .text-muted-foreground {
+  color: var(--muted-foreground);
+}
+.eva-dashboard-root .text-primary {
+  color: var(--primary);
+}
+.eva-dashboard-root .text-primary-foreground {
+  color: var(--primary-foreground);
+}
+.eva-dashboard-root .text-destructive {
+  color: var(--destructive);
+}
+.eva-dashboard-root .text-accent-foreground {
+  color: var(--accent-foreground);
+}
+
+.eva-dashboard-root .text-muted-foreground\/70 {
+  color: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
+}
+.eva-dashboard-root .placeholder\:text-muted-foreground\/70::placeholder {
+  color: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
+}
+
+/* Focus states */
+.eva-dashboard-root .focus\:border-primary\/60:focus {
+  border-color: color-mix(in oklab, var(--primary) 60%, transparent);
+}
+.eva-dashboard-root .focus\:ring-primary\/20:focus {
+  --tw-ring-color: color-mix(in oklab, var(--primary) 20%, transparent);
+}
+.eva-dashboard-root .focus-visible\:ring-primary\/30:focus-visible {
+  --tw-ring-color: color-mix(in oklab, var(--primary) 30%, transparent);
+}
