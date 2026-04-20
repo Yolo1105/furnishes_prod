@@ -21,10 +21,22 @@ if (cliDatabaseUrl) {
   process.env.DATABASE_URL = cliDatabaseUrl;
 }
 
+/**
+ * Prisma 7+: connection URLs live here, not in `schema.prisma`.
+ * When `DATABASE_URL` is unset (e.g. before Vercel env is applied), use a valid
+ * placeholder so `prisma generate` can run — it does not open a real connection.
+ */
+const prismaCliDatasourceUrl =
+  process.env.DATABASE_URL?.trim() ||
+  "postgresql://prisma-cli-placeholder:prisma@127.0.0.1:5432/prisma?schema=public";
+
 export default defineConfig({
   schema: path.join("prisma", "schema.prisma"),
   migrations: {
     path: path.join("prisma", "migrations"),
     seed: "tsx prisma/seed.ts",
+  },
+  datasource: {
+    url: prismaCliDatasourceUrl,
   },
 });

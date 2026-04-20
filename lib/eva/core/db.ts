@@ -1,3 +1,4 @@
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
 import { BUILD_PLACEHOLDER_DATABASE_URL } from "./env";
@@ -48,8 +49,9 @@ function createPrisma(): PrismaClient {
   const devLog: ("error" | "warn" | "query" | "info")[] =
     process.env.PRISMA_LOG === "1" ? ["error", "warn"] : [];
 
+  const adapter = new PrismaPg({ connectionString: url });
   return new PrismaClient({
-    datasources: { db: { url } },
+    adapter,
     log: process.env.NODE_ENV === "development" ? devLog : ["error"],
   });
 }
