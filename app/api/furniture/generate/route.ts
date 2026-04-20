@@ -22,8 +22,11 @@ import {
 } from "@/lib/furniture-gen/create-studio-piece-from-generation";
 
 export const runtime = "nodejs";
-/** Meshy v6 can run several minutes; allow up to 10 minutes on supported hosts. */
-export const maxDuration = 600;
+/**
+ * Vercel Hobby: `maxDuration` must be ≤ 300s (5 min). Pro/Enterprise allow higher
+ * limits in the dashboard — keep this at 300 so deploys succeed on Hobby.
+ */
+export const maxDuration = 300;
 
 const BodySchema = z.object({
   prompt: z.string().trim().min(1).max(4000),
