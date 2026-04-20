@@ -51,7 +51,7 @@ npm run analyze
 
 ## Stack (pinned in `package.json`)
 
-- Node.js **20+** (`engines` in `package.json`, **`.nvmrc`** for nvm / fnm)
+- Node.js **24.x** (`engines` in `package.json`, **`.nvmrc`** for nvm / fnm)
 - Next.js 16.x
 - React 19.x
 - TypeScript 5.x
