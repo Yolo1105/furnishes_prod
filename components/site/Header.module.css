@@ -55,20 +55,37 @@
 
 .siteTitleBlock {
   display: block;
+  white-space: nowrap;
 }
 
 .siteTitleLine {
-  display: block;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Slightly smaller type + tracking on compact laptops so the grid stays balanced without wrapping. */
+.siteTitleBlock .menuText {
+  font-size: clamp(0.72rem, 0.35vw + 0.68rem, 1rem);
+  letter-spacing: clamp(0.03em, 0.12vw + 0.024em, 0.05em);
+}
+
+@media (min-width: 768px) {
+  .siteTitleBlock .menuText {
+    font-size: clamp(0.78rem, 0.4vw + 0.7rem, 1rem);
+  }
+}
+
+@media (min-width: 1280px) {
+  .siteTitleBlock .menuText {
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+  }
 }
 
 .logoPipe {
   display: inline-block;
   margin-left: 0;
   margin-right: 0.25em;
-}
-
-.siteTitleLine .menuText {
-  letter-spacing: 0.05em;
 }
 
 /* Inline gaps between logo segments (spaces in strings collapse across inline-blocks). */

@@ -9,14 +9,15 @@ import { MainWithSidebarMargin } from "@/components/site/main-with-sidebar-margi
 import { SiteChromeScrollSentinel } from "@/components/site/SiteChrome";
 import { WorkspaceRailGateProvider } from "@/components/site/workspace-rail-gate";
 import type { MarketingHeaderContext } from "@/lib/auth/marketing-header-context.types";
-import { isMarketingWorkspaceRailEnabled } from "@/lib/site/marketing-workspace-rail";
-import { CartProvider } from "@/contexts/CartContext";
-import { ProjectProvider } from "@/contexts/ProjectContext";
-import {
-  SidebarProvider,
-  RightSidebar as FurnishesWorkspaceSidebar,
-} from "@/components/shared/layout/sidebar";
-import { ContentWrapper } from "@/components/shared/layout/ContentWrapper";
+/* Will be used somewhere else later: signed-in right workspace rail (icons + drawer). */
+// import { isMarketingWorkspaceRailEnabled } from "@/lib/site/marketing-workspace-rail";
+// import { CartProvider } from "@/contexts/CartContext";
+// import { ProjectProvider } from "@/contexts/ProjectContext";
+// import {
+//   SidebarProvider,
+//   RightSidebar as FurnishesWorkspaceSidebar,
+// } from "@/components/shared/layout/sidebar";
+// import { ContentWrapper } from "@/components/shared/layout/ContentWrapper";
 
 export function SiteMarketingChromeBody({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -45,8 +46,11 @@ export function SiteMarketingChromeBody({ children }: { children: ReactNode }) {
     };
   }, [pathname]);
 
-  const railAllowed = isMarketingWorkspaceRailEnabled(pathname);
-  const enabled = headerCtx?.signedIn === true && railAllowed;
+  /* Will be used somewhere else later: mount rail when signed in + route allows it. */
+  // const railAllowed = isMarketingWorkspaceRailEnabled(pathname);
+  // const enabled = headerCtx?.signedIn === true && railAllowed;
+  const enabled = false;
+  void headerCtx;
 
   const main = (
     <MainWithSidebarMargin>
@@ -58,6 +62,7 @@ export function SiteMarketingChromeBody({ children }: { children: ReactNode }) {
   const chrome = (
     <>
       <SiteMarketingFixedChrome />
+      {/* Will be used somewhere else later:
       {enabled ? (
         <ContentWrapper sidebar={<FurnishesWorkspaceSidebar />}>
           {main}
@@ -65,12 +70,15 @@ export function SiteMarketingChromeBody({ children }: { children: ReactNode }) {
       ) : (
         main
       )}
+      */}
+      {main}
       <SiteMarketingFooterGate />
     </>
   );
 
   return (
     <WorkspaceRailGateProvider enabled={enabled}>
+      {/* Will be used somewhere else later:
       {enabled ? (
         <CartProvider>
           <ProjectProvider>
@@ -80,6 +88,8 @@ export function SiteMarketingChromeBody({ children }: { children: ReactNode }) {
       ) : (
         chrome
       )}
+      */}
+      {chrome}
     </WorkspaceRailGateProvider>
   );
 }

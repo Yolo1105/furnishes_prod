@@ -4,10 +4,11 @@ import { usePathname } from "next/navigation";
 import { Header } from "@/components/site/Header";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { UtilityBar } from "@/components/site/UtilityBar";
-import { useWorkspaceRailHover } from "@/components/shared/layout/sidebar/workspace-rail-hover";
+/* Will be used somewhere else later: workspace rail hover dock + z-index above drawer. */
+// import { useWorkspaceRailHover } from "@/components/shared/layout/sidebar/workspace-rail-hover";
 import { isAuthMarketingSplitPath } from "@/lib/site/auth-marketing-paths";
 import { LANDING_SECTION_IDS } from "@/content/site/landing-sections";
-import { useSidebarOptional } from "@/components/shared/layout/sidebar";
+// import { useSidebarOptional } from "@/components/shared/layout/sidebar";
 
 /**
  * Fixed top chrome for `(site)`: login/signup omit the orange utility strip;
@@ -19,21 +20,17 @@ import { useSidebarOptional } from "@/components/shared/layout/sidebar";
 export function SiteMarketingFixedChrome() {
   const pathname = usePathname();
   const hideUtilityBar = isAuthMarketingSplitPath(pathname);
-  const hover = useWorkspaceRailHover();
-  const sidebarOptional = useSidebarOptional();
-  /** Workspace drawer is z-index 100; lift fixed chrome above it so cart/profile stay visible. */
-  const chromeAbovePanel =
-    sidebarOptional?.panelOpen || sidebarOptional?.panelClosing
-      ? "z-[110]"
-      : undefined;
+  // Will be used somewhere else later (workspace rail):
+  // const hover = useWorkspaceRailHover();
+  // const sidebarOptional = useSidebarOptional();
+  // const chromeAbovePanel =
+  //   sidebarOptional?.panelOpen || sidebarOptional?.panelClosing
+  //     ? "z-[110]"
+  //     : undefined;
 
   return (
-    <SiteChrome className={chromeAbovePanel}>
-      <div
-        className="flex w-full flex-col"
-        onMouseEnter={hover.onChromeDockEnter}
-        onMouseLeave={(e) => hover.onChromeDockLeave(e)}
-      >
+    <SiteChrome>
+      <div className="flex w-full flex-col">
         {!hideUtilityBar && <UtilityBar />}
         <Header
           variant="fixed"

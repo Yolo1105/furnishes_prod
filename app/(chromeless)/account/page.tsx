@@ -6,7 +6,10 @@ import { getAccountDashboard } from "@/lib/site/account/server/dashboard";
 
 export default async function AccountDashboardPage() {
   const resolved = await resolveSession();
-  const dash = await getAccountDashboard(resolved.user.id, resolved.counts);
+  const dash = await getAccountDashboard(resolved.user.id, resolved.counts, {
+    name: resolved.user.name,
+    email: resolved.user.email,
+  });
 
   return (
     <ToastProvider>

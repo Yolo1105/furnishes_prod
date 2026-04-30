@@ -16,9 +16,11 @@ async function main() {
     );
   }
 
-  const demoPassword = randomBytes(16).toString("hex");
+  /** Fixed so `/login` prefilled credentials match after seed (override per env). */
+  const demoPasswordPlain =
+    process.env.DEMO_SEED_PASSWORD?.trim() || "demopass-change-me-123";
   const adminPassword = randomBytes(16).toString("hex");
-  const demoHash = await bcrypt.hash(demoPassword, SALT_ROUNDS);
+  const demoHash = await bcrypt.hash(demoPasswordPlain, SALT_ROUNDS);
   const adminHash = await bcrypt.hash(adminPassword, SALT_ROUNDS);
 
   const demoUser = await prisma.user.upsert({
@@ -93,7 +95,9 @@ async function main() {
     );
   }
 
-  console.log(`Seeded demo user with password: ${demoPassword}`);
+  console.log(
+    `Seeded demo user (${demoUser.email}) — password matches login form default / DEMO_SEED_PASSWORD.`,
+  );
   console.log(`Seeded admin user with password: ${adminPassword}`);
 }
 

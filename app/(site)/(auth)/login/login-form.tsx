@@ -3,18 +3,14 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { isMockAuthUiOffered } from "@/lib/auth/mock-auth";
 import { authFieldControl } from "@/content/site/auth-field-styles";
 
-/** Demo credentials — match `prisma/seed.ts`. */
-const DEMO_EMAIL = "mohan@demo.furnishes.sg";
-const DEMO_PASSWORD = "demopass-change-me-123";
-
-/** Show the "Sign in as demo" button when NOT in production. Keep this
- *  condition simple — Next inlines NEXT_PUBLIC_* at build time. */
-const SHOW_DEMO_BUTTON =
-  process.env.NEXT_PUBLIC_SHOW_DEMO_LOGIN === "1" ||
-  process.env.NODE_ENV !== "production";
+/** Default login values — match seeded `demo@example.com` (`prisma/seed.ts`, DEMO_SEED_PASSWORD). */
+const DEFAULT_LOGIN_EMAIL =
+  process.env.NEXT_PUBLIC_LOGIN_DEFAULT_EMAIL?.trim() || "demo@example.com";
+const DEFAULT_LOGIN_PASSWORD =
+  process.env.NEXT_PUBLIC_LOGIN_DEFAULT_PASSWORD?.trim() ||
+  "demopass-change-me-123";
 
 /** Open redirects: only allow same-origin paths for `?next=`. */
 function safeNextPath(raw: string | null | undefined): string {
@@ -28,8 +24,8 @@ export function LoginForm() {
   const search = useSearchParams();
   const next = safeNextPath(search?.get("next"));
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(DEFAULT_LOGIN_EMAIL);
+  const [password, setPassword] = useState(DEFAULT_LOGIN_PASSWORD);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,81 +62,8 @@ export function LoginForm() {
     }
   }
 
-  async function handleDemoSignIn() {
-    setError(null);
-    setSubmitting(true);
-    try {
-      // In mock mode (default in dev + when DB isn't wired), set a
-      // client cookie the account layout checks, then route to /account.
-      // This lets visual reviewers see every page without Prisma setup.
-      const mockMode = isMockAuthUiOffered();
-
-      if (mockMode) {
-        // Set a simple session cookie — 30-day lifetime
-        document.cookie = `furnishes-mock-auth=1; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
-        // Full navigation avoids a dev-only Webpack error where client-side
-        // route transitions load a stale/missing chunk ("Cannot read properties
-        // of undefined (reading 'call')"). SPA transition is unnecessary for demo.
-        window.location.assign(next);
-        return;
-      }
-
-      // Real mode — hit the Credentials provider
-      await doSignIn(DEMO_EMAIL, DEMO_PASSWORD);
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
   return (
     <div className="mt-6">
-      {/* ── DEMO / DEV — one-tap sign-in ──────────────────── */}
-      {SHOW_DEMO_BUTTON && (
-        <div
-          className="mb-5 border p-4"
-          style={{
-            background: "rgba(242,74,18,0.04)",
-            borderColor: "rgba(242,74,18,0.25)",
-            borderStyle: "dashed",
-          }}
-        >
-          <div
-            className="mb-1 text-[10px] font-semibold tracking-[0.2em] uppercase"
-            style={{ color: "var(--color-accent, #f24a12)" }}
-          >
-            [ DEV / DEMO ]
-          </div>
-          <p
-            className="mb-3 text-xs"
-            style={{ color: "var(--muted-foreground, #6b7280)" }}
-          >
-            Sign in as the seeded demo user (
-            <code className="font-mono">{DEMO_EMAIL}</code>) — skip straight to
-            the account dashboard.
-          </p>
-          <button
-            type="button"
-            onClick={handleDemoSignIn}
-            disabled={submitting}
-            className="h-10 w-full cursor-pointer border text-[11px] font-semibold tracking-[0.18em] uppercase transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
-            style={{
-              background: "var(--color-accent, #f24a12)",
-              color: "#ffffff",
-              borderColor: "var(--color-accent, #f24a12)",
-            }}
-          >
-            {submitting ? "Signing in…" : "Sign in as demo →"}
-          </button>
-          <p
-            className="mt-2 text-[10px] italic"
-            style={{ color: "var(--muted-foreground, #6b7280)" }}
-          >
-            Only visible outside production. Set{" "}
-            <code>NEXT_PUBLIC_SHOW_DEMO_LOGIN=0</code> to force-hide.
-          </p>
-        </div>
-      )}
-
       {/* ── Google (optional) ─────────────────────────────── */}
       <button
         type="button"
