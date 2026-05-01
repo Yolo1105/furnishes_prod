@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.37",
-    "@auth/prisma-adapter": "^2.11.1",
+    "@auth/prisma-adapter": "^2.11.2",
     "@aws-sdk/client-s3": "^3.1030.0",
     "@aws-sdk/s3-request-presigner": "^3.1030.0",
     "@fal-ai/client": "^1.9.5",
