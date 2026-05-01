@@ -11,10 +11,10 @@ import {
   getMarketingNavActiveKey,
   type HeaderActiveLink,
 } from "@/content/site/nav";
+import { isPlaygroundNavVisible } from "@/lib/site/studio-nav-flag";
 import { useRightNav } from "@/components/site/right-nav-context";
-/* Will be used somewhere else later: workspace rail hover + panel-open header tint. */
-// import { useWorkspaceRailHover } from "@/components/shared/layout/sidebar/workspace-rail-hover";
-// import { useSidebarOptional } from "@/components/shared/layout/sidebar";
+import { useWorkspaceRailHover } from "@/components/shared/layout/sidebar/workspace-rail-hover";
+import { useSidebarOptional } from "@/components/shared/layout/sidebar";
 import { SlidingNavIcons } from "@/components/site/sliding-nav-icons";
 import { useFirstSectionNavTheme } from "@/hooks/site/useFirstSectionNavTheme";
 import { isAuthMarketingSplitPath } from "@/lib/site/auth-marketing-paths";
@@ -36,6 +36,10 @@ const [logoLine] = SITE_TITLE_LINES;
 const LOGO_PARTS = logoLine
   ? logoLine.split(/\s*\|\s*/)
   : ["FURNISHES [ INTERIOR REVOLUTION ]"];
+
+const HEADER_NAV_ITEMS = NAV_ITEMS.filter(
+  (item) => item.activeKey !== "playground" || isPlaygroundNavVisible(),
+);
 
 function MenuText({
   text,
@@ -115,12 +119,11 @@ export function Header({
   const activeLink = activeLinkProp ?? activeFromPath;
   const { isNavExpanded, isSidebarOpen, toggleJourneyMenu, onNavIconClick } =
     useRightNav();
-  // Will be used somewhere else later (workspace rail):
-  // const railHover = useWorkspaceRailHover();
-  // const sidebarOptional = useSidebarOptional();
-  // const workspacePanelOpen = !!(
-  //   sidebarOptional?.panelOpen || sidebarOptional?.panelClosing
-  // );
+  const railHover = useWorkspaceRailHover();
+  const sidebarOptional = useSidebarOptional();
+  const workspacePanelOpen = !!(
+    sidebarOptional?.panelOpen || sidebarOptional?.panelClosing
+  );
 
   const [headerCtx, setHeaderCtx] = useState<MarketingHeaderContext | null>(
     null,
@@ -172,18 +175,17 @@ export function Header({
 
   const headerGridCols = authMinimalHeader
     ? "grid-cols-1"
-    : "grid-cols-[auto_minmax(0,1fr)_auto]";
+    : "grid-cols-[1fr_auto_1fr]";
 
   const iconStrokeColor =
-    effectiveTheme === "dark"
+    workspacePanelOpen || effectiveTheme === "dark"
       ? "var(--color-primary)"
       : "var(--color-light-text)";
 
-  /** `auto` columns keep the wordmark on one line; center column absorbs width changes on laptop sizes. */
   const positionClass =
     variant === "fixed"
-      ? `relative z-30 w-full grid ${headerGridCols} items-baseline gap-x-3 min-[1000px]:gap-x-5 xl:gap-x-6 px-[var(--site-inline-gutter)] pt-4 pb-5 md:pt-5 md:pb-6`
-      : `sticky z-30 grid ${headerGridCols} items-baseline gap-x-3 min-[1000px]:gap-x-5 xl:gap-x-6 px-[var(--site-inline-gutter)] pt-4 pb-5 md:pt-5 md:pb-6 ${
+      ? `relative z-30 w-full grid ${headerGridCols} items-baseline gap-x-6 px-[var(--site-inline-gutter)] pt-4 pb-5 md:pt-5 md:pb-6`
+      : `sticky z-30 grid ${headerGridCols} items-baseline gap-x-6 px-[var(--site-inline-gutter)] pt-4 pb-5 md:pt-5 md:pb-6 ${
           authMinimalHeader ? "top-0" : "top-[var(--utility-bar-height)]"
         }`;
 
@@ -197,7 +199,7 @@ export function Header({
       } ${effectiveTheme === "dark" && !authMinimalHeader ? styles.navOverContent : ""}`}
     >
       <div
-        className={`${styles.menuItemWrapper} ${styles.menuItemAnimated} shrink-0`}
+        className={`${styles.menuItemWrapper} ${styles.menuItemAnimated} min-w-0`}
         style={{ ["--animation-delay" as string]: "0s" }}
       >
         <Link href="/" className={styles.menuItem}>
@@ -224,10 +226,10 @@ export function Header({
 
       {!authMinimalHeader && (
         <nav
-          className="flex w-full min-w-0 items-center justify-center gap-3 min-[1000px]:gap-5 xl:gap-8"
+          className="flex items-center justify-center gap-6 md:gap-8"
           aria-label="Main"
         >
-          {NAV_ITEMS.map((item, idx) => {
+          {HEADER_NAV_ITEMS.map((item, idx) => {
             const isActive = activeLink === item.activeKey;
             const isAnchor = item.href.startsWith("#");
             const resolvedHref =
@@ -331,6 +333,7 @@ export function Header({
                   : "Profile"
               }
               title={headerCtx.displayName ?? "Account"}
+              onMouseEnter={railHover.onProfileDockEnter}
             >
               <UserCircle
                 className="h-5 w-5"

@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@studio/*": ["./lib/studio/*", "./components/studio/*"]
     }
   },
   "include": [

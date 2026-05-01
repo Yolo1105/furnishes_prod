@@ -51,7 +51,7 @@ export default function AccountError({
             style={{ color: "var(--muted-foreground)" }}
           >
             The rest of Studio is unaffected. Try the action below — if it keeps
-            happening, let us know via support and we'll dig in.
+            happening, let us know via support and we&apos;ll dig in.
           </p>
 
           {error.digest && (

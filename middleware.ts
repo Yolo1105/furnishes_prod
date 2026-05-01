@@ -3,8 +3,16 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { getAuthSecret } from "@/lib/auth/auth-secret";
 import { isMockAuthEnabled } from "@/lib/auth/mock-auth";
+import { isStudioEnabled } from "@/lib/studio/studio-enabled";
+import { isStudioPlaygroundPathname } from "@/lib/routes/studio-playground-path";
 
-const PROTECTED_PATHS = ["/account", "/checkout", "/cart", "/admin"];
+const PROTECTED_PATHS = [
+  "/account",
+  "/checkout",
+  "/cart",
+  "/admin",
+  "/api/studio",
+] as const;
 const MOCK_AUTH_COOKIE = "furnishes-mock-auth";
 
 function requireApiAuth(): boolean {
@@ -40,7 +48,25 @@ export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const res = nextWithPathname(req, path);
 
-  const isProtected = PROTECTED_PATHS.some((p) => path.startsWith(p));
+  if (!isStudioEnabled()) {
+    if (path.startsWith("/api/studio")) {
+      return addSecurityHeaders(
+        NextResponse.json(
+          { error: "Studio is disabled", code: "STUDIO_DISABLED" },
+          { status: 503 },
+        ),
+      );
+    }
+    if (isStudioPlaygroundPathname(path)) {
+      return addSecurityHeaders(
+        NextResponse.rewrite(new URL("/not-found", req.url)),
+      );
+    }
+  }
+
+  const isProtected =
+    PROTECTED_PATHS.some((p) => path.startsWith(p)) ||
+    isStudioPlaygroundPathname(path);
   if (isProtected) {
     const mockOk =
       isMockAuthEnabled() && req.cookies.get(MOCK_AUTH_COOKIE)?.value === "1";

@@ -11,19 +11,16 @@ function InviteAcceptInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
-  const [status, setStatus] = useState<"idle" | "working" | "ok" | "err">(
-    "idle",
+  const [status, setStatus] = useState<"working" | "ok" | "err">(() =>
+    token ? "working" : "err",
   );
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(() =>
+    token ? null : "Missing token. Use the link from your invitation email.",
+  );
   const [projectId, setProjectId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
-      setStatus("err");
-      setMessage("Missing token. Use the link from your invitation email.");
-      return;
-    }
-    setStatus("working");
+    if (!token) return;
     void apiPost<{ ok: boolean; projectId: string }>(
       API_ROUTES.projectInvitationAccept,
       { token },

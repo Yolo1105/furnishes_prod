@@ -10,12 +10,15 @@ export function OrderSummaryPanel({
   ctaLabel,
   onContinue,
   continueDisabled,
+  continueTestId,
 }: {
   items: CartItem[];
   summary: OrderSummary;
   ctaLabel: string;
   onContinue: () => void;
   continueDisabled?: boolean;
+  /** E2E: stable selector for Playwright (e.g. shipping-continue, delivery-continue). */
+  continueTestId?: string;
 }) {
   const active = items.filter((i) => !i.savedForLater);
 
@@ -117,6 +120,7 @@ export function OrderSummaryPanel({
         type="button"
         onClick={onContinue}
         disabled={continueDisabled}
+        {...(continueTestId ? { "data-testid": continueTestId } : {})}
         className="font-ui mt-5 h-11 w-full border text-[11px] tracking-[0.18em] uppercase transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
         style={{
           background: "var(--primary)",

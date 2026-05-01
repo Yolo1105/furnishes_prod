@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
+import { isPrismaUniqueConstraintError } from "@/lib/db/errors";
 import { verifyWebhookSignature } from "@/lib/payments/stripe";
 import { sendOrderConfirmationEmail } from "@/lib/email/send";
 import { formatSGD } from "@/lib/site/money";
@@ -18,8 +19,8 @@ import { getPublicOrigin } from "@/lib/eva/core/public-origin";
  *   - Signature verification is REQUIRED. Webhooks without a valid signature
  *     are rejected. This prevents an attacker forging "payment succeeded"
  *     for someone else's order.
- *   - Idempotency: same Stripe event can fire multiple times. We check
- *     the order's current status before mutating to avoid double-processing.
+ *   - Idempotency: `ProcessedStripeEvent` dedupes by Stripe `evt_...` id.
+ *     Handlers also guard on order status where relevant.
  *
  * NOTE: This endpoint is NOT subject to CSRF (Stripe POSTs, not the browser).
  * Excluded from middleware via the matcher pattern.
@@ -49,16 +50,28 @@ export async function POST(req: NextRequest) {
   const event = verified.event;
   console.log(`[stripe webhook] received: ${event.type}`);
 
+  let dedupRecorded = false;
+  try {
+    await prisma.processedStripeEvent.create({
+      data: { stripeEventId: event.id },
+    });
+    dedupRecorded = true;
+  } catch (e) {
+    if (isPrismaUniqueConstraintError(e)) {
+      console.log(
+        `[stripe webhook] duplicate delivery for ${event.id} — acknowledging`,
+      );
+      return NextResponse.json({ received: true });
+    }
+    throw e;
+  }
+
   const siteOrigin = getPublicOrigin(req);
 
   try {
     switch (event.type) {
       case "payment_intent.succeeded":
-        await handlePaymentSucceeded(
-          event.data.object,
-          siteOrigin,
-          (event as { id?: string }).id ?? "unknown",
-        );
+        await handlePaymentSucceeded(event.data.object, siteOrigin, event.id);
         break;
       case "payment_intent.payment_failed":
         await handlePaymentFailed(event.data.object);
@@ -72,6 +85,18 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ received: true });
   } catch (e) {
+    if (dedupRecorded) {
+      try {
+        await prisma.processedStripeEvent.deleteMany({
+          where: { stripeEventId: event.id },
+        });
+      } catch (cleanupErr) {
+        console.error(
+          "[stripe webhook] failed to roll back dedup row:",
+          cleanupErr,
+        );
+      }
+    }
     console.error("[stripe webhook] handler error:", e);
     try {
       const Sentry = await import("@sentry/nextjs");

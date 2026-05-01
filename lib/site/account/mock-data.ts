@@ -35,7 +35,6 @@ import { DEFAULT_NOTIFICATION_PREFS } from "./account-prisma-mappers";
 import { PROJECT_COLLABORATION_DEFAULTS } from "./project-access-copy";
 import { ALL_STYLE_PROFILES, getStyleArchetypes } from "./style-archetypes";
 
-const now = () => new Date();
 const daysAgo = (n: number) =>
   new Date(Date.now() - n * 86_400_000).toISOString();
 const hoursAgo = (n: number) =>

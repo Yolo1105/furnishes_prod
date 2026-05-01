@@ -96,7 +96,7 @@ export default function UnsubscribePage({
                 letterSpacing: "-0.015em",
               }}
             >
-              You're off the marketing list.
+              You&apos;re off the marketing list.
             </h1>
             <p
               style={{
@@ -107,9 +107,9 @@ export default function UnsubscribePage({
                 lineHeight: 1.65,
               }}
             >
-              You'll still receive transactional emails — order confirmations,
-              account security — as required by law. Manage all preferences
-              anytime in your account.
+              You&apos;ll still receive transactional emails — order
+              confirmations, account security — as required by law. Manage all
+              preferences anytime in your account.
             </p>
             <div
               style={{
@@ -166,7 +166,7 @@ export default function UnsubscribePage({
                 letterSpacing: "-0.01em",
               }}
             >
-              We couldn't process that link
+              We couldn&apos;t process that link
             </h1>
             <p
               style={{

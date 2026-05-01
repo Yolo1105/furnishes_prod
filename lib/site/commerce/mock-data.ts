@@ -1,10 +1,4 @@
-import type {
-  Cart,
-  CartItem,
-  Address,
-  PaymentMethod,
-  ContactPrefs,
-} from "./types";
+import type { Cart, Address, PaymentMethod, ContactPrefs } from "./types";
 
 export { computeOrderSummary } from "@/lib/commerce/order-summary";
 export { formatETARange } from "@/lib/commerce/delivery-options";

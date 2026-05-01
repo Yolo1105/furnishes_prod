@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
               className="mt-3 text-sm leading-relaxed"
               style={authPosterBodySx}
             >
-              Drop your email and we'll send a one-time link to set a new
+              Drop your email and we&apos;ll send a one-time link to set a new
               password. Links expire after 30 minutes for your security.
             </p>
           </div>
@@ -89,8 +89,8 @@ export default function ForgotPasswordPage() {
             className="mt-2 text-sm"
             style={{ color: "var(--muted-foreground, #6b7280)" }}
           >
-            Enter the email you signed up with. We'll email a link valid for 30
-            minutes.
+            Enter the email you signed up with. We&apos;ll email a link valid
+            for 30 minutes.
           </p>
 
           <ForgotForm />

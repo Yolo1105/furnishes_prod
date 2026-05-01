@@ -434,6 +434,7 @@ export function CheckoutReviewView() {
             type="button"
             onClick={() => void handlePlace()}
             disabled={placing}
+            data-testid="place-order"
             className="font-ui h-12 w-full border text-[11px] tracking-[0.18em] uppercase transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
             style={{
               background: "var(--primary)",

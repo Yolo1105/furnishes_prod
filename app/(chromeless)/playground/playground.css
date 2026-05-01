@@ -1,0 +1,686 @@
+/* Studio playground — scoped shell + visuals (Tailwind v4: no @tailwind here). */
+.studio-shell,
+.studio-shell * {
+  box-sizing: border-box;
+}
+.studio-shell {
+  --font-app: var(--font-syne);
+  margin: 0;
+  padding: 0;
+  color: #1a1a1a;
+  position: relative;
+  background: linear-gradient(135deg, #fff4e3 0%, #ffd1ad 55%, #f8b78a 100%);
+  background-attachment: fixed;
+}
+.bg-fluid {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bg-fluid .bg-blob {
+  position: absolute;
+  /* 90% × 90% so each blob is huge — the whole point is for them to
+   * drift PARTIALLY off-screen, with most of the visible area
+   * showing the blob's transparent-edge falloff. */
+  width: 90vmax;
+  height: 90vmax;
+  border-radius: 50%;
+  filter: blur(80px);
+  /* will-change tells the browser these layers will be transformed,
+   * so it promotes them to compositor layers up front. Without this,
+   * the first frame of animation would re-rasterize the blur. */
+  will-change: transform;
+}
+
+.bg-fluid .bg-blob-1 {
+  background: radial-gradient(
+    circle,
+    rgba(255, 232, 200, 0.85) 0%,
+    rgba(255, 232, 200, 0) 60%
+  );
+  top: -20%;
+  left: -25%;
+  animation: blob-drift-1 29s ease-in-out infinite;
+}
+
+.bg-fluid .bg-blob-2 {
+  background: radial-gradient(
+    circle,
+    rgba(255, 198, 156, 0.7) 0%,
+    rgba(255, 198, 156, 0) 60%
+  );
+  top: -10%;
+  right: -30%;
+  animation: blob-drift-2 41s ease-in-out infinite;
+}
+
+.bg-fluid .bg-blob-3 {
+  background: radial-gradient(
+    circle,
+    rgba(255, 248, 235, 0.9) 0%,
+    rgba(255, 248, 235, 0) 60%
+  );
+  bottom: -25%;
+  left: 10%;
+  animation: blob-drift-3 53s ease-in-out infinite;
+}
+
+/* Each blob animates on a different irregular path — values picked
+ * to read as random rather than circular. Translate-only animations
+ * are cheap (no layer re-rasterization). Keyframes use 5 stops at
+ * non-aligned percentages so the path isn't visibly periodic. */
+@keyframes blob-drift-1 {
+  0% {
+    transform: translate(0, 0);
+  }
+  22% {
+    transform: translate(35vmax, 18vmax);
+  }
+  47% {
+    transform: translate(20vmax, 40vmax);
+  }
+  71% {
+    transform: translate(-12vmax, 28vmax);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes blob-drift-2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  19% {
+    transform: translate(-28vmax, 22vmax);
+  }
+  43% {
+    transform: translate(-45vmax, -8vmax);
+  }
+  68% {
+    transform: translate(-14vmax, 35vmax);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes blob-drift-3 {
+  0% {
+    transform: translate(0, 0);
+  }
+  27% {
+    transform: translate(28vmax, -32vmax);
+  }
+  54% {
+    transform: translate(45vmax, 8vmax);
+  }
+  79% {
+    transform: translate(8vmax, -22vmax);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-fluid {
+    display: none;
+  }
+}
+
+/* ─── Glass surfaces ─────────────────────────────────────────────────────
+ * Two tiers used throughout the app:
+ *   .glass        — floating cards (chat input, conversation bubble)
+ *   .glass-modal  — centered overlay (upload modal); stronger blur + surface
+ * ──────────────────────────────────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 250, 244, 0.55);
+  border: 1px solid rgba(124, 80, 50, 0.18);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
+    0 8px 24px -14px rgba(124, 80, 50, 0.12);
+}
+
+.glass-modal {
+  background: rgba(255, 250, 244, 0.85);
+  border: 1px solid rgba(124, 80, 50, 0.22);
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.7) inset,
+    0 24px 60px -20px rgba(26, 18, 10, 0.3);
+}
+
+/* Anchored menus (project switcher, etc.): parent may already be
+ * `.glass`; a second translucent layer lets the 3D canvas bleed through.
+ * This tier matches the cream surface but stays nearly opaque. */
+.glass-popover {
+  background: rgba(255, 252, 247, 0.97);
+  border: 1px solid rgba(124, 80, 50, 0.2);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.75) inset,
+    0 12px 40px -12px rgba(26, 18, 10, 0.22);
+}
+
+/* ─── Hover treatments ───────────────────────────────────────────────────
+ * Kept as plain CSS rather than Tailwind variants so the hover state
+ * picks up the precise rgba values from the JSX without round-trip
+ * encoding through arbitrary-value classes.
+ * ──────────────────────────────────────────────────────────────────────── */
+.icon-btn:hover {
+  background: rgba(26, 26, 26, 0.05);
+  color: #1a1a1a;
+}
+
+.suggestion-chip:hover {
+  background: rgba(255, 90, 31, 0.08);
+  color: #ff5a1f;
+  border-color: rgba(255, 90, 31, 0.35);
+}
+
+.mode-btn:hover {
+  background: rgba(26, 26, 26, 0.05);
+}
+
+.menu-row:hover {
+  background: #fff4ec;
+}
+
+.send-btn-enabled:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px -4px rgba(255, 90, 31, 0.5);
+}
+
+.mic-btn:hover {
+  background: rgba(26, 26, 26, 0.1);
+  color: #1a1a1a;
+}
+
+.conversation-bubble:hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(124, 80, 50, 0.3);
+}
+
+.bubble-hide:hover {
+  color: rgba(26, 26, 26, 0.7);
+  background: rgba(26, 26, 26, 0.05);
+}
+
+.ref-dropzone:hover,
+.ref-dropzone[data-dragging="true"] {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 90, 31, 0.45);
+}
+
+.ref-thumb:hover .ref-thumb-remove {
+  opacity: 1 !important;
+}
+
+.ref-thumb-add:hover {
+  background: rgba(255, 90, 31, 0.06);
+  border-color: rgba(255, 90, 31, 0.45);
+  color: rgba(255, 90, 31, 0.9);
+}
+
+/* Project card hover treatments — match the JSX prototype exactly.
+ * The card uses subtle neutral hovers, not accent colors, which keeps
+ * the brand area calm and lets the dropdown's accent "See all" link
+ * stand out as the primary action. */
+.project-name:hover {
+  background: rgba(26, 26, 26, 0.06);
+  color: #1a1a1a;
+}
+
+.project-caret:hover {
+  background: rgba(26, 26, 26, 0.06);
+  color: #1a1a1a;
+}
+
+.project-caret:focus-visible {
+  outline: 2px solid rgba(26, 26, 26, 0.22);
+  outline-offset: 2px;
+}
+
+.project-caret:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.project-menu-row:hover {
+  background: rgba(26, 26, 26, 0.05);
+}
+
+/* ─── Top bar ──────────────────────────────────────────────────────
+ * Icon buttons in the top-center toolbar. The base button is neutral;
+ * `:hover` darkens the icon slightly. Disabled buttons stay at base
+ * with reduced opacity and no hover treatment.
+ *
+ * The active state (`data-active="true"`) is styled inline in the
+ * component because it carries the accent color, which we want to
+ * track with the brand token rather than encode in a class.
+ * ─────────────────────────────────────────────────────────────────── */
+.topbar-btn:not(:disabled):hover {
+  background: rgba(26, 26, 26, 0.06);
+  color: #1a1a1a;
+}
+
+.topbar-btn[data-active="true"]:hover {
+  background: rgba(255, 90, 31, 0.1);
+}
+
+.topbar-menu-row:hover {
+  background: rgba(26, 26, 26, 0.05);
+}
+
+.topbar-planner-btn:hover {
+  background: #e64a16;
+  box-shadow: 0 6px 16px -4px rgba(255, 90, 31, 0.45);
+}
+
+/* ─── Scrollbar hiding utility ─────────────────────────────────────
+ * Opt-in: add `className="no-scrollbar"` to any scroll container that
+ * should keep scroll behavior but not show its scrollbar. Used on the
+ * Inventory list, the Catalog grid, and the Catalog category pills.
+ * ─────────────────────────────────────────────────────────────────── */
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ / old Edge */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, modern Edge */
+}
+
+/* ─── Tools card ───────────────────────────────────────────────────
+ * Hover treatments for the Tools card's chevron-collapse button and
+ * its tool-row pills. Active tool rows (i.e. their floating card is
+ * open) get an accent background that we set inline; the hover here
+ * is the *non-active* hover.
+ * ─────────────────────────────────────────────────────────────────── */
+.tools-chevron:hover {
+  background: rgba(26, 26, 26, 0.06);
+  color: #1a1a1a;
+}
+
+.tools-collapsed-pill:hover {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(124, 80, 50, 0.3);
+}
+
+.tool-tile:not([data-active="true"]):hover {
+  background: rgba(26, 26, 26, 0.05);
+  color: rgba(26, 26, 26, 0.85);
+}
+
+.tool-tile[data-active="true"]:hover {
+  background: rgba(255, 90, 31, 0.14);
+}
+
+/* ─── Inventory rows ───────────────────────────────────────────────
+ * On row hover, the price fades out and the trash button slides into
+ * its slot. The "active" (selected) row's hover gets a slightly
+ * stronger accent fill.
+ *
+ * NOTE: `.inventory-delete` MUST set `opacity: 0` + `pointer-events:
+ * none` here in CSS rather than inline on the JSX, because inline
+ * styles win over CSS without `!important`. Putting the base state
+ * in CSS lets the `:hover` rule below override cleanly.
+ * ─────────────────────────────────────────────────────────────────── */
+.inventory-row:hover {
+  background: rgba(26, 26, 26, 0.04);
+}
+
+.inventory-row[data-active="true"]:hover {
+  background: rgba(255, 90, 31, 0.12);
+}
+
+.inventory-row:hover .inventory-price {
+  opacity: 0;
+}
+
+.inventory-delete {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.inventory-row:hover .inventory-delete {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.inventory-delete:hover {
+  background: rgba(180, 50, 30, 0.1);
+}
+
+/* Custom tooltip for the bubble's hide button — shown on hover via ::after. */
+.bubble-hide {
+  position: relative;
+}
+
+.bubble-hide::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 28px;
+  right: 0;
+  padding: 5px 9px;
+  background: rgba(26, 26, 26, 0.92);
+  color: #fff4ec;
+  border-radius: 6px;
+  font-family: var(--font-syne), sans-serif;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-2px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.bubble-hide:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Form field polish ─────────────────────────────────────────────────── */
+.chat-textarea::placeholder,
+.guided-input::placeholder,
+.notes-textarea::placeholder {
+  color: rgba(26, 26, 26, 0.35);
+}
+
+.chat-textarea,
+.notes-textarea {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(26, 26, 26, 0.2) transparent;
+}
+
+.guided-input:focus,
+.notes-textarea:focus,
+.chat-textarea:focus {
+  outline: none;
+}
+
+/* ─── Animations ────────────────────────────────────────────────────────
+ * Ported verbatim from the JSX so the motion language stays identical.
+ * cubic-bezier(0.22, 1, 0.36, 1) is reused everywhere — a soft-spring
+ * easing that gives entrances their characteristic settle.
+ * ──────────────────────────────────────────────────────────────────────── */
+@keyframes thinking-line-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-8px) translateY(2px);
+    max-height: 0;
+  }
+  60% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+    max-height: 28px;
+  }
+}
+
+/* v0.40.42: soft accent shimmer across the LATEST thinking line.
+ * Sweeps a faint orange highlight from left to right every 2.5s,
+ * giving the impression of "still thinking" without the bright
+ * blink that a pulse would produce. The gradient uses the brand
+ * accent at very low alpha so it reads as ambient motion rather
+ * than an attention-grab. */
+@keyframes thinking-line-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes thinking-icon-pulse {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+/* v0.40.42: dot-cascade for the trailing "..." next to the latest
+ * thinking line. Each dot brightens and lifts slightly in sequence
+ * (50/150/250ms staggered start), reading as a wave moving left to
+ * right. Plays on a 1.4s loop so it's clearly alive but not
+ * frenetic. The hardcoded delays on the spans below in the
+ * thinking-dots block-pick this up. */
+@keyframes thinking-dot-bounce {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+/* v0.40.26: gentle fade-in for the pinned user-message echo line.
+ * No translateY — this line stays put while the thinking lines
+ * below it stream/fade. */
+@keyframes thinking-userecho-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* v0.40.30: expand animation for the Interior Design tile's
+ * sub-piece row. Slight downward fade so the row reads as
+ * "expanding from above" rather than appearing magically. */
+@keyframes tile-row-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dots-blink {
+  0%,
+  20% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes guided-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bubble-expand-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.thinking-line {
+  animation: thinking-line-in 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* v0.40.26: latest line's icon used to be orange (#FF5A1F) so both
+ * the icon AND the trailing dots were orange — visually doubled. The
+ * user asked for ONE accent only. We keep the orange on the trailing
+ * dots (they blink, which carries the "live" signal more strongly)
+ * and let the icon stay neutral on every line, latest or older.
+ * The icon still pulses on the latest line to mark "this is the
+ * active step" — just in neutral color, not orange. */
+.thinking-line:last-child .thinking-icon {
+  animation: thinking-icon-pulse 1.3s ease-in-out infinite;
+}
+
+.thinking-line:last-child .thinking-dots span:nth-child(1) {
+  animation: dots-blink 1.2s ease-in-out infinite;
+}
+.thinking-line:last-child .thinking-dots span:nth-child(2) {
+  animation: dots-blink 1.2s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+.thinking-line:last-child .thinking-dots span:nth-child(3) {
+  animation: dots-blink 1.2s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+.guided-row {
+  animation: guided-row-in 0.3s ease;
+}
+
+/* ─── Focus rings ─────────────────────────────────────────────
+   Replace browsers' default blue focus ring with our brand
+   orange. Applied to all buttons + interactive surfaces so that
+   keyboard navigation is visible without looking like an
+   accessibility tester forgot to theme it.
+   :focus-visible (vs :focus) means mouse-clicks don't get rings
+   — only keyboard tab navigation does. */
+*:focus {
+  outline: none;
+}
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #ff5a1f;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Tour-mode progress dot pulse. */
+@keyframes tour-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.35);
+  }
+}
+
+/* Planner workspace modal fade-in. Subtle ease-out so the modal
+   feels grounded rather than slamming into existence. */
+@keyframes planner-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Generic spinner — used by the Options tab generate state. */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Walk path marker pulsing halo — gentle scale + opacity ripple,
+   keyed via CSS so the SVG element doesn't need per-frame react
+   updates. The marker position itself updates via tourProgress
+   (10 Hz writes from TourCamera). */
+.walk-marker-halo {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: walk-marker-halo-pulse 1.4s ease-in-out infinite;
+}
+@keyframes walk-marker-halo-pulse {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.32;
+    transform: scale(1.25);
+  }
+}
+
+/* Properties card entrance — slide in from the right edge. */
+@keyframes properties-card-in {
+  0% {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* v0.40.48 Starred modal entrance — fade-up like CatalogModal but
+   slightly tighter; matches the visual signature of "expand from
+   tile to centered modal." */
+@keyframes starred-modal-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

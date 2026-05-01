@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { STUDIO_PLAYGROUND_PATH_PREFIX } from "@/lib/routes/studio-playground-path";
 import { WORKFLOW_ROUTES } from "@/lib/site/workflow-routes";
 
 /**
@@ -16,7 +17,7 @@ const HEAVY_ROUTE_PREFIXES: readonly string[] = [
   "/cart",
   WORKFLOW_ROUTES.assistant,
   "/checkout",
-  "/playground",
+  STUDIO_PLAYGROUND_PATH_PREFIX,
   "/quiz",
   "/shared",
   "/style",
@@ -66,8 +67,10 @@ export function RouteProgressSweep() {
       clearTimeout(timeoutRef.current);
     }
 
-    setTick((t) => t + 1);
-    setIsAnimating(true);
+    queueMicrotask(() => {
+      setTick((t) => t + 1);
+      setIsAnimating(true);
+    });
 
     timeoutRef.current = setTimeout(() => {
       setIsAnimating(false);

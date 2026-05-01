@@ -7,7 +7,18 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   eslintConfigPrettier,
-  /** Ported verbatim from `chatbot_v3` — keep upstream patterns; relax hooks that flag reference code. */
+
+  /**
+   * Upstream-synced reference UI. We import this code verbatim from the
+   * chatbot_v3 studio. Fully matching our lint rules would require forking
+   * and maintaining the code long-term, which is not a seed-stage priority.
+   *
+   * Decision: docs/adr/0011-eva-dashboard-eslint-bypass.md. Revisit when
+   * we have a dedicated dashboard engineer (post-Series A) or when upstream
+   * archives.
+   *
+   * Do NOT add new folders to this block. Any new code must pass full lint.
+   */
   {
     files: [
       "components/eva-dashboard/**/*.{ts,tsx}",
@@ -15,55 +26,40 @@ const eslintConfig = defineConfig([
     ],
     rules: {
       "react-hooks/set-state-in-effect": "off",
-      "@typescript-eslint/no-unused-vars": "off",
       "react-hooks/exhaustive-deps": "off",
-    },
-  },
-  /** Studio reference UI — match upstream lint posture (copy-paste fidelity). */
-  {
-    files: [
-      "app/(chromeless)/account/**/*.{ts,tsx}",
-      "app/(site)/(auth)/**/*.{ts,tsx}",
-      "app/admin/**/*.{ts,tsx}",
-      "app/cart/**/*.{ts,tsx}",
-      "app/checkout/**/*.{ts,tsx}",
-      "app/privacy-policy/**/*.{ts,tsx}",
-      "app/terms/**/*.{ts,tsx}",
-      "app/unsubscribe/**/*.{ts,tsx}",
-      "components/commerce/**/*.{ts,tsx}",
-      "components/site/cookie-consent.tsx",
-      "components/site/route-progress-sweep.tsx",
-      "components/site/auth-poster-image.tsx",
-      "components/eva-dashboard/account/**/*.{ts,tsx}",
-      "lib/actions/**/*.{ts,tsx}",
-      "lib/auth/**/*.{ts,tsx}",
-      "lib/email/**/*.{ts,tsx}",
-      "lib/jobs/**/*.{ts,tsx}",
-      "lib/payments/**/*.{ts,tsx}",
-      "lib/site/account/**/*.{ts,tsx}",
-      "lib/site/commerce/**/*.{ts,tsx}",
-      "lib/site/support/**/*.{ts,tsx}",
-      "lib/validation/**/*.{ts,tsx}",
-      "lib/rate-limit.ts",
-      "app/api/auth/**/*.{ts,tsx}",
-      "app/api/checkout/**/*.{ts,tsx}",
-      "app/api/profile/**/*.{ts,tsx}",
-      "app/api/user-preferences/**/*.{ts,tsx}",
-      "app/api/uploads/sign/**/*.{ts,tsx}",
-      "app/api/webhooks/stripe/**/*.{ts,tsx}",
-      "app/api/inngest/**/*.{ts,tsx}",
-      "scripts/verify-prod.ts",
-    ],
-    rules: {
-      "react/no-unescaped-entities": "off",
+      "react-hooks/rules-of-hooks": "off",
       "react-hooks/purity": "off",
       "react-hooks/refs": "off",
-      "react-hooks/rules-of-hooks": "off",
-      "react-hooks/set-state-in-effect": "off",
-      "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "react/no-unescaped-entities": "off",
     },
   },
+
+  /**
+   * Furnishes Studio (ported from furnishes-studio). Lint rules are
+   * relaxed here until Phase 13 brings the lifted tree to full CI parity.
+   */
+  {
+    files: [
+      "components/studio/**/*.{ts,tsx}",
+      "lib/studio/**/*.{ts,tsx}",
+      "app/(chromeless)/playground/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "react-hooks/immutability": "off",
+      "react-hooks/purity": "off",
+      "react-hooks/refs": "off",
+      "react-hooks/static-components": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@next/next/no-img-element": "off",
+      "react/no-unescaped-entities": "off",
+    },
+  },
+
   globalIgnores([
     ".next/**",
     "out/**",

@@ -192,6 +192,8 @@ enum ProjectEventType {
   member_joined
   member_removed
   role_changed
+  /** Furnishes Studio — playground client snapshot persisted to `Project.playgroundClientSnapshot`. */
+  studio_playground_snapshot_saved
 }
 
 /** Phase 7 — real-world procurement / execution state per shortlist row (distinct from design role `ProjectShortlistStatus`). */
@@ -856,6 +858,12 @@ model Project {
   playbookUpdatedAt DateTime?
 
   /**
+   * Furnishes Studio / Playground — full client `ProjectSnapshot` JSON plus monotonic `revision`
+   * for optimistic concurrency (`GET`/`PUT` `/api/studio/projects/[id]/snapshot`). Validated on write.
+   */
+  playgroundClientSnapshot Json?
+
+  /**
    * Phase 5 — project-scoped decision context (preferred path, compare set, notes).
    * Validated with Zod on write; do not store conversation-only state here.
    */
@@ -1515,6 +1523,12 @@ model Delivery {
   updatedAt DateTime @updatedAt
 
   @@index([status])
+}
+
+/// Stripe webhook idempotency — one row per `evt_...` successfully processed.
+model ProcessedStripeEvent {
+  stripeEventId String   @id
+  receivedAt    DateTime @default(now())
 }
 
 // ─────────────────────────────────────────────────────────────

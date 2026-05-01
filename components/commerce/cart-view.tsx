@@ -45,17 +45,18 @@ export function CartView() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    refresh()
-      .catch(() => {
-        if (!cancelled) {
-          setItems([]);
-          setGiftDiscountCents(0);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+    queueMicrotask(() => {
+      refresh()
+        .catch(() => {
+          if (!cancelled) {
+            setItems([]);
+            setGiftDiscountCents(0);
+          }
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    });
     return () => {
       cancelled = true;
     };
@@ -275,6 +276,7 @@ export function CartView() {
                 </span>
                 <span
                   className="font-display text-2xl tabular-nums"
+                  data-testid="cart-total"
                   style={{ color: "var(--foreground)" }}
                 >
                   {formatSGD(summary.totalCents)}
@@ -286,6 +288,7 @@ export function CartView() {
               href="/checkout/shipping"
               variant="primary"
               className="mt-5 w-full justify-center"
+              data-testid="cart-checkout-link"
               icon={<ArrowRight className="h-3.5 w-3.5" />}
             >
               Checkout

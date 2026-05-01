@@ -23,8 +23,8 @@ import {
 
 export const runtime = "nodejs";
 /**
- * Vercel Hobby: `maxDuration` must be ≤ 300s (5 min). Pro/Enterprise allow higher
- * limits in the dashboard — keep this at 300 so deploys succeed on Hobby.
+ * Vercel Hobby caps serverless `maxDuration` at 300s; exceeding it fails deploy.
+ * Keep at 300 so builds succeed; use Pro/Enterprise or async patterns for longer work.
  */
 export const maxDuration = 300;
 

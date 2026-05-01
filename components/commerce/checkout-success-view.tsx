@@ -137,6 +137,7 @@ export function CheckoutSuccessView({
       </div>
       <h1
         className="font-display mt-5 text-4xl"
+        data-testid="order-confirmation"
         style={{ color: "var(--foreground)" }}
       >
         We&apos;ve got it from here.
@@ -146,7 +147,11 @@ export function CheckoutSuccessView({
         style={{ color: "var(--muted-foreground)" }}
       >
         Order{" "}
-        <span className="font-ui" style={{ color: "var(--foreground)" }}>
+        <span
+          className="font-ui"
+          data-testid="order-number"
+          style={{ color: "var(--foreground)" }}
+        >
           {orderNumber}
         </span>{" "}
         is confirmed. We&apos;ve sent a receipt to your email when payment

@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import bundleAnalyzer from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
 import { productionContentSecurityPolicy } from "./lib/site/content-security-policy";
+import { oauthAvatarRemotePatterns } from "./lib/site/oauth-avatar-image";
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -45,6 +46,7 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
+      ...oauthAvatarRemotePatterns(),
       {
         protocol: "https",
         hostname: "images.unsplash.com",

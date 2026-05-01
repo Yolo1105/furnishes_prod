@@ -153,7 +153,7 @@ export function ResetPasswordClient({ token }: { token: string }) {
                 className="mt-1 text-[10px]"
                 style={{ color: "var(--destructive, #dc2626)" }}
               >
-                Passwords don't match.
+                Passwords don&apos;t match.
               </p>
             )}
           </div>

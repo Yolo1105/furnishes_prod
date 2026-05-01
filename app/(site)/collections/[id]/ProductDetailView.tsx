@@ -351,6 +351,7 @@ export function ProductDetailView({
           <button
             type="button"
             disabled={adding}
+            data-testid="add-to-cart"
             className={`${styles.addToCart} ${addToCartSuccess ? styles.addToCartSuccess : ""}`}
             onClick={() => void handleAddToCart()}
           >

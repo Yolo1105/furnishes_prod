@@ -70,7 +70,7 @@ export function VerifyEmailClient({ token }: { token: string }) {
               className="mt-4 text-2xl font-[var(--font-manrope)] tracking-tight"
               style={{ color: "var(--foreground)" }}
             >
-              You're verified
+              You&apos;re verified
             </h1>
             <p
               className="mt-2 text-sm"

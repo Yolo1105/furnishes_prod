@@ -1,3 +1,8 @@
+import {
+  STUDIO_PLAYGROUND_PATH_PREFIX,
+  isStudioPlaygroundPathname,
+} from "@/lib/routes/studio-playground-path";
+
 export const SITE_TITLE_LINES = ["FURNISHES [ INTERIOR REVOLUTION ]"] as const;
 
 export const CTA_NAV_LABEL = "START JOURNEY";
@@ -27,8 +32,7 @@ export function getMarketingNavActiveKey(
     return "collections";
   if (pathname === "/inspiration" || pathname.startsWith("/inspiration/"))
     return "inspiration";
-  if (pathname === "/playground" || pathname.startsWith("/playground/"))
-    return "playground";
+  if (isStudioPlaygroundPathname(pathname)) return "playground";
   if (pathname === "/account" || pathname.startsWith("/account/"))
     return "studio";
   return null;
@@ -49,7 +53,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     name: "Playground",
-    href: "/playground",
+    href: STUDIO_PLAYGROUND_PATH_PREFIX,
     activeKey: "playground",
     badge: "[05]",
   },

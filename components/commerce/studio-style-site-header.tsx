@@ -9,11 +9,16 @@ import {
   CTA_NAV_LABEL,
   getMarketingNavActiveKey,
 } from "@/content/site/nav";
+import { isPlaygroundNavVisible } from "@/lib/site/studio-nav-flag";
 import type { MarketingHeaderContext } from "@/lib/auth/marketing-header-context.types";
 import { LOGIN_RETURN_TO_ACCOUNT } from "@/lib/auth/login-paths";
 import { useRightNav } from "@/components/site/right-nav-context";
 import { SlidingNavIcons } from "@/components/site/sliding-nav-icons";
 import { cn } from "@/lib/utils";
+
+const COMMERCE_HEADER_NAV_ITEMS = NAV_ITEMS.filter(
+  (item) => item.activeKey !== "playground" || isPlaygroundNavVisible(),
+);
 
 /**
  * Full marketing nav (Collections … Studio … About) with badges + auth CTA,
@@ -69,7 +74,7 @@ export function StudioStyleSiteHeader() {
         className="flex min-h-0 min-w-0 items-stretch justify-start gap-4 overflow-x-auto py-1 [scrollbar-width:none] sm:justify-center sm:gap-6 sm:py-0 md:gap-8 [&::-webkit-scrollbar]:hidden"
         aria-label="Main"
       >
-        {NAV_ITEMS.map((item) => {
+        {COMMERCE_HEADER_NAV_ITEMS.map((item) => {
           const resolvedHref =
             item.activeKey === "studio"
               ? headerCtx?.signedIn === true

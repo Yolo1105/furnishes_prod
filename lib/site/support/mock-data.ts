@@ -1,4 +1,4 @@
-import type { SupportThread, SupportMessage } from "./types";
+import type { SupportThread } from "./types";
 
 const daysAgo = (n: number) =>
   new Date(Date.now() - n * 86_400_000).toISOString();

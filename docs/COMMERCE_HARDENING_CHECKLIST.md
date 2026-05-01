@@ -22,12 +22,14 @@ See **Phase 1** below.
 
 - [x] **Stripe webhook → Inngest**: `sendOrderPaidEvent` in `app/api/webhooks/stripe/route.ts` sends `order/paid` when `INNGEST_EVENT_KEY` is set; `paid` + webhook retry re-sends so fulfillment can recover; `processing`+ skips duplicate pipeline work.
 - [x] **`handleOrderPaid` in `lib/jobs/inngest.ts`**: **`fulfillment-integration`** calls **`dispatchPaidOrderFulfillment`** (`lib/commerce/fulfillment-dispatch.ts`): optional **`FULFILLMENT_WEBHOOK_URL`** POST (`furnishes.order.paid`); otherwise stub log `commerce.fulfillment.stub` + Sentry breadcrumb. **`verify:prod`** warns in production if commerce is on but the webhook URL is unset.
-- [x] **Idempotency**: webhook skips `processing`/`shipped`/`delivered`; `mark-processing` uses `updateMany` where `status: "paid"` so duplicate `order/paid` events are safe.
+- [x] **Idempotency**: Stripe **`ProcessedStripeEvent`** table dedupes by `evt_...` id before handlers run; order-status guards remain (`processing`/`shipped`/`delivered` skips; `mark-processing` uses `updateMany` where `status: "paid"` for duplicate `order/paid` events).
 
 ## Phase 3 — Verification
 
-- [ ] Run **`npm run verify:prod`** / **`npm run verify:prod:local`** — step-by-step: **`docs/VERIFY_ENV_AND_STAGING.md`** (Postgres `DATABASE_URL`, auth secret, then fix failures until green).
-- [ ] Staging: place test order → confirm `paid` → confirm job runs (logs / Inngest dashboard) — same doc §2.
+Procedure and checklist: **`docs/seed-readiness/03-verification.md`**.
+
+- [ ] Run **`npm run verify:prod`** / **`npm run verify:prod:local`** — step-by-step: **`docs/VERIFY_ENV_AND_STAGING.md`** §1 (Postgres `DATABASE_URL`, auth secret, then fix failures until green).
+- [ ] Staging: place test order → confirm `paid` → confirm job runs (logs / Inngest dashboard) — **`docs/VERIFY_ENV_AND_STAGING.md`** §2.
 
 ## Phase 4 — Security & hygiene (non-blocking for MVP commerce)
 
@@ -39,7 +41,7 @@ See **Phase 1** below.
 - [x] **Inspiration page**: server `app/(site)/inspiration/page.tsx` (metadata + entry); interactive Framer Motion UI in `components/site/inspiration/inspiration-page-client.tsx`.
 - [x] **`CollectionFilter`**: search draft syncs from URL `q` during render when `state.q` changes (back/forward, clear) — no `set-state-in-effect` suppression.
 - [x] **`image-gen-workspace`**: Fal pipeline images use **`next/image`**; **`next.config.ts`** allows **`v3.fal.media`** (`remotePatterns`).
-- [ ] **Optional:** **`ProfileContent`** OAuth avatars stay as **`<img>`** — provider picture URLs use many hosts; extend **`remotePatterns`** if you standardize on Google/GitHub-only and switch to **`Image`**.
+- [x] **`ProfileContent`** OAuth avatars — **`next/image`** for allowlisted hosts (Google `lh*.googleusercontent.com`, GitHub **`avatars.githubusercontent.com`**); other URLs remain **`<img>`** — see **`lib/site/oauth-avatar-image.ts`**.
 
 ## Phase 6 — Product (parallel)
 

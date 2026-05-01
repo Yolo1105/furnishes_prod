@@ -132,7 +132,15 @@ export async function POST(req: NextRequest) {
       verifyUrl,
     });
 
-    return NextResponse.json({ ok: true, userId: user.id }, { status: 201 });
+    const response = NextResponse.json(
+      { ok: true, userId: user.id },
+      { status: 201 },
+    );
+    // Never set ALLOW_TEST_HELPERS on production deploy — see lib/env/production-guards.ts.
+    if (process.env.ALLOW_TEST_HELPERS === "1") {
+      response.headers.set("x-test-verify-token", rawToken);
+    }
+    return response;
   } catch (e) {
     return apiError(e);
   }

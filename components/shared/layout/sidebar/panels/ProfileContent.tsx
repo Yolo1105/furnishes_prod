@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   LogIn,
@@ -11,6 +12,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { isOptimizableOAuthAvatarUrl } from "@/lib/site/oauth-avatar-image";
 import styles from "./ProfileContent.module.css";
 
 function initialsFrom(
@@ -108,12 +110,22 @@ function LoggedIn({
       <div className={styles.profileHeader}>
         <div className={styles.avatar}>
           {image ? (
-            // eslint-disable-next-line @next/next/no-img-element -- OAuth avatar URLs (Google, etc.)
-            <img
-              src={image}
-              alt=""
-              className="h-full w-full rounded-full object-cover"
-            />
+            isOptimizableOAuthAvatarUrl(image) ? (
+              <Image
+                src={image}
+                alt=""
+                width={44}
+                height={44}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element -- non-allowlisted avatar host (e.g. future providers)
+              <img
+                src={image}
+                alt=""
+                className="h-full w-full rounded-full object-cover"
+              />
+            )
           ) : (
             initials
           )}

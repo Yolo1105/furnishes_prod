@@ -32,15 +32,17 @@ export function CheckoutShippingView() {
 
   useEffect(() => {
     if (bootstrap.loading) return;
-    setAddresses(bootstrap.addresses);
-    if (bootstrap.addresses.length > 0) {
-      setSelectedId(
-        bootstrap.addresses.find((a) => a.isDefault)?.id ??
-          bootstrap.addresses[0]!.id,
-      );
-    } else {
-      setSelectedId(null);
-    }
+    queueMicrotask(() => {
+      setAddresses(bootstrap.addresses);
+      if (bootstrap.addresses.length > 0) {
+        setSelectedId(
+          bootstrap.addresses.find((a) => a.isDefault)?.id ??
+            bootstrap.addresses[0]!.id,
+        );
+      } else {
+        setSelectedId(null);
+      }
+    });
   }, [bootstrap.loading, bootstrap.addresses]);
 
   const cartItems: CartItem[] = bootstrap.cart?.items ?? [];
@@ -170,6 +172,7 @@ export function CheckoutShippingView() {
               ctaLabel="Continue to delivery"
               onContinue={handleContinue}
               continueDisabled={!selectedId || addresses.length === 0}
+              continueTestId="shipping-continue"
             />
           </div>
         )}

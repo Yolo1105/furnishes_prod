@@ -91,6 +91,8 @@ export function eventTypeToLegacyKind(
       return ProjectTimelineKind.member_removed;
     case ProjectEventType.role_changed:
       return ProjectTimelineKind.role_changed;
+    case ProjectEventType.studio_playground_snapshot_saved:
+      return ProjectTimelineKind.execution_lifecycle_changed;
     default:
       return ProjectTimelineKind.execution_lifecycle_changed;
   }

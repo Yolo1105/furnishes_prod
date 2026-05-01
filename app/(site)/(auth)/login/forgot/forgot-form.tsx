@@ -56,14 +56,14 @@ export function ForgotForm() {
           className="mt-2 text-sm leading-relaxed"
           style={{ color: "var(--foreground)" }}
         >
-          If <strong>{email}</strong> matches an account, we've sent a reset
-          link. It's valid for the next 30 minutes.
+          If <strong>{email}</strong> matches an account, we&apos;ve sent a
+          reset link. It&apos;s valid for the next 30 minutes.
         </p>
         <p
           className="mt-3 text-xs"
           style={{ color: "var(--muted-foreground, #6b7280)" }}
         >
-          Didn't get it? Check spam, or{" "}
+          Didn&apos;t get it? Check spam, or{" "}
           <button
             type="button"
             onClick={() => setStatus("idle")}

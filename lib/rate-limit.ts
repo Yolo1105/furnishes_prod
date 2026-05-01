@@ -63,6 +63,15 @@ export const FURNITURE_LIMITS = {
   },
 } as const;
 
+/** Furnishes Studio `/api/studio/*` — per signed-in user. */
+export const STUDIO_API_LIMITS = {
+  default: {
+    requests: 200,
+    windowSeconds: 3600,
+    prefix: "studio:api",
+  },
+} as const;
+
 /** Per-IP limits for Eva chat (shared Upstash / in-memory backend). */
 export const EVA_CHAT_LIMITS = {
   requests: 30,

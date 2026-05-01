@@ -2,6 +2,10 @@ import { captureRequestError } from "@sentry/nextjs";
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
+    const { assertSeedReadinessProductionGuards } =
+      await import("./lib/env/production-guards");
+    assertSeedReadinessProductionGuards();
+
     await import("./sentry.server.config");
     if (process.env.NODE_ENV === "production") {
       const { logProductionConfigWarnings } =

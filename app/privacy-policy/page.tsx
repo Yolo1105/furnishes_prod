@@ -103,16 +103,16 @@ export default function PrivacyPolicyPage() {
           </Section>
 
           <Section title="How we use it">
-            To provide the service: personalising Eva's recommendations,
+            To provide the service: personalising Eva&apos;s recommendations,
             fulfilling orders, sending receipts and delivery updates. For
             marketing: only if you opt in, via the Contact preferences page.
           </Section>
 
           <Section title="Who we share with">
             Sub-processors we work with: Stripe (payments), Resend (email),
-            Cloudflare R2 (photo storage), Anthropic / OpenAI (Eva's underlying
-            model). We have data processing agreements with each. We never sell
-            your data.
+            Cloudflare R2 (photo storage), Anthropic / OpenAI (Eva&apos;s
+            underlying model). We have data processing agreements with each. We
+            never sell your data.
           </Section>
 
           <Section title="Your rights under PDPA">
@@ -130,14 +130,14 @@ export default function PrivacyPolicyPage() {
 
           <Section title="Security">
             Passwords hashed with bcrypt. TLS in transit. Encrypted at rest.
-            Payment data never touches our servers. We've implemented reasonable
-            technical measures as required by PDPA section 24.
+            Payment data never touches our servers. We&apos;ve implemented
+            reasonable technical measures as required by PDPA section 24.
           </Section>
 
           <Section title="Cookies">
             We use essential cookies for authentication and session management.
-            Analytics cookies are opt-in via the cookie banner. We don't use
-            third-party tracking cookies for advertising.
+            Analytics cookies are opt-in via the cookie banner. We don&apos;t
+            use third-party tracking cookies for advertising.
           </Section>
 
           <Section title="Data Protection Officer">
@@ -145,12 +145,12 @@ export default function PrivacyPolicyPage() {
             <a href="mailto:dpo@furnishes.sg" style={{ color: "#f24a12" }}>
               dpo@furnishes.sg
             </a>
-            . We'll respond within 30 days as required by law.
+            . We&apos;ll respond within 30 days as required by law.
           </Section>
 
           <Section title="Changes to this policy">
-            If we update this policy, we'll email account holders and note the
-            change in your Activity log. Material changes require renewed
+            If we update this policy, we&apos;ll email account holders and note
+            the change in your Activity log. Material changes require renewed
             consent.
           </Section>
         </div>

@@ -166,6 +166,7 @@ export function CheckoutDeliveryView() {
                 router.push("/checkout/review");
               }}
               continueDisabled={!selectedId}
+              continueTestId="delivery-continue"
             />
           </div>
         )}

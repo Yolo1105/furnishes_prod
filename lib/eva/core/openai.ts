@@ -7,8 +7,21 @@ import { getPublicOrigin } from "@/lib/eva/core/public-origin";
 const openRouterKey = process.env.OPENROUTER_API_KEY?.trim() || null;
 const openaiKey = process.env.OPENAI_API_KEY?.trim() || null;
 
-const openRouterReferer =
-  process.env.OPENROUTER_HTTP_REFERER?.trim() || getPublicOrigin();
+function resolveOpenRouterReferer(): string {
+  const explicit = process.env.OPENROUTER_HTTP_REFERER?.trim();
+  if (explicit) return explicit;
+  try {
+    return getPublicOrigin();
+  } catch {
+    /**
+     * OpenRouter uses this header for analytics/routing hints only.
+     * Keep module import/build safe when public-origin env vars are missing.
+     */
+    return "http://localhost:3000";
+  }
+}
+
+const openRouterReferer = resolveOpenRouterReferer();
 const openRouterTitle =
   process.env.OPENROUTER_APP_TITLE?.trim() ||
   process.env.NEXT_PUBLIC_APP_NAME?.trim() ||

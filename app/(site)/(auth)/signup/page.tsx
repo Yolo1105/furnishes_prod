@@ -55,7 +55,7 @@ export default function SignupPage() {
               className="text-4xl leading-tight font-[var(--font-manrope)] tracking-tight md:text-5xl"
               style={authPosterHeadlineSx}
             >
-              Let's build a room together.
+              Let&apos;s build a room together.
             </h2>
             <p
               className="mt-3 max-w-md text-sm leading-relaxed"
@@ -89,7 +89,7 @@ export default function SignupPage() {
             className="mt-2 text-sm"
             style={{ color: "var(--muted-foreground, #6b7280)" }}
           >
-            Takes under a minute. We'll send a one-time verification email.
+            Takes under a minute. We&apos;ll send a one-time verification email.
           </p>
 
           <Suspense fallback={null}>

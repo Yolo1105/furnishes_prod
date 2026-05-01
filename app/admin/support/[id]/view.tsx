@@ -398,7 +398,7 @@ export function AdminSupportThreadView({
                         }}
                       >
                         <XCircle className="h-3.5 w-3.5" />
-                        Won't ship
+                        Won&apos;t ship
                       </button>
                       <button
                         type="button"

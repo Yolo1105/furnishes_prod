@@ -44,7 +44,7 @@ export default function CartError({
         className="font-display mt-4 text-2xl md:text-3xl"
         style={{ color: "var(--foreground)" }}
       >
-        We couldn't load your cart.
+        We couldn&apos;t load your cart.
       </h1>
       <p
         className="font-body mt-3 max-w-md text-sm"

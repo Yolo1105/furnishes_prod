@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-/** Used during Vercel/CI build when DATABASE_URL is not set; db layer must not connect. */
+/** Used during Vercel/CI build when DATABASE_URL is not set; must be Postgres-shaped for `pg` adapter. */
 export const BUILD_PLACEHOLDER_DATABASE_URL =
-  "file:./prisma/build-placeholder.db";
+  "postgresql://prisma-cli-placeholder:prisma@127.0.0.1:5432/prisma?schema=public";
 
 const envSchema = z.object({
   DATABASE_URL: z
@@ -44,6 +44,12 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
+  /** Studio `/api/studio/*` daily spend cap per user (USD, rolling 24h). */
+  STUDIO_USER_DAILY_COST_LIMIT_USD: z.string().optional(),
+  FAL_API_KEY: z.string().optional(),
+  FAL_KEY: z.string().optional(),
+  MESH_HERO_PROVIDER: z.string().optional(),
+  MESH_PREVIEW_PROVIDER: z.string().optional(),
 });
 
 export type EvaEnv = z.infer<typeof envSchema>;

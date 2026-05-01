@@ -97,14 +97,14 @@ export default function TermsPage() {
         >
           <Section title="01. About these terms">
             These terms govern your use of Furnishes (furnishes.sg). By creating
-            an account, you agree to them. If you don't agree, don't use the
-            service.
+            an account, you agree to them. If you don&apos;t agree, don&apos;t
+            use the service.
           </Section>
 
           <Section title="02. Your account">
             You are responsible for keeping your account credentials
             confidential. Notify us at security@furnishes.sg if you suspect
-            unauthorised access. One person per account. Don't share your
+            unauthorised access. One person per account. Don&apos;t share your
             sign-in details.
           </Section>
 
@@ -132,12 +132,12 @@ export default function TermsPage() {
           <Section title="06. Intellectual property">
             Your uploaded photos and Style Profile remain yours. You grant us a
             licence to process them for the purpose of delivering the service.
-            Our interface, Eva's conversations, and editorial content remain
-            ours.
+            Our interface, Eva&apos;s conversations, and editorial content
+            remain ours.
           </Section>
 
           <Section title="07. Acceptable use">
-            Don't use Furnishes to harass others, upload illegal content,
+            Don&apos;t use Furnishes to harass others, upload illegal content,
             attempt to compromise our systems, or abuse our fair-use policies on
             AI conversation limits.
           </Section>
@@ -151,7 +151,7 @@ export default function TermsPage() {
           <Section title="09. Liability">
             Furnishes is provided as-is. We do our best, but cannot guarantee
             uninterrupted service or perfect recommendations. Our liability is
-            limited to the amount you've paid us in the prior 12 months.
+            limited to the amount you&apos;ve paid us in the prior 12 months.
           </Section>
 
           <Section title="10. Governing law">

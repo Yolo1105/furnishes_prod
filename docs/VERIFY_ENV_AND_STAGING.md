@@ -2,6 +2,8 @@
 
 Follow in order. This matches the engineering plan: **verify locally → staging smoke → fulfillment → optional lint/image polish.**
 
+Seed-readiness **Phase 3** wraps these steps: **`docs/seed-readiness/03-verification.md`**.
+
 ## 1. Local / CI: production readiness script
 
 ### Prerequisites
@@ -23,6 +25,8 @@ npm run verify:prod:local
 
 - Exit code **0**, no **✗** lines (warnings may be OK outside true production).
 - Fix every **failure** before treating the app as deploy-ready.
+
+Related: **`docs/seed-readiness/02-production-guards.md`** (runtime boot guards vs `verify:prod` safety checks).
 
 ### Common fixes
 
@@ -64,4 +68,4 @@ Details: **`docs/COMMERCE_HARDENING_CHECKLIST.md`** (Phase 2).
 
 ## 4. Optional ESLint / `next/image` polish
 
-**Phase 5** in **`docs/COMMERCE_HARDENING_CHECKLIST.md`** lists optional follow-ups — e.g. **`ProfileContent`** OAuth avatars (many hosts) may stay **`<img>`** until **`remotePatterns`** + **`next/image`**. Not a launch blocker.
+**Phase 5** in **`docs/COMMERCE_HARDENING_CHECKLIST.md`**: **`ProfileContent`** uses **`next/image`** for allowlisted OAuth avatar hosts — see **`lib/site/oauth-avatar-image.ts`**.

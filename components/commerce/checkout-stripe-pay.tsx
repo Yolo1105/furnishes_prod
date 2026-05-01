@@ -46,7 +46,9 @@ function PayForm({ orderId }: { orderId: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
+      <div data-testid="stripe-element">
+        <PaymentElement />
+      </div>
       {err && (
         <p className="font-body text-sm text-red-600" role="alert">
           {err}
@@ -55,6 +57,7 @@ function PayForm({ orderId }: { orderId: string }) {
       <button
         type="submit"
         disabled={!stripe || busy}
+        data-testid="stripe-pay-submit"
         className="font-ui h-12 w-full border text-[11px] tracking-[0.18em] uppercase transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
         style={{
           background: "var(--primary)",

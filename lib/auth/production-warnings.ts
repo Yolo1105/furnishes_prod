@@ -1,5 +1,6 @@
 import "server-only";
 
+import { isDeployedProductionRuntime } from "@/lib/env/production-guards";
 import { serverLog } from "@/lib/server/server-log";
 
 /**
@@ -8,6 +9,15 @@ import { serverLog } from "@/lib/server/server-log";
  */
 export function logProductionConfigWarnings(): void {
   if (process.env.NODE_ENV !== "production") return;
+
+  if (
+    !isDeployedProductionRuntime() &&
+    process.env.ALLOW_TEST_HELPERS === "1"
+  ) {
+    serverLog("warn", "config_allow_test_helpers", {
+      fix: "ALLOW_TEST_HELPERS is for E2E/CI only — never set on Vercel/production.",
+    });
+  }
 
   if (process.env.SUPPORT_MEMORY_FALLBACK === "1") {
     serverLog("warn", "config_support_memory_fallback", {

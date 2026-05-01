@@ -15,7 +15,7 @@ export default function AccountNotFound() {
             className="font-display mt-5 text-4xl"
             style={{ color: "var(--foreground)" }}
           >
-            This page doesn't exist in Studio
+            This page doesn&apos;t exist in Studio
           </h1>
           <p
             className="font-body mt-3 max-w-md text-sm"

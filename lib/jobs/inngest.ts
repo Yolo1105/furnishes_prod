@@ -1,6 +1,10 @@
 /**
  * Inngest client + scheduled job definitions.
  *
+ * When adding **Furnishes Studio** background work, gate it with
+ * `isStudioEnabled()` from `@/lib/studio/studio-enabled` so
+ * `STUDIO_ENABLED=0` skips registration or no-ops inside the handler.
+ *
  * Inngest is a typed event-driven scheduler that handles:
  *   - Scheduled crons (deletion finalization, token cleanup)
  *   - Event-triggered workflows (order paid → fulfillment)

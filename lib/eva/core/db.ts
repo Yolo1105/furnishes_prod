@@ -1,23 +1,8 @@
-import path from "node:path";
-
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
-import { config as loadEnv } from "dotenv";
+import { Pool } from "pg";
 
 import { BUILD_PLACEHOLDER_DATABASE_URL } from "./env";
-
-/**
- * Match `prisma.config.ts`: Prisma CLI loads these files explicitly; Next also
- * loads them for the dev server, but scripts/tests that import `prisma` first
- * should still see `DATABASE_URL` from disk. Preserve an already-set URL (e.g.
- * `DATABASE_URL=... npm run …`) so dotenv does not clobber it.
- */
-const preservedDatabaseUrl = process.env.DATABASE_URL?.trim();
-loadEnv({ path: path.join(process.cwd(), ".env") });
-loadEnv({ path: path.join(process.cwd(), ".env.local"), override: true });
-if (preservedDatabaseUrl) {
-  process.env.DATABASE_URL = preservedDatabaseUrl;
-}
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -65,7 +50,9 @@ function createPrisma(): PrismaClient {
   const devLog: ("error" | "warn" | "query" | "info")[] =
     process.env.PRISMA_LOG === "1" ? ["error", "warn"] : [];
 
-  const adapter = new PrismaPg({ connectionString: url });
+  const pool = new Pool({ connectionString: url });
+  const adapter = new PrismaPg(pool);
+
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? devLog : ["error"],

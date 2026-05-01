@@ -56,6 +56,7 @@ type StripeLike = {
       signature: string,
       secret: string,
     ) => {
+      id: string;
       type: string;
       data: { object: Record<string, unknown> };
     };
@@ -208,7 +209,11 @@ export async function verifyWebhookSignature(args: {
 }): Promise<
   | {
       ok: true;
-      event: { type: string; data: { object: Record<string, unknown> } };
+      event: {
+        id: string;
+        type: string;
+        data: { object: Record<string, unknown> };
+      };
     }
   | { ok: false; error: string }
 > {
@@ -223,7 +228,16 @@ export async function verifyWebhookSignature(args: {
       args.signature,
       secret,
     );
-    return { ok: true, event };
+    return {
+      ok: true,
+      event: {
+        id: event.id,
+        type: event.type,
+        data: {
+          object: event.data.object as Record<string, unknown>,
+        },
+      },
+    };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
   }

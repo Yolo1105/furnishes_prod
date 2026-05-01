@@ -270,8 +270,41 @@ async function checkCommerceConfig(isProd: boolean) {
   }
 }
 
+/** True only for the live production deploy (not Vercel preview / local prod-like runs). */
+function isTrueProductionDeploy(): boolean {
+  return (
+    process.env.VERCEL_ENV === "production" ||
+    process.env.DEPLOYMENT_ENV === "production"
+  );
+}
+
 async function checkSafetyFlags(isProd: boolean) {
   section("3. Production safety flags");
+
+  // MUST be off on the canonical production deploy (preview may still use NODE_ENV=production)
+  if (isTrueProductionDeploy()) {
+    if (process.env.ALLOW_TEST_HELPERS === "1") {
+      fail(
+        "ALLOW_TEST_HELPERS",
+        "MUST NOT be set on production — leaks signup verification tokens to clients.",
+      );
+    } else {
+      pass("ALLOW_TEST_HELPERS", "unset");
+    }
+    if (process.env.ALLOW_MOCK_AUTH === "1") {
+      fail(
+        "ALLOW_MOCK_AUTH",
+        "MUST NOT be set on production — enables mock-auth cookie bypass.",
+      );
+    } else {
+      pass("ALLOW_MOCK_AUTH", "unset");
+    }
+  } else if (isProd && process.env.ALLOW_TEST_HELPERS === "1") {
+    warn(
+      "ALLOW_TEST_HELPERS",
+      "Enabled while NODE_ENV=production — fine for local `next start` / CI; never set on Vercel production.",
+    );
+  }
 
   // MUST be off in production (demo login button)
   const dangerInProd = ["NEXT_PUBLIC_SHOW_DEMO_LOGIN"];
@@ -367,12 +400,13 @@ async function checkDatabase() {
   }
 
   try {
-    const { PrismaClient } = await import("@prisma/client").catch(() => {
+    const { prisma } = await import("../lib/eva/db").catch((e) => {
       throw new Error(
-        "@prisma/client not installed. Run: npm install @prisma/client && npx prisma generate",
+        `Failed to load Prisma client (run \`npx prisma generate\`): ${
+          e instanceof Error ? e.message : String(e)
+        }`,
       );
     });
-    const prisma = new PrismaClient();
 
     // Simple ping
     await prisma.$queryRaw`SELECT 1 as ping`;

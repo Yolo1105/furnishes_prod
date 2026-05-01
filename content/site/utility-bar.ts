@@ -1,3 +1,5 @@
+import { isStudioPlaygroundPathname } from "@/lib/routes/studio-playground-path";
+
 /**
  * Left / right utility strip (locale, delivery, store) — shared across pages.
  * Center copy is per-route; see `getUtilityBarCenterMessage`.
@@ -62,7 +64,7 @@ export function getUtilityBarCenterMessage(pathname: string): string {
   if (pathname === "/about" || pathname.startsWith("/about/")) {
     return "Learn how we work. Studio process, materials, and the team behind Furnishes.";
   }
-  if (pathname === "/playground" || pathname.startsWith("/playground/")) {
+  if (isStudioPlaygroundPathname(pathname)) {
     return "Sandbox for experiments: layouts, motion, and UI checks before they go live.";
   }
   return "Interior design and renovation. Quality materials, enduring spaces.";

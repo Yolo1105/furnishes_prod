@@ -13,8 +13,7 @@ export function accountDashboardPlanLabel(): "FREE" | "PRO" | "STUDIO+" {
  * Display cap for Eva token usage (prompt + completion) on dashboard/billing.
  * Override with `ACCOUNT_EVA_TOKEN_DISPLAY_LIMIT` (positive integer).
  */
-/** Exported for degraded dashboard path when CostLog aggregate cannot run. */
-export function evaTokenDisplayLimit(): number {
+function evaTokenDisplayLimit(): number {
   const raw = process.env.ACCOUNT_EVA_TOKEN_DISPLAY_LIMIT?.trim();
   if (!raw) return 1_000_000;
   const n = parseInt(raw, 10);

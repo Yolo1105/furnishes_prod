@@ -4,6 +4,10 @@
  * Every Server Action in the app returns this shape. Callers check
  * `result.ok` to discriminate success from failure.
  */
+type OkResult<T> = [T] extends [undefined]
+  ? { ok: true }
+  : { ok: true; data: T };
+
 export type ActionResult<T = undefined> =
-  | ({ ok: true } & (T extends undefined ? {} : { data: T }))
+  | OkResult<T>
   | { ok: false; error: string };

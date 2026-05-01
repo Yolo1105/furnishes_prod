@@ -86,6 +86,8 @@ export function CollectionProductCard({
     <Link href={listingHref} className={styles.link}>
       <div
         ref={ref}
+        data-testid="product-card"
+        data-product-id={String(product.id)}
         className={`${styles.revealWrap} ${visible ? styles.revealWrapVisible : styles.revealWrapHidden}`}
         style={{
           transitionDelay: visible ? `${delay}ms` : undefined,
