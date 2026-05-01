@@ -21,6 +21,30 @@ function requireApiAuth(): boolean {
 }
 
 let mockAuthProdWarned = false;
+let authSecretProdWarned = false;
+
+function getAuthSecretForMiddleware(): string | null {
+  try {
+    return getAuthSecret();
+  } catch (error) {
+    if (process.env.NODE_ENV === "production" && !authSecretProdWarned) {
+      authSecretProdWarned = true;
+      console.warn(
+        JSON.stringify({
+          ts: new Date().toISOString(),
+          level: "warn",
+          event: "auth_secret_missing_in_middleware",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Unknown auth secret error",
+          fix: "Set AUTH_SECRET or NEXTAUTH_SECRET in deployment environment variables.",
+        }),
+      );
+    }
+    return null;
+  }
+}
 
 function addSecurityHeaders(res: NextResponse) {
   res.headers.set("X-Frame-Options", "SAMEORIGIN");
@@ -84,7 +108,13 @@ export default async function middleware(req: NextRequest) {
       }
       return res;
     }
-    const token = await getToken({ req, secret: getAuthSecret() });
+    const secret = getAuthSecretForMiddleware();
+    if (!secret) {
+      const url = new URL("/login", req.url);
+      url.searchParams.set("next", path);
+      return addSecurityHeaders(NextResponse.redirect(url));
+    }
+    const token = await getToken({ req, secret });
     if (!token) {
       const url = new URL("/login", req.url);
       url.searchParams.set("next", path);
@@ -94,7 +124,13 @@ export default async function middleware(req: NextRequest) {
   }
 
   if (path.startsWith("/api/") && requireApiAuth()) {
-    const token = await getToken({ req, secret: getAuthSecret() });
+    const secret = getAuthSecretForMiddleware();
+    if (!secret) {
+      return addSecurityHeaders(
+        NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
+      );
+    }
+    const token = await getToken({ req, secret });
     if (!token) {
       return addSecurityHeaders(
         NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
