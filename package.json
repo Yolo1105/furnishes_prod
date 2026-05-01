@@ -47,7 +47,7 @@
     "*.{json,css,md,yml,yaml}": "prettier --write"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^3.0.37",
+    "@ai-sdk/openai": "^3.0.58",
     "@auth/prisma-adapter": "^2.11.1",
     "@aws-sdk/client-s3": "^3.1030.0",
     "@aws-sdk/s3-request-presigner": "^3.1030.0",
