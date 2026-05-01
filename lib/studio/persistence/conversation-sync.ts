@@ -159,9 +159,7 @@ function messageRowToTurn(row: MessageRow): ConversationTurn {
  *      for metadata: title, timestamps; local can have unsent turns
  *      that haven't pushed yet).
  */
-export async function pullConversationsForProject(
-  projectId: string,
-): Promise<{
+export async function pullConversationsForProject(projectId: string): Promise<{
   kind: "ok" | "no-auth" | "unavailable" | "error";
   count?: number;
 }> {
