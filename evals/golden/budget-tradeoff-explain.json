@@ -1,0 +1,24 @@
+{
+  "id": "budget-tradeoff-explain",
+  "description": "Budget tradeoff cites the user's budget band",
+  "setup": {
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": "$5000",
+      "style": "japandi",
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "Where should I spend versus save?",
+      "expect": {
+        "mustMatch": ["5000|budget|sofa"],
+        "mustNotMatch": ["SKU", "add to cart"],
+        "judge": "Reply explains a spend/save tradeoff tied to the user's budget.",
+        "maxWords": 120
+      }
+    }
+  ]
+}

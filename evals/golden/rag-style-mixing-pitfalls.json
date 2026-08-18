@@ -1,0 +1,26 @@
+{
+  "id": "rag-style-mixing-pitfalls",
+  "description": "RAG retrieval for style-mixing pitfalls",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "What's the rule when mixing two interior styles in one room?",
+      "expect": {
+        "mustMatch": ["dominant|accent|70|30|tension"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}

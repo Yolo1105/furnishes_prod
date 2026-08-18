@@ -1,0 +1,23 @@
+{
+  "id": "design-rule-clearance",
+  "description": "Design-rule recall for furniture clearance",
+  "setup": {
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "What clearance do I need between furniture?",
+      "expect": {
+        "mustMatch": ["30|36|inch|clearance|walkway"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 100
+      }
+    }
+  ]
+}

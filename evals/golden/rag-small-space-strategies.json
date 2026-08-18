@@ -1,0 +1,26 @@
+{
+  "id": "rag-small-space-strategies",
+  "description": "RAG retrieval for small-space strategies",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "How do I furnish a small living room without blocking walkways?",
+      "expect": {
+        "mustMatch": ["walkway|30|36|legs|scale|edit"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}

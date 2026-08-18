@@ -1,0 +1,17 @@
+{
+  "id": "suggest-chip-shape",
+  "description": "Suggestion chips are short next-message prompts",
+  "setup": {
+    "flags": { "CHAT_SIDE_FEATURES_ENABLED": "1" }
+  },
+  "turns": [
+    {
+      "user": "Give me next questions to ask.",
+      "expect": {
+        "mustMatch": ["suggestions|sofa|rug|lighting"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 80
+      }
+    }
+  ]
+}

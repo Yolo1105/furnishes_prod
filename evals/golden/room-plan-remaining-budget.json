@@ -1,0 +1,48 @@
+{
+  "id": "room-plan-remaining-budget",
+  "description": "With room plan enabled, Eva cites the exact remaining budget from the plan block",
+  "setup": {
+    "flags": {
+      "CHAT_ROOM_PLAN_ENABLED": "1",
+      "CHAT_POLICY_GATING_ENABLED": "0"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": "$5000",
+      "style": "japandi",
+      "color": "warm beige",
+      "furniture": null
+    },
+    "roomPlan": {
+      "name": "Living room plan",
+      "budgetCapCents": 500000,
+      "currency": "USD",
+      "items": [
+        {
+          "label": "Sofa",
+          "category": "sofa",
+          "priority": "core",
+          "status": "decided",
+          "budgetCents": 180000
+        },
+        {
+          "label": "Rug",
+          "category": "rug",
+          "priority": "core",
+          "status": "needed",
+          "budgetCents": 50000
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "user": "How much budget do I have left on my room plan?",
+      "expect": {
+        "mustMatch": ["2700", "remaining"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 80
+      }
+    }
+  ]
+}

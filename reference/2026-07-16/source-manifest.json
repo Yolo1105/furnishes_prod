@@ -1,0 +1,15 @@
+{
+  "version": "2026-07-16",
+  "importedAt": "2026-07-16T17:02:49.994Z",
+  "hashAlgorithm": "sha256-normalized-lf",
+  "sources": {
+    "landing": {
+      "file": "landing.jsx",
+      "sha256": "5db069567ffda4cbe7aab9efcf4310ca835a51f503b1db0880966c5e9b6e9e19"
+    },
+    "account": {
+      "file": "account.jsx",
+      "sha256": "ee8e938705655c7ab91af1482ac2f19caf17438124f6806918645353eff3068f"
+    }
+  }
+}

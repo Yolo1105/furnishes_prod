@@ -1,0 +1,26 @@
+{
+  "id": "rag-mid-century-modern",
+  "description": "RAG retrieval for mid-century modern deep-dive",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "What defines mid-century modern furniture legs and wood choices?",
+      "expect": {
+        "mustMatch": ["tapered|walnut|teak|MCM|mid-century"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}

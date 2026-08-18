@@ -1,0 +1,23 @@
+{
+  "id": "persona-style-lens",
+  "description": "Style persona emphasizes palette cohesion",
+  "setup": {
+    "confirmedPreferences": {
+      "room": "bedroom",
+      "budget": null,
+      "style": "soft modern",
+      "color": "greige",
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "How should the walls and wood tones relate?",
+      "expect": {
+        "mustMatch": ["palette|cohesion|greige|walnut|accent"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 100
+      }
+    }
+  ]
+}

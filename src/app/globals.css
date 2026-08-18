@@ -1,0 +1,119 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  background-color: #fff2e5;
+}
+
+body {
+  margin: 0;
+}
+
+:root {
+  --focus-ring: oklch(0.605 0.176 41);
+  --caret: oklch(0.35 0.05 40);
+  accent-color: var(--focus-ring);
+  caret-color: var(--caret);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* No system-blue focus ring or caret anywhere. */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  caret-color: var(--caret);
+}
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
+/* Root app error — matches account crash tone outside the shell */
+.furnishes-crash {
+  --crash-ink: #6b2c12;
+  --crash-terra: oklch(0.605 0.176 41);
+  --crash-paper: #fff2e5;
+  --crash-on: #fbf0dc;
+  box-sizing: border-box;
+  min-height: 100vh;
+  margin: 0;
+  padding: clamp(48px, 12vh, 96px) clamp(20px, 5vw, 48px);
+  background: var(--crash-paper);
+  color: var(--crash-ink);
+  font-family: var(--font-archivo), "Archivo", system-ui, sans-serif;
+}
+.furnishes-crash__kicker {
+  margin: 0 0 10px;
+  font-family: var(--font-space-mono), "Space Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--crash-terra);
+}
+.furnishes-crash__t {
+  margin: 0 0 10px;
+  font-weight: 600;
+  font-stretch: 78%;
+  font-size: clamp(28px, 4vw, 36px);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.furnishes-crash__p {
+  margin: 0 0 24px;
+  max-width: 38ch;
+  font-stretch: 78%;
+  font-size: 16px;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--crash-ink) 62%, transparent);
+}
+.furnishes-crash__act {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+}
+.furnishes-crash__btn {
+  appearance: none;
+  margin: 0;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--crash-terra);
+  color: var(--crash-on);
+  font: inherit;
+  font-stretch: 78%;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.furnishes-crash__link {
+  color: var(--crash-ink);
+  font-stretch: 78%;
+  font-size: 15px;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--crash-ink) 22%, transparent);
+  text-underline-offset: 3px;
+}
+.furnishes-crash__link:hover {
+  color: var(--crash-terra);
+}

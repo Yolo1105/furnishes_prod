@@ -1,0 +1,25 @@
+{
+  "id": "recommend-explain-quiz-prefs",
+  "description": "Recommendation reason cites accepted quiz-sourced preferences",
+  "setup": {
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": "$5k–$15k",
+      "style": "minimalist",
+      "color": "warm linen",
+      "furniture": "sofa"
+    },
+    "flags": { "CHAT_SIDE_FEATURES_ENABLED": "1" }
+  },
+  "turns": [
+    {
+      "user": "Recommend a sofa for this room.",
+      "expect": {
+        "mustMatch": ["minimalist|warm linen|living room|sofa|budget|5k"],
+        "mustNotMatch": ["SKU", "ASIN"],
+        "judge": "EXPLAIN: reason references at least one confirmed quiz-sourced preference (style, palette, room, or budget).",
+        "maxWords": 120
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "memory-long-thread-constraint",
+  "description": "Long conversation remembers early avoid-dark-wood constraint",
+  "setup": {
+    "flags": { "CHAT_SUMMARY_ENABLED": "1" },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": "$5k",
+      "style": "calm",
+      "color": "neutral",
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "Earlier I said avoid dark wood — still true for the media console?",
+      "expect": {
+        "mustMatch": ["dark wood|light oak|avoid"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 120
+      }
+    }
+  ]
+}

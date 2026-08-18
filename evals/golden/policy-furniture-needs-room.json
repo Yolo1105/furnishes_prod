@@ -1,0 +1,24 @@
+{
+  "id": "policy-furniture-needs-room",
+  "description": "Furniture recs without room type ask for room",
+  "setup": {
+    "flags": { "CHAT_POLICY_GATING_ENABLED": "1" },
+    "confirmedPreferences": {
+      "room": null,
+      "budget": "$3k",
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "What furniture should I buy?",
+      "expect": {
+        "mustMatch": ["room"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 60
+      }
+    }
+  ]
+}

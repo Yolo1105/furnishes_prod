@@ -1,0 +1,25 @@
+{
+  "id": "recommend-explain-user-facts",
+  "description": "Recommendation reason cites confirmed user facts",
+  "setup": {
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": "$6k",
+      "style": "japandi",
+      "color": "walnut",
+      "furniture": null
+    },
+    "flags": { "CHAT_SIDE_FEATURES_ENABLED": "1" }
+  },
+  "turns": [
+    {
+      "user": "Recommend a media console.",
+      "expect": {
+        "mustMatch": ["japandi|walnut|budget|6k"],
+        "mustNotMatch": ["SKU", "ASIN"],
+        "judge": "EXPLAIN: reason references at least one confirmed user preference.",
+        "maxWords": 120
+      }
+    }
+  ]
+}

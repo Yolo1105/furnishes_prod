@@ -1,0 +1,24 @@
+{
+  "id": "policy-shopping-needs-budget",
+  "description": "Shopping list without budget triggers clarification",
+  "setup": {
+    "flags": { "CHAT_POLICY_GATING_ENABLED": "1" },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "Make me a shopping list for this room.",
+      "expect": {
+        "mustMatch": ["budget"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 60
+      }
+    }
+  ]
+}

@@ -1,8 +1,26 @@
-.nvmrc
-.next
-out
-build
 node_modules
-package-lock.json
-*.min.js
-.next/cache
+.pnpm-store
+.next
+dist
+coverage
+playwright-report
+test-results
+pnpm-lock.yaml
+tsconfig.tsbuildinfo
+next-env.d.ts
+# Immutable approved design references — never formatted.
+reference/
+# Extracted single-file quiz — keep source formatting.
+src/features/quiz/FurnishesDesignQuiz.tsx
+# Ported playground (Phase 15) — keep upstream formatting.
+src/features/account/canvas/playground/
+src/app/api/chat/
+src/app/api/suggestions/
+src/app/api/explain/
+src/app/api/arrange/
+src/app/api/generate-asset/
+src/app/api/generate-room/
+src/app/api/studio/
+src/app/api/conversations/
+# Playground catalog seeds
+public/studio/catalog/

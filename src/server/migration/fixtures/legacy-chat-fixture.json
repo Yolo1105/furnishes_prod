@@ -1,0 +1,196 @@
+{
+  "users": [
+    {
+      "id": "legacy-user-1",
+      "email": "owner@example.com",
+      "name": "Owner",
+      "password": "hash",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-02T00:00:00.000Z"
+    },
+    {
+      "id": "legacy-user-guestish",
+      "email": null,
+      "name": "No Email",
+      "password": null,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "conversations": [
+    {
+      "id": "conv-owned",
+      "userId": "legacy-user-1",
+      "guestSessionId": null,
+      "title": "Living room",
+      "status": "active",
+      "projectId": "project-missing",
+      "assistantId": "eva-style",
+      "createdAt": "2026-02-01T00:00:00.000Z",
+      "updatedAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "conv-guest",
+      "userId": null,
+      "guestSessionId": "guest-abc",
+      "title": "Guest chat",
+      "status": "active",
+      "projectId": null,
+      "assistantId": "eva-general",
+      "createdAt": "2026-02-01T00:00:00.000Z",
+      "updatedAt": "2026-02-01T00:00:00.000Z"
+    },
+    {
+      "id": "conv-bad-persona",
+      "userId": "legacy-user-1",
+      "guestSessionId": null,
+      "title": "Older thread",
+      "status": "archived",
+      "projectId": null,
+      "assistantId": "eva-unknown",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-15T00:00:00.000Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg-user-1",
+      "conversationId": "conv-owned",
+      "role": "user",
+      "content": "I want a calm japandi living room.",
+      "createdAt": "2026-02-01T00:01:00.000Z"
+    },
+    {
+      "id": "msg-asst-1",
+      "conversationId": "conv-owned",
+      "role": "assistant",
+      "content": "Here is a calm palette.",
+      "createdAt": "2026-02-01T00:02:00.000Z"
+    },
+    {
+      "id": "msg-guest-1",
+      "conversationId": "conv-guest",
+      "role": "user",
+      "content": "Guest only",
+      "createdAt": "2026-02-01T00:01:00.000Z"
+    },
+    {
+      "id": "msg-system",
+      "conversationId": "conv-owned",
+      "role": "system",
+      "content": "skip me",
+      "createdAt": "2026-02-01T00:00:00.000Z"
+    }
+  ],
+  "feedback": [
+    {
+      "id": "fb-1",
+      "messageId": "msg-asst-1",
+      "rating": "up",
+      "createdAt": "2026-02-01T00:03:00.000Z"
+    },
+    {
+      "id": "fb-2",
+      "messageId": "msg-asst-1",
+      "rating": "down",
+      "createdAt": "2026-02-01T00:04:00.000Z"
+    },
+    {
+      "id": "fb-guest",
+      "messageId": "msg-guest-1",
+      "rating": "up",
+      "createdAt": "2026-02-01T00:03:00.000Z"
+    }
+  ],
+  "userPreferences": [
+    {
+      "id": "up-1",
+      "userId": "legacy-user-1",
+      "group": "style",
+      "field": "aesthetic",
+      "value": "japandi",
+      "status": "confirmed",
+      "confidence": 0.9,
+      "sourceConversationId": "conv-owned",
+      "createdAt": "2026-02-01T00:00:00.000Z",
+      "updatedAt": "2026-02-05T00:00:00.000Z"
+    },
+    {
+      "id": "up-potential",
+      "userId": "legacy-user-1",
+      "group": "budget",
+      "field": "range",
+      "value": "under 5k",
+      "status": "potential",
+      "confidence": 0.4,
+      "sourceConversationId": null,
+      "createdAt": "2026-02-01T00:00:00.000Z",
+      "updatedAt": "2026-02-01T00:00:00.000Z"
+    },
+    {
+      "id": "up-conflict-a",
+      "userId": "legacy-user-1",
+      "group": "room",
+      "field": "main",
+      "value": "living",
+      "status": "confirmed",
+      "confidence": 0.8,
+      "sourceConversationId": null,
+      "createdAt": "2026-02-01T00:00:00.000Z",
+      "updatedAt": "2026-02-08T00:00:00.000Z"
+    },
+    {
+      "id": "up-conflict-b",
+      "userId": "legacy-user-1",
+      "group": "room",
+      "field": "primary",
+      "value": "bedroom",
+      "status": "confirmed",
+      "confidence": 0.8,
+      "sourceConversationId": null,
+      "createdAt": "2026-02-01T00:00:00.000Z",
+      "updatedAt": "2026-02-08T00:00:00.000Z"
+    }
+  ],
+  "conversationPreferences": [
+    {
+      "id": "cp-1",
+      "conversationId": "conv-owned",
+      "field": "palette",
+      "value": "warm neutrals",
+      "confidence": 0.7,
+      "status": "confirmed",
+      "source": "msg-user-1",
+      "createdAt": "2026-02-01T00:00:00.000Z",
+      "updatedAt": "2026-02-03T00:00:00.000Z"
+    },
+    {
+      "id": "cp-guest",
+      "conversationId": "conv-guest",
+      "field": "style",
+      "value": "industrial",
+      "confidence": 0.6,
+      "status": "confirmed",
+      "source": null,
+      "createdAt": "2026-02-01T00:00:00.000Z",
+      "updatedAt": "2026-02-01T00:00:00.000Z"
+    }
+  ],
+  "preferenceChanges": [
+    {
+      "id": "pc-1",
+      "conversationId": "conv-owned",
+      "field": "style",
+      "newValue": "scandi",
+      "confirmed": false,
+      "createdAt": "2026-02-01T00:00:00.000Z"
+    }
+  ],
+  "targetUsers": [
+    {
+      "id": "target-user-1",
+      "email": "owner@example.com"
+    }
+  ],
+  "targetProjectIds": []
+}

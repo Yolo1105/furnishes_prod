@@ -1,0 +1,24 @@
+{
+  "id": "policy-layout-needs-dimensions",
+  "description": "Layout question without dimensions triggers clarification",
+  "setup": {
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    },
+    "flags": { "CHAT_POLICY_GATING_ENABLED": "1" }
+  },
+  "turns": [
+    {
+      "user": "How should I arrange the sofa and chairs?",
+      "expect": {
+        "mustMatch": ["dimension"],
+        "mustNotMatch": ["SKU", "buy now"],
+        "maxWords": 80
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "tools-recommend-once",
+  "description": "Shopping ask fires generate_recommendations exactly once",
+  "setup": {
+    "flags": {
+      "CHAT_TOOLS_ENABLED": "1",
+      "CHAT_SIDE_FEATURES_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": "$6k",
+      "style": "japandi",
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "just tell me what to buy for my living room",
+      "expect": {
+        "mustMatch": ["sofa|living|archetype|recommend"],
+        "mustNotMatch": ["SKU"],
+        "toolsExact": ["generate_recommendations"],
+        "maxWords": 80
+      }
+    }
+  ]
+}

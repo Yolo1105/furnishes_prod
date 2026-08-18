@@ -1,0 +1,26 @@
+{
+  "id": "rag-coastal",
+  "description": "RAG retrieval for coastal deep-dive",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "What palette and materials keep coastal from looking kitschy?",
+      "expect": {
+        "mustMatch": ["sand|blue|linen|jute|rattan|nautical"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}

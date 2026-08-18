@@ -1,0 +1,32 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/app/**/{page,layout,error,loading,not-found,robots,route}.{ts,tsx}",
+    "e2e/**/*.spec.ts",
+    "scripts/*.{mjs,ts}",
+    "evals/run.ts",
+    "prisma/seed.mjs",
+    "e2e/env.mjs"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "e2e/**/*.ts",
+    "e2e/**/*.mjs",
+    "scripts/**/*.{mjs,ts}",
+    "evals/**/*.ts",
+    "prisma/**/*.mjs"
+  ],
+  "ignore": ["reference/**", ".data/**", "evals/reports/**"],
+  "ignoreIssues": {
+    "src/features/account/canvas/playground/**/*.{ts,tsx}": [
+      "exports",
+      "types"
+    ],
+    "src/server/canvas/**/*.{ts,tsx}": ["exports", "types"]
+  },
+  "rules": {
+    "exports": "warn",
+    "types": "warn"
+  },
+  "ignoreDependencies": ["postcss", "tailwindcss"]
+}

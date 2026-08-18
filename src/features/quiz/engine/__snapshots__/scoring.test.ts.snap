@@ -1,0 +1,248 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`quiz scoring snapshots > fixtureA: calculateTally / rankTally / computeBudgetRange / assembleQuizResultV1 1`] = `
+{
+  "assembled": {
+    "answers": {
+      "budgetBand": "$4.3k–$12.8k",
+      "furniture": [
+        "sofa",
+        "floor lamp",
+      ],
+      "lifestyle": [
+        "white space",
+        "pure material",
+        "restraint",
+      ],
+      "palette": {
+        "avoid": [],
+        "colors": [
+          "warm linen",
+          "soft taupe",
+          "sage mist",
+        ],
+      },
+      "roomFocus": "living room",
+      "style": {
+        "primary": "minimalist",
+        "secondary": [
+          "organic",
+          "industrial",
+        ],
+      },
+    },
+    "completedAt": "2026-08-13T15:00:00.000Z",
+    "rawScores": {
+      "artisan": 0,
+      "industrial": 1,
+      "maximalist": 0,
+      "minimalist": 17,
+      "organic": 1,
+    },
+    "version": 1,
+  },
+  "budgetRange": [
+    4300,
+    12800,
+  ],
+  "ranked": [
+    {
+      "key": "minimal",
+      "pct": 89,
+      "score": 17,
+    },
+    {
+      "key": "organic",
+      "pct": 5,
+      "score": 1,
+    },
+    {
+      "key": "industrial",
+      "pct": 5,
+      "score": 1,
+    },
+    {
+      "key": "maximalist",
+      "pct": 0,
+      "score": 0,
+    },
+    {
+      "key": "artisan",
+      "pct": 0,
+      "score": 0,
+    },
+  ],
+  "tally": {
+    "artisan": 0,
+    "industrial": 1,
+    "maximalist": 0,
+    "minimal": 17,
+    "organic": 1,
+  },
+}
+`;
+
+exports[`quiz scoring snapshots > fixtureB: calculateTally / rankTally / computeBudgetRange / assembleQuizResultV1 1`] = `
+{
+  "assembled": {
+    "answers": {
+      "budgetBand": "$12k",
+      "furniture": [
+        "bed",
+        "dresser",
+      ],
+      "lifestyle": [
+        "abundance",
+        "layered",
+        "warmth",
+      ],
+      "palette": {
+        "avoid": [],
+        "colors": [
+          "terracotta",
+          "warm oak",
+          "cream",
+        ],
+      },
+      "roomFocus": "bedroom",
+      "style": {
+        "primary": "maximalist",
+        "secondary": [
+          "organic",
+          "artisan",
+        ],
+      },
+    },
+    "completedAt": "2026-08-13T15:00:00.000Z",
+    "rawScores": {
+      "artisan": 1,
+      "industrial": 0,
+      "maximalist": 13,
+      "minimalist": 0,
+      "organic": 6,
+    },
+    "version": 1,
+  },
+  "budgetRange": [
+    13100,
+    43700,
+  ],
+  "ranked": [
+    {
+      "key": "maximalist",
+      "pct": 65,
+      "score": 13,
+    },
+    {
+      "key": "organic",
+      "pct": 30,
+      "score": 6,
+    },
+    {
+      "key": "artisan",
+      "pct": 5,
+      "score": 1,
+    },
+    {
+      "key": "minimal",
+      "pct": 0,
+      "score": 0,
+    },
+    {
+      "key": "industrial",
+      "pct": 0,
+      "score": 0,
+    },
+  ],
+  "tally": {
+    "artisan": 1,
+    "industrial": 0,
+    "maximalist": 13,
+    "minimal": 0,
+    "organic": 6,
+  },
+}
+`;
+
+exports[`quiz scoring snapshots > fixtureC: calculateTally / rankTally / computeBudgetRange / assembleQuizResultV1 1`] = `
+{
+  "assembled": {
+    "answers": {
+      "budgetBand": "$300–$900",
+      "furniture": [
+        "plants",
+        "rug",
+        "armchair",
+      ],
+      "lifestyle": [
+        "earth",
+        "texture",
+        "growth",
+      ],
+      "palette": {
+        "avoid": [],
+        "colors": [
+          "olive",
+          "warm oak",
+          "cream",
+        ],
+      },
+      "roomFocus": "studio",
+      "style": {
+        "primary": "organic",
+        "secondary": [
+          "minimalist",
+          "maximalist",
+        ],
+      },
+    },
+    "completedAt": "2026-08-13T15:00:00.000Z",
+    "rawScores": {
+      "artisan": 0,
+      "industrial": 0,
+      "maximalist": 1,
+      "minimalist": 3,
+      "organic": 15,
+    },
+    "version": 1,
+  },
+  "budgetRange": [
+    300,
+    900,
+  ],
+  "ranked": [
+    {
+      "key": "organic",
+      "pct": 79,
+      "score": 15,
+    },
+    {
+      "key": "minimal",
+      "pct": 16,
+      "score": 3,
+    },
+    {
+      "key": "maximalist",
+      "pct": 5,
+      "score": 1,
+    },
+    {
+      "key": "industrial",
+      "pct": 0,
+      "score": 0,
+    },
+    {
+      "key": "artisan",
+      "pct": 0,
+      "score": 0,
+    },
+  ],
+  "tally": {
+    "artisan": 0,
+    "industrial": 0,
+    "maximalist": 1,
+    "minimal": 3,
+    "organic": 15,
+  },
+}
+`;

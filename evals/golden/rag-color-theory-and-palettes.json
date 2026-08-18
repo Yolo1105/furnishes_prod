@@ -1,0 +1,26 @@
+{
+  "id": "rag-color-theory-and-palettes",
+  "description": "RAG retrieval for color theory and palettes",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "Explain the 60-30-10 rule and a warm neutral starting palette.",
+      "expect": {
+        "mustMatch": ["60|30|10"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}

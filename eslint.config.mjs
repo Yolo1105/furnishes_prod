@@ -1,72 +1,175 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import eslintConfigPrettier from "eslint-config-prettier";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import js from "@eslint/js";
+import globals from "globals";
+import tseslint from "typescript-eslint";
+import prettier from "eslint-config-prettier";
 
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  eslintConfigPrettier,
+/**
+ * Lint policy.
+ *
+ * - Strict TypeScript everywhere.
+ * - Frozen approved design sources (reference/) are immutable evidence and
+ *   must never be imported into production code.
+ * - Deferred backend/domain dependencies stay forbidden until the Account
+ *   phase re-derives them from the legacy behavioral reference (see
+ *   docs/ARCHITECTURE.md). Vanilla three is allowed for Landing parity.
+ * - No blanket visual rules: nothing here forces Landing and Account onto
+ *   one shared design language.
+ */
 
-  /**
-   * Upstream-synced reference UI. We import this code verbatim from the
-   * chatbot_v3 studio. Fully matching our lint rules would require forking
-   * and maintaining the code long-term, which is not a seed-stage priority.
-   *
-   * Decision: docs/adr/0011-eva-dashboard-eslint-bypass.md. Revisit when
-   * we have a dedicated dashboard engineer (post-Series A) or when upstream
-   * archives.
-   *
-   * Do NOT add new folders to this block. Any new code must pass full lint.
-   */
+const forbiddenProductionImports = [
   {
-    files: [
-      "components/eva-dashboard/**/*.{ts,tsx}",
-      "lib/eva-dashboard/**/*.{ts,tsx}",
+    group: ["**/reference/**", "**/*.jsx"],
+    message:
+      "Frozen approved design sources are immutable evidence and must never be imported into production code.",
+  },
+  {
+    group: [
+      "stripe",
+      "@stripe/*",
+      "openai",
+      "@ai-sdk/*",
+      "ai",
+      "@anthropic-ai/*",
+      "@sentry/*",
+      "@upstash/*",
+      "ioredis",
+      "redis",
+      "resend",
+      "@fal-ai/*",
+      "next-auth",
+      "@auth/*",
     ],
+    message:
+      "Deferred domains: no commerce, first-party AI SDKs, Redis, Sentry/APM, or NextAuth without an ARCHITECTURE.md entry. Prisma, custom session auth, nodemailer, @aws-sdk/client-s3, and structured ops logging are allowed. Canvas playground may use @react-three/* (see ARCHITECTURE.md Phase 15).",
+  },
+];
+
+const productionRestrictedSyntax = [
+  {
+    selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
+    message: "dangerouslySetInnerHTML is forbidden in production code.",
+  },
+  {
+    selector: "AssignmentExpression[left.property.name='innerHTML']",
+    message: "Direct innerHTML assignment is forbidden in production code.",
+  },
+];
+
+const canvasPlaygroundFiles = [
+  "src/features/account/canvas/playground/**/*.{ts,tsx}",
+  "src/app/api/chat/**/*.{ts,tsx}",
+  "src/app/api/suggestions/**/*.{ts,tsx}",
+  "src/app/api/explain/**/*.{ts,tsx}",
+  "src/app/api/arrange/**/*.{ts,tsx}",
+  "src/app/api/generate-asset/**/*.{ts,tsx}",
+  "src/app/api/generate-room/**/*.{ts,tsx}",
+  "src/app/api/studio/**/*.{ts,tsx}",
+  "src/app/api/conversations/**/*.{ts,tsx}",
+];
+
+export default tseslint.config(
+  {
+    ignores: [
+      "**/node_modules/**",
+      "**/.next/**",
+      "**/dist/**",
+      "**/coverage/**",
+      "**/playwright-report/**",
+      "**/test-results/**",
+      ".data/**",
+      "reference/**",
+      "next-env.d.ts",
+    ],
+  },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    files: ["**/*.{ts,tsx,mts,cts,mjs,cjs}"],
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: "module",
+    },
     rules: {
-      "react-hooks/set-state-in-effect": "off",
-      "react-hooks/exhaustive-deps": "off",
-      "react-hooks/rules-of-hooks": "off",
-      "react-hooks/purity": "off",
-      "react-hooks/refs": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-empty-object-type": "off",
-      "react/no-unescaped-entities": "off",
+      "@typescript-eslint/consistent-type-imports": "error",
+      "@typescript-eslint/no-explicit-any": "error",
     },
   },
-
-  /**
-   * Furnishes Studio (ported from furnishes-studio). Lint rules are
-   * relaxed here until Phase 13 brings the lifted tree to full CI parity.
-   */
   {
-    files: [
-      "components/studio/**/*.{ts,tsx}",
-      "lib/studio/**/*.{ts,tsx}",
-      "app/(chromeless)/playground/**/*.{ts,tsx}",
-    ],
+    files: ["src/**/*.{ts,tsx}"],
     rules: {
-      "react-hooks/set-state-in-effect": "off",
-      "react-hooks/exhaustive-deps": "off",
-      "react-hooks/immutability": "off",
-      "react-hooks/purity": "off",
-      "react-hooks/refs": "off",
-      "react-hooks/static-components": "off",
+      "no-restricted-imports": [
+        "error",
+        { patterns: forbiddenProductionImports },
+      ],
+      "no-restricted-syntax": ["error", ...productionRestrictedSyntax],
+    },
+  },
+  {
+    files: ["src/lib/contracts/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["next", "next/*", "react", "react-dom", "three"],
+              message:
+                "Contracts hold non-visual domain types and route builders only — no framework imports.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: canvasPlaygroundFiles,
+    linterOptions: {
+      reportUnusedDisableDirectives: "off",
+    },
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
-      "@next/next/no-img-element": "off",
-      "react/no-unescaped-entities": "off",
+      "@typescript-eslint/consistent-type-imports": "off",
+      "no-restricted-syntax": "off",
+      "no-restricted-imports": "off",
+      "no-useless-escape": "off",
+      "react-hooks/exhaustive-deps": "off",
     },
   },
-
-  globalIgnores([
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    "right-sidebar-bundle/**",
-  ]),
-]);
-
-export default eslintConfig;
+  {
+    files: ["**/*.{test,spec}.ts", "**/*.{test,spec}.tsx"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+  {
+    files: [
+      "scripts/**/*.{mjs,cjs,js}",
+      "prisma/**/*.{mjs,cjs,js}",
+      "e2e/**/*.mjs",
+      "*.config.mjs",
+      "eslint.config.mjs",
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      "@typescript-eslint/consistent-type-imports": "off",
+    },
+  },
+  {
+    files: ["src/features/quiz/components/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+    },
+  },
+  prettier,
+);

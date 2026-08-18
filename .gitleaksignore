@@ -1,0 +1,6 @@
+# False positives. Gitleaks scans full git history (CI fetch-depth: 0), so
+# renaming the current tree is not enough — these fingerprints stay until ignored.
+fa5d3848a2646ba36d7f9f2908b537a7c7d8d5b8:src/server/commerce/payment-provider.test.ts:generic-api-key:38
+fa5d3848a2646ba36d7f9f2908b537a7c7d8d5b8:src/server/commerce/payment-provider.test.ts:generic-api-key:56
+fa5d3848a2646ba36d7f9f2908b537a7c7d8d5b8:src/server/commerce/payment-provider.test.ts:generic-api-key:95
+d62b131ea95cf3fe2bc6f3f4a52a55692868d623:src/lib/contracts/quiz-result.ts:generic-api-key:43

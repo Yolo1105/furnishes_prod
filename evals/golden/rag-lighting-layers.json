@@ -1,0 +1,26 @@
+{
+  "id": "rag-lighting-layers",
+  "description": "RAG retrieval for lighting layers",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "What three lighting layers should every living room have?",
+      "expect": {
+        "mustMatch": ["ambient|task|accent"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}

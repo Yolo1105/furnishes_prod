@@ -1,0 +1,26 @@
+{
+  "id": "rag-scandinavian",
+  "description": "RAG retrieval for Scandinavian deep-dive",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "Remind me how Scandinavian rooms use light wood and hygge textiles.",
+      "expect": {
+        "mustMatch": ["pale|birch|ash|linen|wool|hygge|daylight"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}

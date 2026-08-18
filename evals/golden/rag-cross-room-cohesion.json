@@ -1,0 +1,26 @@
+{
+  "id": "rag-cross-room-cohesion",
+  "description": "RAG retrieval for cross-room cohesion",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "How do I keep metal and wood cohesive across open-plan rooms?",
+      "expect": {
+        "mustMatch": ["metal|wood|cohes|shared|neutral"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}

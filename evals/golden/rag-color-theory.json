@@ -1,0 +1,24 @@
+{
+  "id": "rag-color-theory",
+  "description": "RAG citation for color theory fixture corpus",
+  "setup": {
+    "flags": { "CHAT_RAG_ENABLED": "1" },
+    "confirmedPreferences": {
+      "room": null,
+      "budget": null,
+      "style": null,
+      "color": "navy",
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "Remind me of the 60-30-10 rule for this palette.",
+      "expect": {
+        "mustMatch": ["60|30|10"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 100
+      }
+    }
+  ]
+}

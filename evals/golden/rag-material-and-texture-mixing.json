@@ -1,0 +1,26 @@
+{
+  "id": "rag-material-and-texture-mixing",
+  "description": "RAG retrieval for material and texture mixing",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "How should I mix wood, textile, and metal without clutter?",
+      "expect": {
+        "mustMatch": ["texture|wood|metal|textile|repeat"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}

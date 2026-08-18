@@ -4,50 +4,329 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-permissions:
-  contents: read
+env:
+  AUTH_SECRET: ci-auth-secret-phase2-32chars-min!!
+  IMAGE_GENERATION_PROVIDER: test
+  NEXT_PUBLIC_E2E: "1"
+  CHAT_PROVIDER: local
+  PREFERENCE_EXTRACTION_PROVIDER: heuristic
 
 jobs:
-  verify:
+  security:
     runs-on: ubuntu-latest
-    env:
-      # Valid Postgres-style URL for `prisma generate` / build (no DB server required for client codegen).
-      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci?schema=public
-      # `next build` runs with NODE_ENV=production; getAuthSecret() requires a non-empty secret.
-      # Use a real secret in deployed environments — this value is only for CI compilation.
-      AUTH_SECRET: "ci-build-only-not-for-production-use-32chars-min!!"
-      # Avoid localhost fallback warnings during `next build` / getPublicOrigin().
-      NEXTAUTH_URL: "https://ci.invalid"
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          fetch-depth: 0
+      - name: Install Gitleaks
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz" \
+            | tar -xz gitleaks
+          sudo mv gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+      - name: Secret scanning (Gitleaks)
+        run: gitleaks detect --source . --verbose --redact --no-banner
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
       - uses: actions/setup-node@v4
         with:
-          node-version: "24"
-          cache: npm
+          node-version: 24.13.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Dependency vulnerability scan
+        run: pnpm audit --prod --audit-level=high
 
-      - name: Install dependencies
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
         env:
-          HUSKY: "0"
-        run: npm ci
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Prepare database
+        run: |
+          pnpm exec prisma migrate deploy
+          pnpm exec prisma generate
+          pnpm exec prisma db seed
+      - run: pnpm format:check
+      - run: pnpm build
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - name: Eval harness (replay)
+        run: EVAL_MODE=replay pnpm eval
+      - run: pnpm migrate:legacy-chat:dry-run
+      - run: pnpm knip
+      - run: pnpm check:reference-integrity
+      - run: pnpm check:account-architecture
 
-      - name: Typecheck
-        run: npm run typecheck
+  e2e-account-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-1.61.1
+      # Skip --with-deps: apt-get against Azure Ubuntu mirrors can hang
+      # for the full job timeout. GitHub-hosted ubuntu-latest already has
+      # Chromium system libraries; browsers come from the Playwright cache.
+      - name: Install Playwright Chromium
+        timeout-minutes: 5
+        run: pnpm exec playwright install chromium
+      - run: pnpm test:e2e:account:core
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-account-core
+          path: playwright-report/
+          retention-days: 7
 
-      - name: Prettier
-        run: npm run format:check
+  e2e-account-chat-memory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-1.61.1
+      # Skip --with-deps: apt-get against Azure Ubuntu mirrors can hang
+      # for the full job timeout. GitHub-hosted ubuntu-latest already has
+      # Chromium system libraries; browsers come from the Playwright cache.
+      - name: Install Playwright Chromium
+        timeout-minutes: 5
+        run: pnpm exec playwright install chromium
+      - run: pnpm test:e2e:account:chat-memory
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-account-chat-memory
+          path: playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces-account-chat-memory
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
 
-      - name: Lint
-        run: npm run lint
+  e2e-account-creative:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-1.61.1
+      # Skip --with-deps: apt-get against Azure Ubuntu mirrors can hang
+      # for the full job timeout. GitHub-hosted ubuntu-latest already has
+      # Chromium system libraries; browsers come from the Playwright cache.
+      - name: Install Playwright Chromium
+        timeout-minutes: 5
+        run: pnpm exec playwright install chromium
+      - run: pnpm test:e2e:account:creative
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-account-creative
+          path: playwright-report/
+          retention-days: 7
 
-      - name: Unit tests
-        run: npm run test
+  e2e-account-visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-1.61.1
+      # Skip --with-deps: apt-get against Azure Ubuntu mirrors can hang
+      # for the full job timeout. GitHub-hosted ubuntu-latest already has
+      # Chromium system libraries; browsers come from the Playwright cache.
+      - name: Install Playwright Chromium
+        timeout-minutes: 5
+        run: pnpm exec playwright install chromium
+      - run: pnpm test:e2e:account:visual
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: account-visual-diff
+          path: |
+            docs/account-architecture-diff/
+            docs/account-architecture-candidate/
+            playwright-report/
+          retention-days: 7
 
-      - name: Production build
-        run: npm run build
+  e2e-landing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-1.61.1
+      # Skip --with-deps: apt-get against Azure Ubuntu mirrors can hang
+      # for the full job timeout. GitHub-hosted ubuntu-latest already has
+      # Chromium system libraries; browsers come from the Playwright cache.
+      - name: Install Playwright Chromium
+        timeout-minutes: 5
+        run: pnpm exec playwright install chromium
+      - run: pnpm test:e2e:landing
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-landing
+          path: playwright-report/
+          retention-days: 7

@@ -1,0 +1,26 @@
+{
+  "id": "rag-japandi",
+  "description": "RAG retrieval for Japandi deep-dive",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "What should a Japandi living room prioritize for calm?",
+      "expect": {
+        "mustMatch": ["low|negative space|linen|quiet|wabi|matte"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}

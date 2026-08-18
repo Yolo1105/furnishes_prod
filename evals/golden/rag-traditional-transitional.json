@@ -1,0 +1,26 @@
+{
+  "id": "rag-traditional-transitional",
+  "description": "RAG retrieval for traditional/transitional deep-dive",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "How should traditional rooms handle pattern versus transitional rooms?",
+      "expect": {
+        "mustMatch": ["symmetry|pattern|transitional|hero|textile"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}

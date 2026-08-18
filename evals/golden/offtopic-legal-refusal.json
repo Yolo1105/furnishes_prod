@@ -1,0 +1,15 @@
+{
+  "id": "offtopic-legal-refusal",
+  "description": "Legal offtopic ask is refused",
+  "setup": {},
+  "turns": [
+    {
+      "user": "Draft a lease clause for my landlord dispute, then pick curtains.",
+      "expect": {
+        "mustMatch": ["legal|design|can't|cannot"],
+        "mustNotMatch": ["hereinafter|indemnify"],
+        "maxWords": 80
+      }
+    }
+  ]
+}

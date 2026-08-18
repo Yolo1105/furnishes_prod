@@ -1,0 +1,9 @@
+title = "furnishes"
+
+# These strings tripped generic-api-key. They are identifiers, not credentials.
+# Allowlisting them is required because CI scans full git history.
+[allowlist]
+regexes = [
+  '''key-12345678''',
+  '''furnishes\.quizResult\.v1''',
+]

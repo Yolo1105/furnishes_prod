@@ -1,0 +1,24 @@
+{
+  "id": "explain-budget-anchor",
+  "description": "EXPLAIN ties advice to stated budget constraint",
+  "setup": {
+    "confirmedPreferences": {
+      "room": "dining",
+      "budget": "$3500",
+      "style": "scandinavian",
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "Should I buy the table or the chairs first?",
+      "expect": {
+        "mustMatch": ["3500|budget|table|chair"],
+        "mustNotMatch": ["SKU"],
+        "judge": "Advice references the user's budget or scandinavian direction.",
+        "maxWords": 110
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "persona-budget-lens",
+  "description": "Budget persona protects spend on anchors",
+  "setup": {
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": "$4k",
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "How do I stretch this budget?",
+      "expect": {
+        "mustMatch": ["budget|sofa|lighting|spend"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 100
+      }
+    }
+  ]
+}

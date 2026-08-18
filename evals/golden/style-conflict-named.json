@@ -1,0 +1,24 @@
+{
+  "id": "style-conflict-named",
+  "description": "Conflicting style signals are named and resolved",
+  "setup": {
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": "$8k",
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "I want minimalist but also cozy maximalist shelves.",
+      "expect": {
+        "mustMatch": ["tension|conflict|dominant|accent"],
+        "mustNotMatch": ["SKU"],
+        "judge": "Names the style tension and proposes a dominant/accent resolution.",
+        "maxWords": 140
+      }
+    }
+  ]
+}

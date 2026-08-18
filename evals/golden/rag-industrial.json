@@ -1,0 +1,26 @@
+{
+  "id": "rag-industrial",
+  "description": "RAG retrieval for industrial deep-dive",
+  "setup": {
+    "flags": {
+      "CHAT_RAG_ENABLED": "1"
+    },
+    "confirmedPreferences": {
+      "room": "living room",
+      "budget": null,
+      "style": null,
+      "color": null,
+      "furniture": null
+    }
+  },
+  "turns": [
+    {
+      "user": "How do I keep an industrial loft from feeling cold?",
+      "expect": {
+        "mustMatch": ["metal|wood|textile|leather|rug|warm"],
+        "mustNotMatch": ["SKU"],
+        "maxWords": 110
+      }
+    }
+  ]
+}
