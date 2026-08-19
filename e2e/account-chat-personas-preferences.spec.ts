@@ -85,6 +85,12 @@ async function sendChatMessage(page: Page, text: string) {
 }
 
 test.describe("account chat personas and preferences", () => {
+  // These tests mutate the seeded owner’s persona, memory flag, and
+  // preferences. CI’s account project uses 2 workers + fullyParallel, so
+  // without serial a sibling test can confirm “Navy Blue” while this one
+  // still expects the room chip to be first.
+  test.describe.configure({ mode: "serial" });
+
   test("persona selection persists and affects local replies", async ({
     page,
   }) => {
@@ -204,7 +210,7 @@ test.describe("account chat personas and preferences", () => {
   }) => {
     await setSessionCookie(page, E2E_OWNER.sessionToken);
     await ensureMemoryOn(page);
-    await page.request.delete("/api/account/preferences/room");
+    await resetPreferenceState(page);
 
     const created = await page.request.post("/api/account/conversations", {
       data: { title: `manual-pref-${Date.now()}` },
@@ -222,10 +228,10 @@ test.describe("account chat personas and preferences", () => {
     await expect(page.locator(".wf-toast")).toContainText("Preference saved");
     await page.reload();
     await openEvaPanelIfNeeded(page);
-    await expect(page.getByText("Living Room").first()).toBeVisible();
-    await expect(page.locator(".wf-pref.done .wf-psel__v").first()).toHaveText(
-      "Living Room",
-    );
+    const roomChip = page.locator(".wf-pref.done .wf-psel__v").filter({
+      hasText: /^Living Room$/,
+    });
+    await expect(roomChip).toHaveCount(1);
 
     await page.request.put("/api/account/privacy/memory", {
       data: { memoryEnabled: false },
