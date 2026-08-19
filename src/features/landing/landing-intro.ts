@@ -45,7 +45,8 @@ export function shouldSkipLandingLoader(options: {
 export function markLandingIntroSeen(): void {
   if (typeof document === "undefined") return;
   try {
-    document.cookie = `${LANDING_INTRO_SEEN_COOKIE}=1; Path=/; Max-Age=${MAX_AGE_SECONDS}; SameSite=Lax`;
+    const secure = location.protocol === "https:" ? "; Secure" : "";
+    document.cookie = `${LANDING_INTRO_SEEN_COOKIE}=1; Path=/; Max-Age=${MAX_AGE_SECONDS}; SameSite=Lax${secure}`;
   } catch {
     /* ignore */
   }

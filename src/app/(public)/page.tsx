@@ -7,6 +7,8 @@ import {
 } from "@/features/landing/landing-intro";
 import { getOptionalCurrentSession } from "@/server/auth/session";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage({
   searchParams,
 }: {

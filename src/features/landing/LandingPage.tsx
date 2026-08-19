@@ -23,9 +23,13 @@ export function LandingPage({
   const [heroReady, setHeroReady] = useState(skipIntro);
 
   useLayoutEffect(() => {
+    if (!skipLoader) {
+      clearLandingFreezePaint();
+      return;
+    }
     if (!heroReady) return;
     clearLandingFreezePaint();
-  }, [heroReady]);
+  }, [heroReady, skipLoader]);
 
   useEffect(() => {
     if (skipIntro || heroReady) return;
