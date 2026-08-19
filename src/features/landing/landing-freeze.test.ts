@@ -12,8 +12,9 @@ describe("landing freeze boot", () => {
     expect(LANDING_FREEZE_BOOT_SCRIPT).toContain(LANDING_FREEZE_STYLE_ID);
     expect(LANDING_FREEZE_BOOT_SCRIPT).toContain("html::before");
     expect(LANDING_FREEZE_BOOT_SCRIPT).toContain(
-      "furnishes-landing-intro-seen=1",
+      "furnishes-landing-intro-seen",
     );
+    expect(LANDING_FREEZE_BOOT_SCRIPT).toContain("sessionStorage.getItem");
     expect(LANDING_FREEZE_BOOT_SCRIPT).not.toContain(
       "background-color:#e83200",
     );

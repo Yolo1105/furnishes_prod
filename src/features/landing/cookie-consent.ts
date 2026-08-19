@@ -60,7 +60,7 @@ export function setCookieConsent(
   document.cookie = `${COOKIE_CONSENT_NAME}=${serializeCookieConsent(choice)};path=/;max-age=${maxAge};SameSite=Lax`;
 }
 
-/** True once the hero stage has scrolled fully above the viewport. */
-export function isHeroPastViewport(rectBottom: number): boolean {
-  return rectBottom <= 0;
+/** Banner is offered on every section except Home, until a choice is stored. */
+export function cookieBannerOfferedOnSection(activeSection: string): boolean {
+  return activeSection !== "home";
 }

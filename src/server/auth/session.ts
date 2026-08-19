@@ -2,7 +2,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import type { User } from "@prisma/client";
-import { prisma } from "@/server/db";
+import { isDatabaseUnreachable, prisma } from "@/server/db";
+import { logOps } from "@/server/ops/log";
 import { createRandomToken, digestToken } from "@/server/auth/crypto";
 import { blocksForEmailVerification } from "@/server/auth/email-verification";
 import { recordSecurityEvent } from "@/server/auth/security-events";
@@ -167,51 +168,59 @@ export async function getOptionalCurrentSession(): Promise<CurrentSession | null
     return null;
   }
 
-  const session = await prisma.session.findUnique({
-    where: { tokenDigest: digestToken(token) },
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          displayName: true,
-          emailVerifiedAt: true,
-          memoryEnabled: true,
-          currency: true,
-          createdAt: true,
-          deletedAt: true,
+  try {
+    const session = await prisma.session.findUnique({
+      where: { tokenDigest: digestToken(token) },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            displayName: true,
+            emailVerifiedAt: true,
+            memoryEnabled: true,
+            currency: true,
+            createdAt: true,
+            deletedAt: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  if (
-    !session ||
-    session.revokedAt ||
-    session.expiresAt.getTime() <= Date.now() ||
-    session.user.deletedAt
-  ) {
+    if (
+      !session ||
+      session.revokedAt ||
+      session.expiresAt.getTime() <= Date.now() ||
+      session.user.deletedAt
+    ) {
+      return null;
+    }
+
+    await prisma.session.update({
+      where: { id: session.id },
+      data: { lastSeenAt: new Date() },
+    });
+
+    return {
+      sessionId: session.id,
+      user: {
+        id: session.user.id,
+        email: session.user.email,
+        displayName: session.user.displayName,
+        emailVerifiedAt: session.user.emailVerifiedAt,
+        memoryEnabled: session.user.memoryEnabled,
+        currency: session.user.currency,
+        createdAt: session.user.createdAt,
+      },
+      expiresAt: session.expiresAt,
+    };
+  } catch (error) {
+    if (!isDatabaseUnreachable(error)) throw error;
+    logOps("warn", "session_db_unreachable", {
+      message: error instanceof Error ? error.message.slice(0, 160) : "unknown",
+    });
     return null;
   }
-
-  await prisma.session.update({
-    where: { id: session.id },
-    data: { lastSeenAt: new Date() },
-  });
-
-  return {
-    sessionId: session.id,
-    user: {
-      id: session.user.id,
-      email: session.user.email,
-      displayName: session.user.displayName,
-      emailVerifiedAt: session.user.emailVerifiedAt,
-      memoryEnabled: session.user.memoryEnabled,
-      currency: session.user.currency,
-      createdAt: session.user.createdAt,
-    },
-    expiresAt: session.expiresAt,
-  };
 }
 
 export async function requireCurrentSession(options?: {

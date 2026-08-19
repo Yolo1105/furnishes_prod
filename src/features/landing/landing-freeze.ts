@@ -1,4 +1,4 @@
-import { LANDING_INTRO_SEEN_COOKIE } from "./landing-intro";
+import { LANDING_INTRO_SEEN_KEY } from "./landing-intro";
 
 export const LANDING_FREEZE_KEY = "furnishes-landing-freeze-v3";
 export const LANDING_FREEZE_STYLE_ID = "furnishes-landing-freeze-style";
@@ -31,8 +31,8 @@ const STAGE_WASH: ReadonlyArray<readonly [number, string]> = [
 export const LANDING_FREEZE_BOOT_SCRIPT = `(function(){
   try {
     if (location.pathname !== "/") return;
-    // Never cover the first-visit falling-block loader with a saved house frame.
-    if (document.cookie.indexOf("${LANDING_INTRO_SEEN_COOKIE}=1") === -1) return;
+    // Only after this tab has already seen the intro (sessionStorage).
+    if (sessionStorage.getItem("${LANDING_INTRO_SEEN_KEY}") !== "1") return;
     var data = sessionStorage.getItem("${LANDING_FREEZE_KEY}");
     if (!data || data.indexOf("data:image") !== 0) return;
     if (document.getElementById("${LANDING_FREEZE_STYLE_ID}")) return;

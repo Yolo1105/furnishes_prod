@@ -231,7 +231,7 @@ function LandingMain({
             onContact={() => scrollToLandingSection("contact", rootRef.current)}
           />
           <LandingWaitlist />
-          <LandingCookieConsent />
+          <LandingCookieConsent activeSection={activeSection} />
         </div>
       </PublicShell>
     </main>

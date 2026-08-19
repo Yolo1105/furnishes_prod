@@ -4,14 +4,12 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { BracketedText } from "./BracketedText";
 import {
+  cookieBannerOfferedOnSection,
   getCookieConsent,
-  isHeroPastViewport,
   setCookieConsent,
 } from "./cookie-consent";
 import styles from "./landing.module.css";
 
-/** Hero stage id — must match `LandingExperience` `.stage`. */
-const LANDING_HERO_ID = "landing-hero";
 /** Banner enter/exit transition length (ms) */
 const BANNER_FADE_MS = 300;
 
@@ -19,14 +17,17 @@ const BANNER_FADE_MS = 300;
  * Cookie consent banner — Singapore PDPA-style baseline, adapted from the
  * archive `CookieConsent` for Landing.
  *
- * Appears on `/` after the visitor scrolls past the hero stage, and only if no
- * choice is stored yet.
+ * Stays hidden on Home. Fades in on any other section while no choice is
+ * stored, and fades back out if the visitor returns to Home without choosing.
  */
-export function LandingCookieConsent() {
+export function LandingCookieConsent({
+  activeSection,
+}: {
+  activeSection: string;
+}) {
   const [needsConsent, setNeedsConsent] = useState<boolean | null>(null);
-  const [pastLandingHero, setPastLandingHero] = useState(false);
-  const [exiting, setExiting] = useState(false);
-  const [entered, setEntered] = useState(false);
+  const [present, setPresent] = useState(false);
+  const [open, setOpen] = useState(false);
   const [view, setView] = useState<"banner" | "custom">("banner");
   const [analytics, setAnalytics] = useState(false);
   const [marketing, setMarketing] = useState(false);
@@ -38,47 +39,15 @@ export function LandingCookieConsent() {
     setNeedsConsent(getCookieConsent() === null);
   }, []);
 
-  useEffect(() => {
-    if (needsConsent !== true) return;
-
-    let cancelled = false;
-    let observer: IntersectionObserver | null = null;
-    let raf = 0;
-
-    const watch = (el: Element) => {
-      observer = new IntersectionObserver(
-        ([entry]) => {
-          if (!entry || cancelled) return;
-          if (isHeroPastViewport(entry.boundingClientRect.bottom)) {
-            setPastLandingHero(true);
-          }
-        },
-        { root: null, threshold: 0 },
-      );
-      observer.observe(el);
-    };
-
-    const findHero = () => {
-      const el = document.getElementById(LANDING_HERO_ID);
-      if (el) {
-        watch(el);
-        return;
-      }
-      raf = requestAnimationFrame(findHero);
-    };
-    findHero();
-
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(raf);
-      observer?.disconnect();
-    };
-  }, [needsConsent]);
-
-  const eligible = needsConsent === true && pastLandingHero;
+  const shouldOffer =
+    needsConsent === true && cookieBannerOfferedOnSection(activeSection);
 
   useLayoutEffect(() => {
-    if (!eligible) return;
+    if (shouldOffer) setPresent(true);
+  }, [shouldOffer]);
+
+  useLayoutEffect(() => {
+    if (!present) return;
     const el = view === "custom" ? customRef.current : bannerRef.current;
     if (!el) return;
     const apply = () => setPanelH(el.offsetHeight);
@@ -86,37 +55,32 @@ export function LandingCookieConsent() {
     const ro = new ResizeObserver(apply);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [eligible, view]);
+  }, [present, view]);
 
   useEffect(() => {
-    if (!eligible || exiting) return;
-    setEntered(false);
-    let raf1 = 0;
-    let raf2 = 0;
-    raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => {
-        setEntered(true);
+    if (!present) return;
+    if (shouldOffer) {
+      let raf1 = 0;
+      let raf2 = 0;
+      raf1 = requestAnimationFrame(() => {
+        raf2 = requestAnimationFrame(() => {
+          setOpen(true);
+        });
       });
-    });
-    return () => {
-      cancelAnimationFrame(raf1);
-      cancelAnimationFrame(raf2);
-    };
-  }, [eligible, exiting]);
+      return () => {
+        cancelAnimationFrame(raf1);
+        cancelAnimationFrame(raf2);
+      };
+    }
+    setOpen(false);
+    const hide = window.setTimeout(() => setPresent(false), BANNER_FADE_MS);
+    return () => window.clearTimeout(hide);
+  }, [present, shouldOffer]);
 
   const dismissWithFade = (applyChoice: () => void) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setExiting(true);
-        window.setTimeout(() => {
-          applyChoice();
-          setNeedsConsent(false);
-          setExiting(false);
-          setEntered(false);
-          setView("banner");
-        }, BANNER_FADE_MS);
-      });
-    });
+    applyChoice();
+    setNeedsConsent(false);
+    setView("banner");
   };
 
   const acceptAll = () =>
@@ -138,9 +102,9 @@ export function LandingCookieConsent() {
       setCookieConsent({ essential: true, analytics, marketing }),
     );
 
-  if (!eligible && !exiting) return null;
+  if (!present) return null;
 
-  const visuallyHidden = exiting || !entered;
+  const visuallyHidden = !open;
   const rootClass = cx(
     styles.cookieBanner,
     visuallyHidden ? styles.cookieBannerHidden : styles.cookieBannerVisible,
@@ -151,6 +115,8 @@ export function LandingCookieConsent() {
       role="dialog"
       aria-label="Cookie preferences"
       aria-modal="false"
+      aria-hidden={visuallyHidden}
+      inert={visuallyHidden ? true : undefined}
       className={rootClass}
       style={{ transitionDuration: `${BANNER_FADE_MS}ms` }}
     >

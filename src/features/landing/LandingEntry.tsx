@@ -1,21 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { LandingPage } from "./LandingPage";
 import {
+  forgetPersistentIntroSeen,
+  hasSeenLandingIntroThisVisit,
   isLandingIntroReplayQuery,
-  migrateLandingIntroSeenFromLocalStorage,
+  shouldSkipLandingLoader,
 } from "./landing-intro";
 
 /**
- * Client-side reader for the two test-only query params, so the `/` route
- * stays statically renderable. `e2e=1` only takes effect when the build was
- * made with NEXT_PUBLIC_E2E=1 — never from the query alone in production.
- *
- * Loader skip comes from the server (cookie) so SSR matches the client.
- * `?intro=1` / `?intro=play` replays the drop-in loader after first visit.
- * Hero open (small→large) still runs unless `?intro=skip` (E2E).
+ * Client gate for the first-visit loader. Skip is per tab (sessionStorage).
+ * Closing the page clears it so the intro plays again. `?intro=skip` is E2E only.
  */
 export function LandingEntry({
   userLabel = null,
@@ -26,17 +23,20 @@ export function LandingEntry({
 }) {
   const params = useSearchParams();
   const introQuery = params.get("intro");
-  const skipLoader = isLandingIntroReplayQuery(introQuery)
-    ? false
-    : skipLoaderFromServer;
-  /** Only E2E settled-state skips the hero camera open. */
-  const skipIntro = introQuery === "skip";
+  const replay = isLandingIntroReplayQuery(introQuery);
+  const skipIntro = shouldSkipLandingLoader({ introQuery });
   const e2eMode =
     process.env.NEXT_PUBLIC_E2E === "1" && params.get("e2e") === "1";
+  const [skipLoader, setSkipLoader] = useState(skipLoaderFromServer);
 
-  useEffect(() => {
-    migrateLandingIntroSeenFromLocalStorage();
-  }, []);
+  useLayoutEffect(() => {
+    forgetPersistentIntroSeen();
+    if (replay) {
+      setSkipLoader(false);
+      return;
+    }
+    setSkipLoader(skipIntro || hasSeenLandingIntroThisVisit());
+  }, [replay, skipIntro]);
 
   return (
     <LandingPage

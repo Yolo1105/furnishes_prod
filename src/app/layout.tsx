@@ -1,10 +1,9 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Archivo, Space_Mono } from "next/font/google";
 import { RouteHandoff } from "@/components/route-handoff/RouteHandoff";
 import { ClerkSessionBridge } from "@/features/auth/ClerkSessionBridge";
-import { LANDING_FREEZE_BOOT_SCRIPT } from "@/features/landing/landing-freeze";
+import { LandingFreezeBoot } from "@/features/landing/LandingFreezeBoot";
 import { resolvedPublicOrigin } from "@/server/app-origin";
 import "./globals.css";
 
@@ -46,9 +45,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${archivo.variable} ${spaceMono.variable}`}>
       <body>
-        <Script id="landing-freeze-boot" strategy="beforeInteractive">
-          {LANDING_FREEZE_BOOT_SCRIPT}
-        </Script>
+        <LandingFreezeBoot />
         {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
           <ClerkProvider
             signInUrl="/login"

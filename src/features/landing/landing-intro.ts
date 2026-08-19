@@ -1,31 +1,28 @@
 /**
  * Landing % loader — dropping blocks + drawing line, then the house.
  *
- * Show once per browser, then skip (including return from Account Studio
- * and later localhost refreshes). The “cache” is an explicit seen flag,
- * not HTTP cache: asset cache is a bad first-visit signal (hash busts,
- * hard refresh, prefetch). Cookie so SSR + client agree (no hydration
- * flash of the loader). localStorage is a fallback + migration source.
+ * Show once per tab visit. Refresh and in-site navigation skip it while this
+ * tab is still open (sessionStorage). Close the tab/window and it plays again.
  * Does not skip the hero open (small→large).
  *
- * Query:
+ * Query (E2E / debug only, never linked in the product UI):
  *   `?intro=skip` — skip loader (and hero open, via LandingEntry)
- *   `?intro=1` / `?intro=play` — replay even if already seen
+ *   `?intro=1` / `?intro=play` — replay even if already seen this tab
  */
 
-export const LANDING_INTRO_SEEN_COOKIE = "furnishes-landing-intro-seen";
-/** Older localStorage key — migrated into the cookie when present. */
-const LANDING_INTRO_SEEN_KEY = LANDING_INTRO_SEEN_COOKIE;
+/** Storage key for this tab, and the legacy cookie name to expire. */
+export const LANDING_INTRO_SEEN_KEY = "furnishes-landing-intro-seen";
 
-const MAX_AGE_SECONDS = 60 * 60 * 24 * 400; // ~13 months
-
-export function hasSeenLandingIntroCookie(
-  raw: string | null | undefined,
-): boolean {
-  return raw === "1";
+export function hasSeenLandingIntroThisVisit(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.sessionStorage.getItem(LANDING_INTRO_SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
 }
 
-/** Replay the first-visit 3D loader even when the seen cookie is set. */
+/** Replay the first-visit 3D loader even when this tab already saw it. */
 export function isLandingIntroReplayQuery(
   raw: string | null | undefined,
 ): boolean {
@@ -33,37 +30,35 @@ export function isLandingIntroReplayQuery(
   return v === "1" || v === "play" || v === "force";
 }
 
+/** SSR / E2E query only. Per-tab skip is sessionStorage on the client. */
 export function shouldSkipLandingLoader(options: {
   introQuery?: string | null;
-  seenCookie?: string | null;
 }): boolean {
   if (isLandingIntroReplayQuery(options.introQuery)) return false;
-  if (options.introQuery?.trim().toLowerCase() === "skip") return true;
-  return hasSeenLandingIntroCookie(options.seenCookie);
+  return options.introQuery?.trim().toLowerCase() === "skip";
 }
 
 export function markLandingIntroSeen(): void {
-  if (typeof document === "undefined") return;
+  if (typeof window === "undefined") return;
   try {
-    const secure = location.protocol === "https:" ? "; Secure" : "";
-    document.cookie = `${LANDING_INTRO_SEEN_COOKIE}=1; Path=/; Max-Age=${MAX_AGE_SECONDS}; SameSite=Lax${secure}`;
+    window.sessionStorage.setItem(LANDING_INTRO_SEEN_KEY, "1");
   } catch {
-    /* ignore */
-  }
-  try {
-    window.localStorage.setItem(LANDING_INTRO_SEEN_KEY, "1");
-  } catch {
-    /* ignore */
+    /* private mode */
   }
 }
 
-/** Migrate older localStorage-only flag into the cookie. */
-export function migrateLandingIntroSeenFromLocalStorage(): void {
-  if (typeof window === "undefined") return;
+/** Drop durable flags from earlier builds so closing the tab can replay. */
+export function forgetPersistentIntroSeen(): void {
+  if (typeof document === "undefined") return;
+  const expire = `${LANDING_INTRO_SEEN_KEY}=; Path=/; Max-Age=0`;
   try {
-    if (window.localStorage.getItem(LANDING_INTRO_SEEN_KEY) === "1") {
-      markLandingIntroSeen();
-    }
+    document.cookie = expire;
+    document.cookie = `${expire}; Secure`;
+  } catch {
+    /* ignore */
+  }
+  try {
+    window.localStorage.removeItem(LANDING_INTRO_SEEN_KEY);
   } catch {
     /* ignore */
   }

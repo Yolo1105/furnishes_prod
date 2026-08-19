@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  isHeroPastViewport,
+  cookieBannerOfferedOnSection,
   parseCookieConsent,
   serializeCookieConsent,
 } from "./cookie-consent";
@@ -40,9 +40,10 @@ describe("cookie-consent", () => {
     ).toBeNull();
   });
 
-  it("treats the hero as past once its bottom is at or above the viewport top", () => {
-    expect(isHeroPastViewport(1)).toBe(false);
-    expect(isHeroPastViewport(0)).toBe(true);
-    expect(isHeroPastViewport(-40)).toBe(true);
+  it("offers the banner on every section except Home", () => {
+    expect(cookieBannerOfferedOnSection("home")).toBe(false);
+    expect(cookieBannerOfferedOnSection("about")).toBe(true);
+    expect(cookieBannerOfferedOnSection("experience")).toBe(true);
+    expect(cookieBannerOfferedOnSection("studio")).toBe(true);
   });
 });
