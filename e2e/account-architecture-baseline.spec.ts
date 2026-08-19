@@ -81,6 +81,11 @@ function comparePng(name: string): { ratio: number; mismatched: number } {
 }
 
 test.describe("Account architecture visual regression", () => {
+  // Capture writes gitignored candidates that compare reads. CI uses 2
+  // workers + fullyParallel, so without serial compare races capture and
+  // retries only the compare test ("candidate missing").
+  test.describe.configure({ mode: "serial" });
+
   test("capture required screenshots", async ({ page }) => {
     test.setTimeout(240_000);
     await page.setViewportSize(VIEWPORTS.desktop1440);
