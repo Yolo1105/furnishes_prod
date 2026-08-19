@@ -6,7 +6,7 @@ export function registerRouteHandoff(fn: HandoffGo | null) {
   go = fn;
 }
 
-/** Fade through the peach cover, then navigate. Returns false if no handoff. */
+/** Fade through the destination-colored cover, then navigate. Returns false if no handoff. */
 export function startRouteHandoff(
   href: string,
   options?: { replace?: boolean },

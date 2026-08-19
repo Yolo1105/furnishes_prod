@@ -12,6 +12,8 @@
   --landing-line: rgba(110, 24, 16, 0.16);
   --public-shell-pad: clamp(14px, 2vw, 28px);
   --public-nav-h: 56px;
+  /* Below-the-fold sections: wider inset than the home header/MENU. */
+  --landing-section-pad-x: clamp(20px, 3.4vw, 48px);
   --landing-maxw: 1440px;
   --landing-font-sans: var(--font-archivo), "Archivo", sans-serif;
   --landing-font-mono:
@@ -19,7 +21,7 @@
   /* Bracketed labels: [ Experience ], [ Hours ], etc. */
   --landing-bracket-label-size: clamp(13px, 1vw, 16px);
   min-height: 100vh;
-  /* Top matches the hero band so loaderâ†’landing never flashes paper cream. */
+  /* Top matches the hero band so loader→landing never flashes paper cream. */
   background: var(--landing-orange-top);
   color: var(--landing-ink);
   font-family: var(--landing-font-mono);
@@ -706,7 +708,7 @@
   width: 100%;
   max-width: var(--landing-maxw);
   margin: 0 auto;
-  padding: clamp(78px, 13vh, 140px) var(--public-shell-pad);
+  padding: clamp(78px, 13vh, 140px) var(--landing-section-pad-x);
 }
 
 .block {
@@ -719,7 +721,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(64px, 12vh, 150px) var(--public-shell-pad);
+  padding: clamp(64px, 12vh, 150px) var(--landing-section-pad-x);
   position: relative;
   z-index: 1;
 }
@@ -1895,8 +1897,8 @@
 @media (max-width: 760px) {
   .block,
   .waitlist {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: var(--landing-section-pad-x);
+    padding-right: var(--landing-section-pad-x);
   }
 
   .introCountNum {
@@ -2384,12 +2386,27 @@
   }
 }
 
-/* Cookie consent (archive-adapted) */
+/* Cookie consent (archive-adapted). Portaled to `document.body`, so tokens
+   must live here — `.landingRoot { overflow-x: hidden }` is a containing
+   block for `position: fixed` and would pin this bar to the page footer. */
 .cookieBanner {
+  --landing-ink: #6e1810;
+  --landing-cream: #fff6e9;
+  --landing-orange: #e7551a;
+  --landing-on-orange: #fbf0dc;
+  --landing-terra: oklch(0.605 0.176 41);
+  --landing-line: rgba(110, 24, 16, 0.16);
+  --landing-maxw: 1440px;
+  --landing-section-pad-x: clamp(20px, 3.4vw, 48px);
+  --landing-bracket-label-size: clamp(13px, 1vw, 16px);
+  --landing-font-sans: var(--font-archivo), "Archivo", sans-serif;
+  --landing-font-mono:
+    var(--font-space-mono), "Space Mono", ui-monospace, monospace;
   position: fixed;
-  inset-inline: 0;
+  left: 0;
+  right: 0;
   bottom: 0;
-  z-index: 60;
+  z-index: 70;
   isolation: isolate;
   border-top: 1px solid var(--landing-line);
   background: var(--landing-cream);
@@ -2415,7 +2432,45 @@
   margin-inline: auto;
   width: 100%;
   max-width: var(--landing-maxw);
-  padding: 20px var(--public-shell-pad);
+  padding: 20px var(--landing-section-pad-x);
+}
+
+.cookieViews {
+  position: relative;
+  overflow: hidden;
+  transition: height 0.42s cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+
+.cookieView {
+  width: 100%;
+  transition:
+    opacity 0.32s ease,
+    transform 0.42s cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+
+.cookieViewIn {
+  position: relative;
+  z-index: 1;
+  opacity: 1;
+  transform: none;
+}
+
+.cookieViewOut {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cookieViewExitUp {
+  transform: translateY(-12px);
+}
+
+.cookieViewExitDown {
+  transform: translateY(14px);
 }
 
 .cookieBannerRow {
@@ -2482,6 +2537,9 @@
 .cookieBtnSecondary,
 .cookieBtnPrimary {
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: 1px solid var(--landing-line);
   padding: 8px 16px;
   font-family: var(--landing-font-mono);
@@ -2490,9 +2548,11 @@
   text-transform: uppercase;
   color: var(--landing-ink);
   transition:
-    opacity 0.15s ease,
-    background-color 0.15s ease,
-    border-color 0.15s ease;
+    opacity 0.2s ease,
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.22s cubic-bezier(0.16, 0.84, 0.3, 1);
 }
 
 .cookieBtnGhost {
@@ -2500,8 +2560,13 @@
 }
 
 .cookieBtnGhost:hover {
-  border-color: color-mix(in srgb, var(--landing-ink) 28%, transparent);
-  background: color-mix(in srgb, var(--landing-cream) 82%, #171717 5%);
+  color: var(--landing-orange);
+  border-color: color-mix(in srgb, var(--landing-orange) 42%, transparent);
+  background: color-mix(in srgb, var(--landing-orange) 8%, transparent);
+}
+
+.cookieBtnGhost:hover .cookieBtnArrow {
+  transform: translate(2px, -2px);
 }
 
 .cookieBtnSecondary {
@@ -2509,7 +2574,8 @@
 }
 
 .cookieBtnSecondary:hover {
-  opacity: 0.97;
+  border-color: color-mix(in srgb, var(--landing-ink) 32%, transparent);
+  background: color-mix(in srgb, var(--landing-cream) 82%, #171717 5%);
 }
 
 .cookieBtnPrimary {
@@ -2519,7 +2585,26 @@
 }
 
 .cookieBtnPrimary:hover {
-  opacity: 0.95;
+  opacity: 0.92;
+}
+
+.cookieBtnGhost:active,
+.cookieBtnSecondary:active,
+.cookieBtnPrimary:active {
+  transform: translateY(1px);
+}
+
+.cookieBtnArrow {
+  display: inline-flex;
+  width: 11px;
+  height: 11px;
+  transition: transform 0.22s cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+
+.cookieBtnArrow svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .cookieCustomHead {
@@ -2538,40 +2623,141 @@
   border: 0;
   background: transparent;
   color: color-mix(in srgb, var(--landing-ink) 70%, transparent);
-  transition: color 0.15s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.28s cubic-bezier(0.16, 0.84, 0.3, 1);
 }
 
 .cookieClose:hover {
   color: var(--landing-ink);
+  transform: rotate(90deg);
+}
+
+.cookieClose:active {
+  transform: rotate(90deg) scale(0.92);
 }
 
 .cookieRows {
   border-block: 1px solid
     color-mix(in srgb, var(--landing-ink) 12%, transparent);
-  padding-block: 16px;
+  padding-block: 8px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+}
+
+.cookieViewIn .cookieRow {
+  animation: cookieRowIn 0.42s cubic-bezier(0.16, 0.84, 0.3, 1) both;
+}
+
+.cookieViewIn .cookieRow:nth-child(1) {
+  animation-delay: 0.04s;
+}
+
+.cookieViewIn .cookieRow:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.cookieViewIn .cookieRow:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.cookieViewIn .cookieCustomFoot {
+  animation: cookieRowIn 0.42s cubic-bezier(0.16, 0.84, 0.3, 1) 0.2s both;
+}
+
+@keyframes cookieRowIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cookieBtnGhost:focus-visible,
+.cookieBtnSecondary:focus-visible,
+.cookieBtnPrimary:focus-visible,
+.cookieRowInteractive:focus-visible,
+.cookieClose:focus-visible {
+  outline: 1px solid var(--landing-orange);
+  outline-offset: 2px;
 }
 
 .cookieRow {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin: 0;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  text-align: start;
+  color: inherit;
+  font: inherit;
+  appearance: none;
+}
+
+.cookieRowText {
+  min-width: 0;
 }
 
 .cookieRowInteractive {
   cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.22s cubic-bezier(0.16, 0.84, 0.3, 1);
 }
 
-.cookieCheck {
-  margin-top: 2px;
-  accent-color: var(--landing-orange);
-  cursor: inherit;
+.cookieRowInteractive:hover {
+  background: color-mix(in srgb, var(--landing-orange) 7%, transparent);
 }
 
-.cookieCheck:disabled {
-  cursor: not-allowed;
+.cookieRowInteractive:active {
+  transform: translateY(1px);
+}
+
+.cookieSwitch {
+  flex-shrink: 0;
+  position: relative;
+  width: 36px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--landing-ink) 18%, transparent);
+  transition: background-color 0.28s cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+
+.cookieSwitchOn {
+  background: var(--landing-orange);
+}
+
+.cookieSwitchLocked {
+  opacity: 0.45;
+}
+
+.cookieSwitchKnob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--landing-cream);
+  box-shadow: 0 1px 2px rgba(110, 24, 16, 0.18);
+  transition: transform 0.28s cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+
+.cookieSwitchOn .cookieSwitchKnob {
+  transform: translateX(16px);
+}
+
+.cookieRowInteractive:hover .cookieSwitch:not(.cookieSwitchOn) {
+  background: color-mix(in srgb, var(--landing-ink) 26%, transparent);
 }
 
 .cookieRowLabel,
@@ -2610,4 +2796,29 @@
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookieViews,
+  .cookieView,
+  .cookieBtnGhost,
+  .cookieBtnSecondary,
+  .cookieBtnPrimary,
+  .cookieBtnArrow,
+  .cookieClose,
+  .cookieRowInteractive,
+  .cookieSwitch,
+  .cookieSwitchKnob {
+    transition: none;
+  }
+
+  .cookieViewIn .cookieRow,
+  .cookieViewIn .cookieCustomFoot {
+    animation: none;
+  }
+
+  .cookieViewExitUp,
+  .cookieViewExitDown {
+    transform: none;
+  }
 }

@@ -53,6 +53,14 @@ export const INTRO_COPY = {
     flows: [{ label: "ROOM", sub: "10 questions" }],
     footer: "ROOM DETAILS · A COMPLETE BRIEF",
   },
+  resume: {
+    ghost: "HOLD",
+    eyebrow: "INTERIOR STYLE QUIZ",
+    title: "PICK UP WHERE YOU LEFT OFF?",
+    body: "Your last session is still on this device. Continue the same path, or choose a new one and start fresh.",
+    flows: [],
+    footer: "PROGRESS KEPT · NOTHING WAS LOST",
+  },
   full: {
     ghost: "SPACE",
     eyebrow: "INTERIOR STYLE QUIZ",
@@ -81,3 +89,5 @@ export const MODE_OPTIONS = [
   },
   { id: "room", label: "ROOM ONLY", sub: "Brief your space · 10 questions" },
 ];
+
+export const QUIZ_SAVE_KEY = "furnishes-quiz-save";

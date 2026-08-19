@@ -167,6 +167,8 @@ export function AccountShellClient({
           ref={rootRef}
           className={["furnishes-account", className].filter(Boolean).join(" ")}
           data-surface="account"
+          data-route-paint="account"
+          data-route-path={pathname}
         >
           <div className="app">
             <div className="headrule" aria-hidden="true" />

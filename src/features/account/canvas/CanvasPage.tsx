@@ -22,6 +22,8 @@ export function CanvasPage({ className }: { className?: string }) {
         data-canvas-playground="1"
         data-canvas-project={projectName}
         data-canvas-ready={seeded ? "1" : "0"}
+        data-route-paint="canvas"
+        data-route-path="/account/canvas"
       >
         <div className="bg-fluid" aria-hidden="true">
           <div className="bg-blob bg-blob-1" />

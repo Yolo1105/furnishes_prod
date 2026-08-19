@@ -193,7 +193,8 @@
   overflow: hidden;
   background: var(--landing-accent-hi);
   color: #f9e9c2;
-  padding: clamp(48px, 7vh, 80px) var(--public-shell-pad)
+  padding: clamp(48px, 7vh, 80px)
+    var(--landing-section-pad-x, var(--public-shell-pad))
     clamp(18px, 2.6vh, 28px);
 }
 
@@ -636,8 +637,8 @@
 
 @media (max-width: 760px) {
   .footer {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: var(--landing-section-pad-x, var(--public-shell-pad));
+    padding-right: var(--landing-section-pad-x, var(--public-shell-pad));
   }
 
   .footerGrid {

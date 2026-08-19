@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Archivo, Space_Mono } from "next/font/google";
 import { RouteHandoff } from "@/components/route-handoff/RouteHandoff";
+import { LANDING_FREEZE_BOOT_SCRIPT } from "@/features/landing/landing-freeze";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -38,6 +40,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${archivo.variable} ${spaceMono.variable}`}>
       <body>
+        <Script id="landing-freeze-boot" strategy="beforeInteractive">
+          {LANDING_FREEZE_BOOT_SCRIPT}
+        </Script>
         <RouteHandoff>{children}</RouteHandoff>
       </body>
     </html>

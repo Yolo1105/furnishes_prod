@@ -256,11 +256,13 @@ export function LandingShell({
   skipIntro = false,
   e2eMode = false,
   userLabel = null,
+  onHeroReady,
 }: {
   skipLoader?: boolean;
   skipIntro?: boolean;
   e2eMode?: boolean;
   userLabel?: string | null;
+  onHeroReady?: () => void;
 }) {
   const [introGone, setIntroGone] = useState(skipLoader);
   const [loaderReleased, setLoaderReleased] = useState(skipLoader);
@@ -269,6 +271,8 @@ export function LandingShell({
   const releasedOnceRef = useRef(false);
   const goneOnceRef = useRef(false);
   const heroReadyOnceRef = useRef(false);
+  const onHeroReadyRef = useRef(onHeroReady);
+  onHeroReadyRef.current = onHeroReady;
 
   useEffect(() => {
     if (skipLoader) return;
@@ -277,6 +281,8 @@ export function LandingShell({
       LOADER_TIMING.stallForceMs,
     );
     const goneTimer = window.setTimeout(() => {
+      if (goneOnceRef.current) return;
+      goneOnceRef.current = true;
       markLandingIntroSeen();
       setIntroGone(true);
     }, LOADER_TIMING.stallGoneMs);
@@ -312,6 +318,7 @@ export function LandingShell({
             if (heroReadyOnceRef.current) return;
             heroReadyOnceRef.current = true;
             setHeroReady(true);
+            onHeroReadyRef.current?.();
           }}
         />
       ) : null}

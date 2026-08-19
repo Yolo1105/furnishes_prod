@@ -2,8 +2,8 @@ import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { LandingEntry } from "@/features/landing/LandingEntry";
 import {
-  hasSeenLandingIntroCookie,
   LANDING_INTRO_SEEN_COOKIE,
+  shouldSkipLandingLoader,
 } from "@/features/landing/landing-intro";
 import { getOptionalCurrentSession } from "@/server/auth/session";
 
@@ -19,11 +19,11 @@ export default async function HomePage({
     null;
 
   const params = await searchParams;
-  const querySkip = params.intro === "skip";
   const jar = await cookies();
-  const skipLoader =
-    querySkip ||
-    hasSeenLandingIntroCookie(jar.get(LANDING_INTRO_SEEN_COOKIE)?.value);
+  const skipLoader = shouldSkipLandingLoader({
+    introQuery: params.intro ?? null,
+    seenCookie: jar.get(LANDING_INTRO_SEEN_COOKIE)?.value ?? null,
+  });
 
   return (
     <Suspense fallback={null}>

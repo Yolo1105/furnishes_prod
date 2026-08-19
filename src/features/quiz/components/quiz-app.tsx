@@ -3,12 +3,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useInjectQuizCss } from "./shared";
-import { FLOW_META_DEFS } from "@/features/quiz/data/constants";
+import { FLOW_META_DEFS, QUIZ_SAVE_KEY } from "@/features/quiz/data/constants";
 import { getLayoutComponent, paletteTheme } from "./layouts";
 import { QuizShell } from "./quiz-shell";
 import { FlowInterstitial } from "./flow-interstitial";
 import { ResultsPage } from "./results-page";
 import { IntroPage } from "./intro-page";
+import { QuizBgSlides } from "./quiz-bg-slides";
 import {
   buildQuestionSequence,
   isAnswerComplete,
@@ -18,8 +19,95 @@ import {
   computeBudgetRange,
 } from "@/features/quiz/engine/scoring";
 
+function quizStorage() {
+  if (typeof window === "undefined") return null;
+  if (window.storage) return window.storage;
+  try {
+    const ls = window.localStorage;
+    return {
+      get: async (key) => {
+        const value = ls.getItem(key);
+        return value == null ? null : { value };
+      },
+      set: async (key, value) => {
+        ls.setItem(key, value);
+      },
+      delete: async (key) => {
+        ls.removeItem(key);
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
+function parseSave(raw) {
+  try {
+    const d = typeof raw === "string" ? JSON.parse(raw) : raw;
+    if (
+      d &&
+      d.v === 1 &&
+      d.mode &&
+      d.answers &&
+      typeof d.answers === "object"
+    ) {
+      return d;
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function nearestYScroller(start) {
+  let el = start instanceof Element ? start : null;
+  while (el && el !== document.body && el !== document.documentElement) {
+    if (el instanceof HTMLElement) {
+      const overflowY = window.getComputedStyle(el).overflowY;
+      if (
+        (overflowY === "auto" || overflowY === "scroll") &&
+        el.scrollHeight > el.clientHeight + 1
+      ) {
+        return el;
+      }
+    }
+    el = el.parentElement;
+  }
+  return null;
+}
+
+/** Pin the quiz to the window. Wheel/trackpad must not rubber-band the page. */
+function useLockQuizViewport() {
+  useEffect(() => {
+    const onWheel = (event) => {
+      if (event.ctrlKey) return;
+      const scroller = nearestYScroller(event.target);
+      if (!scroller) {
+        event.preventDefault();
+        return;
+      }
+      const atTop = scroller.scrollTop <= 0;
+      const atBottom =
+        scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
+      if ((event.deltaY < 0 && atTop) || (event.deltaY > 0 && atBottom)) {
+        event.preventDefault();
+      }
+    };
+    const onTouchMove = (event) => {
+      if (!nearestYScroller(event.target)) event.preventDefault();
+    };
+    document.addEventListener("wheel", onWheel, { passive: false });
+    document.addEventListener("touchmove", onTouchMove, { passive: false });
+    return () => {
+      document.removeEventListener("wheel", onWheel);
+      document.removeEventListener("touchmove", onTouchMove);
+    };
+  }, []);
+}
+
 export function FurnishesDesignQuizInner() {
   useInjectQuizCss();
+  useLockQuizViewport();
   const [mode, setMode] = useState("full");
   const [screen, setScreen] = useState("intro");
   useEffect(() => {
@@ -73,12 +161,9 @@ export function FurnishesDesignQuizInner() {
   /* CLARITY UPGRADE: interstitial splash announcing the next flow */
   const [interstitial, setInterstitial] = useState(null); // flow key | null
 
-  /* ── RESUME — progress persists across reloads via window.storage.
-     Fully optional: every call is guarded, and the quiz behaves identically
-     when the API is missing or failing. ── */
-  const storageRef = useRef(
-    typeof window !== "undefined" && window.storage ? window.storage : null,
-  );
+  /* ── RESUME — progress persists across reloads via localStorage
+     (or window.storage when a host provides it). ── */
+  const storageRef = useRef(quizStorage());
   const [savedGame, setSavedGame] = useState(null);
   useEffect(() => {
     const s = storageRef.current;
@@ -86,18 +171,10 @@ export function FurnishesDesignQuizInner() {
     let alive = true;
     (async () => {
       try {
-        const r = await s.get("furnishes-quiz-save");
+        const r = await s.get(QUIZ_SAVE_KEY);
         if (!alive || !r || !r.value) return;
-        const d = JSON.parse(r.value);
-        /* discard saves from incompatible future/past schemas silently */
-        if (
-          d &&
-          d.v === 1 &&
-          d.mode &&
-          d.answers &&
-          typeof d.answers === "object"
-        )
-          setSavedGame(d);
+        const d = parseSave(r.value);
+        if (d) setSavedGame(d);
       } catch {
         /* no save / storage unavailable — fresh start */
       }
@@ -106,29 +183,32 @@ export function FurnishesDesignQuizInner() {
       alive = false;
     };
   }, []);
+  const persistSave = useCallback((payload) => {
+    const s = storageRef.current;
+    if (!s) return;
+    const write = s.set(QUIZ_SAVE_KEY, JSON.stringify(payload));
+    if (write && typeof write.catch === "function") write.catch(() => {});
+  }, []);
   const saveTimer = useRef(null);
   useEffect(() => {
-    const s = storageRef.current;
-    if (!s || screen !== "quiz") return;
+    if (screen !== "quiz") return;
     clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      s.set(
-        "furnishes-quiz-save",
-        JSON.stringify({
-          v: 1,
-          mode,
-          answers,
-          currentIdx,
-          savedAt: Date.now(),
-        }),
-      ).catch(() => {});
+      const payload = {
+        v: 1,
+        mode,
+        answers,
+        currentIdx,
+        savedAt: Date.now(),
+      };
+      persistSave(payload);
     }, 600);
     return () => clearTimeout(saveTimer.current);
-  }, [answers, currentIdx, mode, screen]);
+  }, [answers, currentIdx, mode, screen, persistSave]);
   const clearSave = useCallback(() => {
     setSavedGame(null);
     const s = storageRef.current;
-    if (s) s.delete("furnishes-quiz-save").catch(() => {});
+    if (s) s.delete(QUIZ_SAVE_KEY).catch(() => {});
   }, []);
 
   const budgetAnswer = answers["b1"];
@@ -209,6 +289,17 @@ export function FurnishesDesignQuizInner() {
     fadeSwap(
       () => {
         if (safeIdx === 0) {
+          const snapshot = {
+            v: 1,
+            mode,
+            answers,
+            currentIdx: 0,
+            savedAt: Date.now(),
+          };
+          if (Object.keys(answers ?? {}).length > 0) {
+            setSavedGame(snapshot);
+            persistSave(snapshot);
+          }
           setScreen("intro");
         } else {
           setCurrentIdx(safeIdx - 1);
@@ -218,7 +309,7 @@ export function FurnishesDesignQuizInner() {
       },
       safeIdx === 0 ? "page" : "content",
     );
-  }, [fadeSwap, safeIdx]);
+  }, [fadeSwap, safeIdx, mode, answers, persistSave]);
 
   /* A11Y: after each question change, move focus to the new heading so
      assistive tech announces the page turn (no scroll jump). */
@@ -325,6 +416,7 @@ export function FurnishesDesignQuizInner() {
   const handleStart = useCallback(() => {
     clearSave();
     fadeSwap(() => {
+      setAnswers({});
       setScreen("quiz");
       setCurrentIdx(0);
       setAnimKey((k) => k + 1);
@@ -403,7 +495,7 @@ export function FurnishesDesignQuizInner() {
   let body;
   if (screen === "results") {
     body = (
-      <div key={animKey} className="quiz-enter">
+      <div key={animKey} className="quiz-enter" style={{ height: "100%" }}>
         <ResultsPage
           mode={mode}
           tally={tally}
@@ -416,7 +508,7 @@ export function FurnishesDesignQuizInner() {
     );
   } else if (screen === "intro") {
     body = (
-      <div key={animKey} className="quiz-enter">
+      <div key={animKey} className="quiz-enter" style={{ height: "100%" }}>
         <IntroPage
           mode={mode}
           onStart={handleStart}
@@ -446,7 +538,7 @@ export function FurnishesDesignQuizInner() {
   } else {
     const LayoutComponent = getLayoutComponent(rawQuestion);
     body = (
-      <div>
+      <div style={{ height: "100%" }}>
         <QuizShell
           question={question}
           answer={answer}
@@ -476,21 +568,45 @@ export function FurnishesDesignQuizInner() {
 
   /* SMOOTH TRANSITIONS — one persistent layer owns the page background and
      cross-fades it between every screen and question. Content remounts with
-     enter/exit animations inside it, but the color never hard-cuts. */
+     enter/exit animations inside it, but the color never hard-cuts. Intro
+     sits on rotating interior stills; questions keep their own solid theme. */
   const pageBg =
     screen === "quiz" && !interstitial && question ? question.bg : "#1a1714";
 
   return (
-    <div className="style-explorer-root">
+    <div
+      className="style-explorer-root"
+      data-route-paint="quiz"
+      data-route-path="/quiz"
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+        overscrollBehavior: "none",
+      }}
+    >
+      <style>{`
+        html, body {
+          background-color: #1a1714 !important;
+          height: 100%;
+          width: 100%;
+          overflow: hidden;
+          overscroll-behavior: none;
+        }
+      `}</style>
       <div
         className="q-vh"
         style={{
           position: "relative",
           overflow: "hidden",
+          height: "100%",
           backgroundColor: pageBg,
           transition: "background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       >
+        {screen === "intro" && <QuizBgSlides />}
         {/* env-proof page fade — applies only to screen-level changes; plain
             question steps keep the shell (header/footer) perfectly still and
             fade only the content area inside QuizShell */}
@@ -499,6 +615,8 @@ export function FurnishesDesignQuizInner() {
           style={{
             position: "relative",
             zIndex: 1,
+            height: "100%",
+            overflow: "hidden",
             opacity: fadeScope === "page" && exiting ? 0 : 1,
             /* Exit quick and clean (shorter than the 300ms timer so it never
                truncates); entered pages stay fully visible. */

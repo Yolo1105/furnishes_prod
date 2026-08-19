@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { INTRO_COPY, MODE_OPTIONS } from "@/features/quiz/data/constants";
 import {
   QUIZ_PAD_X,
@@ -44,19 +44,27 @@ function useEnterOnChange(dep: any) {
 
 /** Line-art marks for the path index — one per mode, drawn in-brand. */
 function IntroGlyph({ kind, active }: any) {
-  const c = active ? "#B33D0E" : "rgba(221,213,196,0.55)";
+  const c = active ? "#B33D0E" : "rgba(221,213,196,0.78)";
   const s = { stroke: c, fill: "none", strokeWidth: 1.6 };
   return (
     <svg
       viewBox="0 0 48 48"
-      width="44"
-      height="44"
+      width="40"
+      height="40"
       aria-hidden="true"
-      style={{ display: "block", transition: "opacity 0.2s" }}
+      style={{
+        display: "block",
+        filter: "drop-shadow(0 2px 10px rgba(0,0,0,0.55))",
+      }}
     >
+      {kind === "resume" && (
+        <>
+          <rect x="16" y="14" width="6" height="20" {...s} />
+          <rect x="26" y="14" width="6" height="20" {...s} />
+        </>
+      )}
       {kind === "full" && (
         <>
-          {/* open editorial spread */}
           <path d="M 8 14 Q 24 10 24 14 L 24 36 Q 24 32 8 36 Z" {...s} />
           <path d="M 40 14 Q 24 10 24 14 L 24 36 Q 24 32 40 36 Z" {...s} />
           <line x1="12" y1="20" x2="20" y2="19" {...s} strokeWidth="1.2" />
@@ -67,7 +75,6 @@ function IntroGlyph({ kind, active }: any) {
       )}
       {kind === "style" && (
         <>
-          {/* fanned swatch cards */}
           <rect
             x="10"
             y="16"
@@ -96,7 +103,6 @@ function IntroGlyph({ kind, active }: any) {
       )}
       {kind === "budget" && (
         <>
-          {/* ledger: line items and a ruled total */}
           <line x1="10" y1="16" x2="30" y2="16" {...s} />
           <line x1="34" y1="16" x2="38" y2="16" {...s} />
           <line x1="10" y1="23" x2="27" y2="23" {...s} />
@@ -108,14 +114,13 @@ function IntroGlyph({ kind, active }: any) {
       )}
       {kind === "room" && (
         <>
-          {/* floor plan with a door swing */}
           <rect x="10" y="10" width="28" height="28" {...s} />
           <line
             x1="20"
             y1="10"
             x2="28"
             y2="10"
-            stroke="#1a1714"
+            stroke="rgba(12,10,8,0.9)"
             strokeWidth="3"
           />
           <line x1="20" y1="10" x2="20" y2="18" {...s} />
@@ -139,6 +144,142 @@ function IntroGlyph({ kind, active }: any) {
   );
 }
 
+function PathRow({
+  index,
+  kind,
+  label,
+  sub,
+  selected,
+  onSelect,
+  delay = 0,
+  onDiscard,
+}: any) {
+  const shadow = "0 1px 18px rgba(0,0,0,0.7)";
+  return (
+    <div className="q-stagger" style={{ ...stagger(delay, 70) }}>
+      <button
+        type="button"
+        onClick={onSelect}
+        role="radio"
+        aria-checked={selected}
+        {...pressFx()}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "18px",
+          width: "100%",
+          textAlign: "left",
+          padding: "16px 8px 16px 14px",
+          background: "none",
+          border: "none",
+          borderTop: "1px solid rgba(221,213,196,0.18)",
+          borderLeft: `2px solid ${selected ? "#B33D0E" : "transparent"}`,
+          cursor: "pointer",
+          fontFamily: "inherit",
+          transition: "border-color 0.25s ease",
+        }}
+      >
+        <span
+          aria-hidden="true"
+          className="q-display"
+          style={{
+            fontSize: "28px",
+            fontWeight: 700,
+            lineHeight: 1,
+            color: "transparent",
+            WebkitTextStroke: `1.2px ${selected ? "#B33D0E" : "rgba(240,235,224,0.72)"}`,
+            flexShrink: 0,
+            width: "42px",
+            filter: "drop-shadow(0 2px 10px rgba(0,0,0,0.55))",
+          }}
+        >
+          {index}
+        </span>
+        <IntroGlyph kind={kind} active={selected} />
+        <span style={{ flex: 1, minWidth: 0 }}>
+          <span
+            style={{
+              display: "block",
+              fontSize: "13px",
+              letterSpacing: "0.2em",
+              fontWeight: 700,
+              color: selected ? "#B33D0E" : "#F0EBE0",
+              textShadow: shadow,
+            }}
+          >
+            {label}
+          </span>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              gap: "12px",
+              marginTop: "5px",
+              flexWrap: "wrap",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "12px",
+                color: "rgba(240,235,224,0.7)",
+                letterSpacing: "0.08em",
+                textShadow: shadow,
+              }}
+            >
+              {sub}
+            </span>
+            {onDiscard ? (
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDiscard();
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onDiscard();
+                  }
+                }}
+                style={{
+                  fontSize: "10px",
+                  letterSpacing: "0.16em",
+                  fontWeight: 700,
+                  color: "rgba(240,235,224,0.45)",
+                  cursor: "pointer",
+                  textShadow: shadow,
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.color = "rgba(240,235,224,0.9)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.color = "rgba(240,235,224,0.45)")
+                }
+              >
+                DISCARD
+              </span>
+            ) : null}
+          </span>
+        </span>
+        <span
+          aria-hidden="true"
+          style={{
+            color: "#B33D0E",
+            opacity: selected ? 1 : 0,
+            filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.5))",
+            flexShrink: 0,
+            width: "14px",
+          }}
+        >
+          <Icon name="chevron" size={13} />
+        </span>
+      </button>
+    </div>
+  );
+}
+
 export function IntroPage({
   mode,
   onStart,
@@ -148,16 +289,32 @@ export function IntroPage({
   onDiscardSave,
 }: any) {
   const savedCount = saved ? Object.keys(saved.answers ?? {}).length : 0;
+  const hasSave = !!(saved && savedCount > 0);
   const savedLabel = saved
     ? (MODE_OPTIONS.find((o) => o.id === saved.mode)?.label ??
       saved.mode.toUpperCase())
     : "";
+  const [intent, setIntent] = useState(hasSave ? "resume" : "path");
+  useEffect(() => {
+    setIntent(hasSave ? "resume" : "path");
+  }, [hasSave]);
+  const resuming = hasSave && intent === "resume";
   /* the whole editorial copy block re-enters whenever the chosen path changes */
-  const copyEnter = useEnterOnChange(mode);
+  const copyEnter = useEnterOnChange(resuming ? "resume" : mode);
 
-  const copy = INTRO_COPY[mode] ?? INTRO_COPY.full;
+  const copy = resuming
+    ? INTRO_COPY.resume
+    : (INTRO_COPY[mode] ?? INTRO_COPY.full);
   const titleWords = copy.title.split(" ");
   const lastWord = titleWords.pop();
+  const footer = resuming
+    ? `${savedLabel} · ${savedCount} ANSWERED`
+    : copy.footer;
+
+  const go = () => {
+    if (resuming) onResume();
+    else onStart();
+  };
 
   return (
     <div
@@ -166,7 +323,7 @@ export function IntroPage({
         backgroundColor: "transparent",
         display: "flex",
         flexDirection: "column",
-        padding: `24px ${QUIZ_PAD_X} 28px`,
+        padding: `24px 0 36px`,
         position: "relative",
         overflow: "hidden",
       }}
@@ -197,7 +354,10 @@ export function IntroPage({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "12px",
+          justifyContent: "flex-start",
+          gap: "10px",
+          width: "fit-content",
+          padding: `0 ${QUIZ_PAD_X}`,
           position: "relative",
           zIndex: 1,
           border: "none",
@@ -207,7 +367,7 @@ export function IntroPage({
         <QuizHomeLink />
         <span
           aria-hidden="true"
-          style={{ color: "rgba(221,213,196,0.28)", fontSize: "12px" }}
+          style={{ color: "rgba(221,213,196,0.45)", fontSize: "12px" }}
         >
           /
         </span>
@@ -215,7 +375,7 @@ export function IntroPage({
           style={{
             fontSize: "11px",
             letterSpacing: "0.2em",
-            color: "rgba(221,213,196,0.45)",
+            color: "rgba(221,213,196,0.62)",
             fontWeight: 700,
           }}
         >
@@ -235,6 +395,8 @@ export function IntroPage({
           zIndex: 1,
           paddingTop: "36px",
           paddingBottom: "24px",
+          paddingLeft: "clamp(48px, 8vw, 120px)",
+          paddingRight: "clamp(48px, 8vw, 120px)",
           width: "100%",
         }}
       >
@@ -266,7 +428,7 @@ export function IntroPage({
             style={{
               fontSize: "13px",
               lineHeight: 1.75,
-              color: "rgba(221,213,196,0.5)",
+              color: "rgba(221,213,196,0.72)",
               letterSpacing: "0.06em",
               marginBottom: "36px",
               maxWidth: "380px",
@@ -275,87 +437,8 @@ export function IntroPage({
           >
             {copy.body}
           </p>
-          {saved && savedCount > 0 && (
-            <div
-              style={{
-                border: "1.5px solid #B33D0E",
-                padding: "14px 16px",
-                marginBottom: "18px",
-                maxWidth: "380px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "14px",
-              }}
-            >
-              <button
-                onClick={onResume}
-                {...pressFx()}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#B33D0E",
-                  fontSize: "12px",
-                  letterSpacing: "0.18em",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  textAlign: "left",
-                  padding: 0,
-                  transition:
-                    "transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s ease, filter 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateX(4px)";
-                  e.currentTarget.style.filter = "brightness(1.35)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "";
-                  e.currentTarget.style.filter = "";
-                }}
-              >
-                CONTINUE <Icon name="chevron" size={11} />
-                <span
-                  style={{
-                    display: "block",
-                    marginTop: "5px",
-                    fontSize: "10px",
-                    letterSpacing: "0.12em",
-                    color: "rgba(221,213,196,0.45)",
-                  }}
-                >
-                  {savedLabel} · {savedCount} ANSWERED
-                </span>
-              </button>
-              <button
-                onClick={onDiscardSave}
-                {...pressFx()}
-                aria-label="Discard saved progress"
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.color = "rgba(221,213,196,0.85)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.color = "rgba(221,213,196,0.35)")
-                }
-                style={{
-                  transition:
-                    "color 0.2s ease, transform 0.15s ease, opacity 0.15s ease",
-                  background: "none",
-                  border: "none",
-                  color: "rgba(221,213,196,0.55)",
-                  fontSize: "10px",
-                  letterSpacing: "0.16em",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  textDecoration: "underline",
-                  flexShrink: 0,
-                }}
-              >
-                START FRESH
-              </button>
-            </div>
-          )}
           <button
-            onClick={onStart}
+            onClick={go}
             {...pressFx()}
             style={{
               backgroundColor: "#B33D0E",
@@ -377,41 +460,47 @@ export function IntroPage({
               e.currentTarget.style.transform = "translateX(0)";
             }}
           >
-            BEGIN{" "}
+            {resuming ? "CONTINUE" : "BEGIN"}{" "}
             <Icon name="arrow-right" size={14} style={{ marginLeft: "6px" }} />
           </button>
           <p
             style={{
               marginTop: "26px",
               fontSize: "11px",
-              color: "rgba(221,213,196,0.25)",
+              color: "rgba(221,213,196,0.5)",
               letterSpacing: "0.14em",
               fontWeight: 700,
               ...copyEnter,
             }}
           >
-            {copy.footer}
+            {footer}
           </p>
         </div>
 
         {/* ── Right: the path index ── */}
         <div
-          style={{ flex: "1 1 430px", minWidth: "320px", maxWidth: "720px" }}
+          style={{
+            flex: "1 1 420px",
+            minWidth: "300px",
+            maxWidth: "560px",
+            minHeight: 0,
+          }}
         >
           <div
             style={{
               display: "flex",
               alignItems: "baseline",
               justifyContent: "space-between",
-              marginBottom: "4px",
+              padding: "0 8px 6px 14px",
             }}
           >
             <span
               style={{
                 fontSize: "10px",
                 letterSpacing: "0.28em",
-                color: "rgba(221,213,196,0.4)",
+                color: "rgba(240,235,224,0.55)",
                 fontWeight: 700,
+                textShadow: "0 1px 14px rgba(0,0,0,0.7)",
               }}
             >
               CHOOSE YOUR PATH
@@ -420,113 +509,50 @@ export function IntroPage({
               style={{
                 fontSize: "10px",
                 letterSpacing: "0.18em",
-                color: "rgba(221,213,196,0.25)",
+                color: "rgba(240,235,224,0.4)",
                 fontWeight: 700,
+                textShadow: "0 1px 14px rgba(0,0,0,0.7)",
               }}
             >
-              {String(
-                MODE_OPTIONS.findIndex((o) => o.id === mode) + 1,
-              ).padStart(2, "0")}{" "}
-              / 04
+              {resuming
+                ? "00 / 04"
+                : `${String(
+                    MODE_OPTIONS.findIndex((o) => o.id === mode) + 1,
+                  ).padStart(2, "0")} / 04`}
             </span>
           </div>
           <div role="radiogroup" aria-label="Choose your path">
-            {MODE_OPTIONS.map((opt, i) => {
-              const sel = mode === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  onClick={() => onModeChange(opt.id)}
-                  role="radio"
-                  aria-checked={sel}
-                  className="q-stagger"
-                  {...pressFx(sel ? "translateX(6px)" : "translateX(0)")}
-                  style={{
-                    ...stagger(i, 70),
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "20px",
-                    width: "100%",
-                    textAlign: "left",
-                    padding: "18px 14px 18px 18px",
-                    background: sel ? "rgba(179,61,14,0.09)" : "none",
-                    border: "none",
-                    borderTop: "1px solid rgba(221,213,196,0.14)",
-                    borderLeft: `2px solid ${sel ? "#B33D0E" : "transparent"}`,
-                    cursor: "pointer",
-                    transform: sel ? "translateX(6px)" : "translateX(0)",
-                    transition:
-                      "background 0.25s ease, border-color 0.25s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!sel)
-                      e.currentTarget.style.background =
-                        "rgba(221,213,196,0.04)";
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!sel) e.currentTarget.style.background = "none";
-                  }}
-                >
-                  <span
-                    aria-hidden="true"
-                    className="q-display"
-                    style={{
-                      fontSize: "30px",
-                      fontWeight: 700,
-                      lineHeight: 1,
-                      color: "transparent",
-                      WebkitTextStroke: `1px ${sel ? "#B33D0E" : "rgba(221,213,196,0.4)"}`,
-                      flexShrink: 0,
-                      width: "44px",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <IntroGlyph kind={opt.id} active={sel} />
-                  <span style={{ flex: 1 }}>
-                    <span
-                      style={{
-                        display: "block",
-                        fontSize: "13px",
-                        letterSpacing: "0.2em",
-                        fontWeight: 700,
-                        color: sel ? "#B33D0E" : "#DDD5C4",
-                        transition: "color 0.2s",
-                      }}
-                    >
-                      {opt.label}
-                    </span>
-                    <span
-                      style={{
-                        display: "block",
-                        fontSize: "12px",
-                        color: "rgba(221,213,196,0.38)",
-                        letterSpacing: "0.08em",
-                        marginTop: "4px",
-                      }}
-                    >
-                      {opt.sub}
-                    </span>
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: 700,
-                      color: "#B33D0E",
-                      opacity: sel ? 1 : 0,
-                      transform: sel ? "translateX(0)" : "translateX(-6px)",
-                      transition: "opacity 0.2s, transform 0.2s",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Icon name="chevron" size={13} />
-                  </span>
-                </button>
-              );
-            })}
-            <div style={{ borderTop: "1px solid rgba(221,213,196,0.14)" }} />
+            {hasSave && (
+              <PathRow
+                index="00"
+                kind="resume"
+                label="CONTINUE"
+                sub={`${savedLabel} · ${savedCount} answered`}
+                selected={resuming}
+                onSelect={() => setIntent("resume")}
+                onDiscard={() => {
+                  setIntent("path");
+                  onDiscardSave();
+                  if (saved?.mode) onModeChange(saved.mode);
+                }}
+              />
+            )}
+            {MODE_OPTIONS.map((opt, i) => (
+              <PathRow
+                key={opt.id}
+                index={String(i + 1).padStart(2, "0")}
+                kind={opt.id}
+                label={opt.label}
+                sub={opt.sub}
+                selected={!resuming && mode === opt.id}
+                onSelect={() => {
+                  setIntent("path");
+                  onModeChange(opt.id);
+                }}
+                delay={hasSave ? i + 1 : i}
+              />
+            ))}
+            <div style={{ borderTop: "1px solid rgba(221,213,196,0.18)" }} />
           </div>
         </div>
       </main>

@@ -6,7 +6,10 @@ export const QUIZ_CSS = `
      next/font CSS variables take priority when the quiz runs inside the app. */
   font-family: var(--font-space-mono, 'Space Mono'), 'Space Mono', ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
   -webkit-font-smoothing: antialiased;
-  min-height: 100dvh;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 .style-explorer-root h1,
 .style-explorer-root .q-display {
@@ -19,7 +22,12 @@ export const QUIZ_CSS = `
   font-stretch: 112%;
 }
 .style-explorer-root * { box-sizing: border-box; }
-.style-explorer-root .q-vh { min-height: 100vh; min-height: 100dvh; }
+.style-explorer-root .q-vh {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
 /* Brand selection color instead of system blue */
 .style-explorer-root ::selection { background: #B33D0E; color: #DDD5C4; }
 /* Kill the grey mobile tap flash; keep scroll chains inside the quiz */
@@ -51,8 +59,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 .style-explorer-root h1, .style-explorer-root p { margin: 0; }
 
 @keyframes style-explorer-fade-up {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 .style-explorer-root .quiz-enter {
   animation: style-explorer-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;

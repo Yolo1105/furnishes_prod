@@ -16,6 +16,8 @@ export default async function SharedConversationPage({ params }: Params) {
 
   return (
     <main
+      data-route-paint="shared"
+      data-route-path={`/shared/${shareId}`}
       style={{
         maxWidth: 720,
         margin: "0 auto",

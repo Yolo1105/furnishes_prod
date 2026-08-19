@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { parseCookieConsent, serializeCookieConsent } from "./cookie-consent";
+import {
+  isHeroPastViewport,
+  parseCookieConsent,
+  serializeCookieConsent,
+} from "./cookie-consent";
 
 describe("cookie-consent", () => {
   it("round-trips a consent choice through serialize/parse", () => {
@@ -34,5 +38,11 @@ describe("cookie-consent", () => {
         ),
       ),
     ).toBeNull();
+  });
+
+  it("treats the hero as past once its bottom is at or above the viewport top", () => {
+    expect(isHeroPastViewport(1)).toBe(false);
+    expect(isHeroPastViewport(0)).toBe(true);
+    expect(isHeroPastViewport(-40)).toBe(true);
   });
 });

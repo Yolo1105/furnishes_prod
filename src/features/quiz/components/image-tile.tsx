@@ -3,6 +3,7 @@
 "use client";
 
 import { STYLE_TILE_GRADIENTS } from "@/features/quiz/data/constants";
+import { hexA } from "./shared";
 
 function SceneGlyph({ styleKey, ink }: any) {
   const s: any = {

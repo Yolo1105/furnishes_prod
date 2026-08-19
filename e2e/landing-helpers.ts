@@ -8,6 +8,22 @@ export const RENDERER_READY_MS = 60_000;
 /** Settled Landing URL: skip intro + low-cost renderer when NEXT_PUBLIC_E2E is set. */
 export const SETTLED_LANDING_PATH = "/?intro=skip&e2e=1";
 
+const E2E_COOKIE_CONSENT = encodeURIComponent(
+  JSON.stringify({
+    essential: true,
+    analytics: false,
+    marketing: false,
+    recordedAt: "2020-01-01T00:00:00.000Z",
+  }),
+);
+
+/** Keep the consent bar from covering waitlist / footer during UI tests. */
+async function seedCookieConsent(page: Page) {
+  await page.addInitScript((value) => {
+    document.cookie = `furnishes-cookie-consent=${value};path=/;SameSite=Lax`;
+  }, E2E_COOKIE_CONSENT);
+}
+
 export function landingHero(page: Page) {
   return page.locator("#landing-hero-scene");
 }
@@ -23,6 +39,7 @@ export async function expectLandingReady(page: Page) {
 }
 
 export async function waitForLandingReady(page: Page) {
+  await seedCookieConsent(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await expectLandingReady(page);
 }
@@ -38,6 +55,7 @@ export async function waitForSettledLanding(
 ) {
   const { requireWebGL = false, testMode = false } = options;
 
+  await seedCookieConsent(page);
   await page.goto(SETTLED_LANDING_PATH, { waitUntil: "domcontentloaded" });
 
   const hero = landingHero(page);
@@ -103,6 +121,7 @@ export async function disableWebGL(page: Page) {
 /** Settled Landing chrome without initializing the heavy WebGL scene. */
 export async function waitForLandingUi(page: Page) {
   await disableWebGL(page);
+  await seedCookieConsent(page);
 
   await page.goto(SETTLED_LANDING_PATH, { waitUntil: "domcontentloaded" });
 

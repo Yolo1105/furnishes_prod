@@ -10,57 +10,60 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { registerRouteHandoff } from "./start-route-handoff";
+import {
+  PEACH_HANDOFF_BG,
+  handoffCoverColor,
+  paintDocumentBg,
+  routePainted,
+  shouldHandoff,
+} from "./route-handoff-logic";
 import styles from "./route-handoff.module.css";
 
 const COVER_MS = 280;
-const PEACH = "#fff2e5";
+const PAINT_HOLD_MS = 8000;
+const SAFETY_MS = 10000;
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-function isHandoffHref(pathname: string) {
-  return (
-    pathname === "/login" ||
-    pathname === "/signup" ||
-    pathname === "/forgot-password" ||
-    pathname === "/reset-password" ||
-    pathname === "/verify-email" ||
-    pathname === "/quiz" ||
-    pathname.startsWith("/account")
-  );
 }
 
 function arrivedAt(pathname: string, pending: string) {
   return pathname === pending;
 }
 
-function shouldHandoff(from: string, to: string) {
-  if (from === to) return false;
-  const fromHome = from === "/";
-  const toHome = to === "/";
-  if (fromHome && isHandoffHref(to)) return true;
-  if (toHome && isHandoffHref(from)) return true;
-  if (isHandoffHref(from) && isHandoffHref(to) && from !== to) {
-    const fromAuth = !from.startsWith("/account");
-    const toAccount = to.startsWith("/account");
-    return fromAuth && toAccount;
-  }
-  return false;
-}
-
 /**
- * Peach cover between landing ↔ login / account so the orange house does not
- * snap off into a blank frame.
+ * Colored cover on every cross-surface URL change so the previous page does
+ * not drop into an unpainted (white) frame. Cover color matches the
+ * destination. Click intercept covers Links; pathname watch covers Back.
  */
 export function RouteHandoff({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const pathnameRef = useRef(pathname);
+  const prevPathRef = useRef(pathname);
   const pendingToRef = useRef<string | null>(null);
   const lockRef = useRef(false);
   const [coverOn, setCoverOn] = useState(false);
+  const [coverBg, setCoverBg] = useState(PEACH_HANDOFF_BG);
   pathnameRef.current = pathname;
+
+  const armCover = useCallback((toPathname: string, fromPathname?: string) => {
+    const bg = handoffCoverColor(
+      toPathname,
+      fromPathname ?? pathnameRef.current,
+    );
+    paintDocumentBg(bg);
+    setCoverBg(bg);
+    pendingToRef.current = toPathname;
+    lockRef.current = true;
+    setCoverOn(true);
+    window.setTimeout(() => {
+      if (!pendingToRef.current) return;
+      pendingToRef.current = null;
+      lockRef.current = false;
+      setCoverOn(false);
+    }, SAFETY_MS);
+  }, []);
 
   const go = useCallback(
     (href: string, replace = false) => {
@@ -72,9 +75,11 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
         return false;
       }
       if (url.origin !== window.location.origin) return false;
-      const to = `${url.pathname}${url.search}`;
       if (!shouldHandoff(from, url.pathname)) return false;
       if (lockRef.current) return true;
+
+      const to = `${url.pathname}${url.search}`;
+      armCover(url.pathname, from);
 
       if (prefersReducedMotion()) {
         if (replace) router.replace(to);
@@ -82,22 +87,13 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
         return true;
       }
 
-      lockRef.current = true;
-      pendingToRef.current = url.pathname;
-      setCoverOn(true);
       window.setTimeout(() => {
         if (replace) router.replace(to);
         else router.push(to);
       }, COVER_MS);
-      window.setTimeout(() => {
-        if (!pendingToRef.current) return;
-        pendingToRef.current = null;
-        lockRef.current = false;
-        setCoverOn(false);
-      }, 4000);
       return true;
     },
-    [router],
+    [armCover, router],
   );
 
   useEffect(() => {
@@ -130,23 +126,61 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
   }, [go]);
 
   useLayoutEffect(() => {
+    const from = prevPathRef.current;
+    if (from !== pathname) {
+      prevPathRef.current = pathname;
+    }
+
+    if (
+      !pendingToRef.current &&
+      from !== pathname &&
+      shouldHandoff(from, pathname)
+    ) {
+      const bg = handoffCoverColor(pathname, from);
+      paintDocumentBg(bg);
+      setCoverBg(bg);
+      if (!routePainted(pathname)) {
+        armCover(pathname, from);
+      }
+    }
+
     const pending = pendingToRef.current;
     if (!pending) return;
     if (!arrivedAt(pathname, pending)) return;
-    pendingToRef.current = null;
-    const hold = window.setTimeout(() => {
+
+    let cancelled = false;
+    const release = () => {
+      if (cancelled) return;
+      pendingToRef.current = null;
       setCoverOn(false);
       lockRef.current = false;
-    }, 180);
-    return () => window.clearTimeout(hold);
-  }, [pathname]);
+    };
+
+    const started = performance.now();
+    const tick = () => {
+      if (cancelled) return;
+      if (routePainted(pathname)) {
+        window.requestAnimationFrame(release);
+        return;
+      }
+      if (performance.now() - started > PAINT_HOLD_MS) {
+        release();
+        return;
+      }
+      window.requestAnimationFrame(tick);
+    };
+    tick();
+    return () => {
+      cancelled = true;
+    };
+  }, [armCover, pathname]);
 
   return (
     <>
       {children}
       <div
         className={`${styles.cover}${coverOn ? ` ${styles.coverOn}` : ""}`}
-        style={{ backgroundColor: PEACH }}
+        style={{ backgroundColor: coverBg }}
         aria-hidden="true"
       />
     </>

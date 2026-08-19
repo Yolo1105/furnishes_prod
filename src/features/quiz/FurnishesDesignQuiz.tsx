@@ -9,8 +9,19 @@ import { FurnishesDesignQuizInner } from "@/features/quiz/components/quiz-app";
  */
 export default function FurnishesDesignQuiz() {
   return (
-    <QuizErrorBoundary>
-      <FurnishesDesignQuizInner />
-    </QuizErrorBoundary>
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+        backgroundColor: "#1a1714",
+      }}
+    >
+      <QuizErrorBoundary>
+        <FurnishesDesignQuizInner />
+      </QuizErrorBoundary>
+    </div>
   );
 }

@@ -90,9 +90,9 @@
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(20, 10, 6, 0.16) 0%,
-    rgba(20, 10, 6, 0.04) 36%,
-    rgba(12, 6, 4, 0.42) 100%
+    rgba(20, 10, 6, 0.32) 0%,
+    rgba(20, 10, 6, 0.18) 36%,
+    rgba(12, 6, 4, 0.58) 100%
   );
 }
 

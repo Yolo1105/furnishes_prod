@@ -1,19 +1,18 @@
 "use client";
 
-const LANDING_PAGE_BG = "#e83200";
-
 /**
- * Document-level styles that live only while `/` (the Landing) is mounted:
- * - paint html/body the hero-band orange to prevent white flash;
- * - hide scrollbars for the Landing's cinematic scroll (scrolling itself
- *   still works). Scoped here — NOT in globals.css — so future surfaces
- *   (Account chat, tables, panels) keep normal scrollbars.
+ * Document-level styles that live only while `/` (the Landing) is mounted.
+ * Orange html/body paint waits until the house is on screen — applying it
+ * earlier is the full red-orange flash before WebGL.
  */
-export function LandingDocumentPaint() {
+export function LandingDocumentPaint({ active = true }: { active?: boolean }) {
   return (
     <style>{`
-      html, body { background-color: ${LANDING_PAGE_BG} !important; }
-      html, body { scrollbar-width: none; -ms-overflow-style: none; }
+      html, body {
+        ${active ? "background-color: #e83200 !important;" : ""}
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
       html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
     `}</style>
   );

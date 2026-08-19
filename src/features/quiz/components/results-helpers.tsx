@@ -23,7 +23,8 @@ export function ResultsShell({ children, ghostWord }: any) {
         display: "flex",
         flexDirection: "column",
         position: "relative",
-        overflow: "hidden",
+        overflow: "auto",
+        overscrollBehavior: "contain",
       }}
     >
       <div

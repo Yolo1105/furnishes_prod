@@ -1,4 +1,5 @@
 import * as THREE from "three-landing";
+import { saveLandingFreezeFromCanvas } from "../landing-freeze";
 import { landingScroll } from "../landing-scroll-state";
 import type { LandingHeroSceneHandle } from "./landing-scene-types";
 
@@ -94,6 +95,7 @@ export function createLandingHeroScene(
     renderer = new THREE.WebGLRenderer({
       antialias: !testMode,
       alpha: true,
+      preserveDrawingBuffer: !testMode,
       powerPreference: testMode ? "low-power" : "high-performance",
     });
   } catch (err) {
@@ -1911,6 +1913,12 @@ export function createLandingHeroScene(
   let tourPhi0 = 0;
   let dropDone = skipOpening;
   let firstFrameFired = false;
+  let freezeFrames = 0;
+
+  const captureFreeze = () => {
+    if (testMode) return;
+    saveLandingFreezeFromCanvas(renderer.domElement);
+  };
 
   let paused = false;
   const focusReqRef: { current: number | "overview" | null } = {
@@ -2211,9 +2219,10 @@ export function createLandingHeroScene(
     if (!firstFrameFired) {
       firstFrameFired = true;
       options.onFirstFrame?.();
+    } else {
+      freezeFrames += 1;
+      if (freezeFrames === 90 || freezeFrames % 120 === 0) captureFreeze();
     }
-
-    /* React owns fixed label positions in E2E — skip projection work. */
     if (testMode) return;
 
     for (let ri = 0; ri < ROOMS.length; ri++) {
@@ -2345,8 +2354,12 @@ export function createLandingHeroScene(
     { threshold: 0, rootMargin: "200px 0px" },
   );
   visIO.observe(mount);
-  const onVisibility = () => syncLoop();
+  const onVisibility = () => {
+    if (document.hidden) captureFreeze();
+    syncLoop();
+  };
   document.addEventListener("visibilitychange", onVisibility);
+  window.addEventListener("pagehide", captureFreeze);
   const onCtxRestored = () => {
     if (lostTimer) {
       window.clearTimeout(lostTimer);
@@ -2370,11 +2383,13 @@ export function createLandingHeroScene(
   );
 
   const dispose = () => {
+    captureFreeze();
     if (lostTimer) window.clearTimeout(lostTimer);
     renderer.setAnimationLoop(null);
     demandRender = null;
     visIO.disconnect();
     document.removeEventListener("visibilitychange", onVisibility);
+    window.removeEventListener("pagehide", captureFreeze);
     renderer.domElement.removeEventListener(
       "webglcontextrestored",
       onCtxRestored,

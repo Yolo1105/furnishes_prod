@@ -2,6 +2,7 @@ import { routes } from "@/lib/contracts/routes";
 
 export const LEGAL_PAGES = {
   terms: {
+    path: routes.terms,
     title: "Terms & Conditions",
     body: [
       "These terms govern use of the Furnishes website and account. They are a working draft pending legal review and do not constitute legal advice.",
@@ -11,6 +12,7 @@ export const LEGAL_PAGES = {
     ],
   },
   privacy: {
+    path: routes.privacy,
     title: "Privacy Policy",
     body: [
       "This notice describes personal data Furnishes processes. It is a working draft aligned to the account-deletion implementation and pending PDPA legal review.",
@@ -21,6 +23,7 @@ export const LEGAL_PAGES = {
     ],
   },
   refunds: {
+    path: routes.refunds,
     title: "Refund Policy",
     body: [
       "Refunds currently apply only when the payment provider reports them to us. There is no in-app refund initiation, returns, or RMA flow yet.",
@@ -30,6 +33,7 @@ export const LEGAL_PAGES = {
     ],
   },
   contact: {
+    path: routes.contact,
     title: "Contact",
     body: [
       "Furnishes — a design studio for modern interiors.",
@@ -46,7 +50,11 @@ export function LegalArticle({
   page: (typeof LEGAL_PAGES)[keyof typeof LEGAL_PAGES];
 }) {
   return (
-    <main style={{ maxWidth: 720, margin: "4rem auto", padding: "0 1.5rem" }}>
+    <main
+      data-route-paint="public"
+      data-route-path={page.path}
+      style={{ maxWidth: 720, margin: "4rem auto", padding: "0 1.5rem" }}
+    >
       <p>
         <a href={routes.home}>furnishes.</a>
       </p>

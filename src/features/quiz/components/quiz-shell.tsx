@@ -5,8 +5,9 @@
 import { QUIZ_PAD_X, Icon, hexA, pressFx } from "./shared";
 import { answerStatus } from "@/features/quiz/engine/sequence";
 import { LayoutBudgetResult } from "./layouts";
+import { FadeIn } from "./results-helpers";
 
-export function QuizHomeLink({ color = "#DDD5C4" }: any) {
+export function QuizHomeLink({ color = "#fff" }: any) {
   return (
     <a
       href="/"
@@ -14,22 +15,16 @@ export function QuizHomeLink({ color = "#DDD5C4" }: any) {
       style={{
         display: "inline-flex",
         alignItems: "center",
-        fontSize: "13px",
-        letterSpacing: "0.03em",
+        fontFamily:
+          "var(--font-space-mono, 'Space Mono'), 'Space Mono', ui-monospace, monospace",
+        fontSize: "15px",
+        letterSpacing: "0.04em",
         color,
         fontWeight: 700,
         textDecoration: "none",
         textTransform: "lowercase",
         flexShrink: 0,
         lineHeight: 1,
-        opacity: 0.92,
-        transition: "opacity 0.2s ease",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.opacity = "1";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.opacity = "0.92";
       }}
     >
       furnishes<span style={{ color: "#B33D0E" }}>.</span>
@@ -64,7 +59,7 @@ export function QuizShell({
         flexDirection: "column",
       }}
     >
-      <header style={{ padding: `24px ${QUIZ_PAD_X} 0` }}>
+      <header style={{ padding: `24px ${QUIZ_PAD_X} 0`, flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
           {/* boxed square — the bare floating glyph read as a stray character */}
           <button
@@ -213,13 +208,23 @@ export function QuizShell({
         </div>
       </header>
 
-      <main style={{ display: "flex", flex: 1, flexDirection: "column" }}>
+      <main
+        style={{
+          display: "flex",
+          flex: 1,
+          flexDirection: "column",
+          minHeight: 0,
+          overflow: "auto",
+          overscrollBehavior: "contain",
+        }}
+      >
         <div
           key={contentKey}
           style={{
             display: "flex",
             flex: 1,
             flexDirection: "column",
+            minHeight: 0,
             opacity:
               contentFade && (contentFade.exiting || !contentFade.entered)
                 ? 0
@@ -253,6 +258,7 @@ export function QuizShell({
           justifyContent: "space-between",
           gap: "16px",
           flexWrap: "wrap",
+          flexShrink: 0,
         }}
       >
         {/* ── Live status: instant feedback on every selection ── */}

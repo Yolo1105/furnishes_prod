@@ -3,7 +3,10 @@
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { LandingPage } from "./LandingPage";
-import { migrateLandingIntroSeenFromLocalStorage } from "./landing-intro";
+import {
+  isLandingIntroReplayQuery,
+  migrateLandingIntroSeenFromLocalStorage,
+} from "./landing-intro";
 
 /**
  * Client-side reader for the two test-only query params, so the `/` route
@@ -11,6 +14,7 @@ import { migrateLandingIntroSeenFromLocalStorage } from "./landing-intro";
  * made with NEXT_PUBLIC_E2E=1 — never from the query alone in production.
  *
  * Loader skip comes from the server (cookie) so SSR matches the client.
+ * `?intro=1` / `?intro=play` replays the drop-in loader after first visit.
  * Hero open (small→large) still runs unless `?intro=skip` (E2E).
  */
 export function LandingEntry({
@@ -21,10 +25,12 @@ export function LandingEntry({
   skipLoader?: boolean;
 }) {
   const params = useSearchParams();
-  const querySkip = params.get("intro") === "skip";
-  const skipLoader = querySkip || skipLoaderFromServer;
+  const introQuery = params.get("intro");
+  const skipLoader = isLandingIntroReplayQuery(introQuery)
+    ? false
+    : skipLoaderFromServer;
   /** Only E2E settled-state skips the hero camera open. */
-  const skipIntro = querySkip;
+  const skipIntro = introQuery === "skip";
   const e2eMode =
     process.env.NEXT_PUBLIC_E2E === "1" && params.get("e2e") === "1";
 

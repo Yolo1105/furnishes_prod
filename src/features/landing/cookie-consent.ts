@@ -59,3 +59,8 @@ export function setCookieConsent(
   const maxAge = COOKIE_CONSENT_MAX_AGE_DAYS * 24 * 60 * 60;
   document.cookie = `${COOKIE_CONSENT_NAME}=${serializeCookieConsent(choice)};path=/;max-age=${maxAge};SameSite=Lax`;
 }
+
+/** True once the hero stage has scrolled fully above the viewport. */
+export function isHeroPastViewport(rectBottom: number): boolean {
+  return rectBottom <= 0;
+}

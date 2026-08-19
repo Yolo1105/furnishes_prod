@@ -5,21 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { routes } from "@/lib/contracts/routes";
+import {
+  INTERIOR_HERO_SLIDE_MS,
+  INTERIOR_HERO_SLIDES,
+} from "@/lib/interior-hero-slides";
 import styles from "./auth.module.css";
-
-const HERO_IMAGES = [
-  "/images/landing-banner-1.jpg",
-  "/images/landing-banner-3.jpg",
-  "/images/landing-banner-4.jpg",
-  "/images/landing-banner.jpg",
-  "/images/landing-main-1.jpg",
-  "/images/landing-main-2.jpg",
-  "/images/landing-main-3.jpg",
-  "/images/landing-main-4.jpg",
-  "/images/landing-main-5.jpg",
-  "/images/landing-main-6.jpg",
-  "/images/landing-main-7.jpg",
-];
 
 function AuthHeroSlides() {
   const [index, setIndex] = useState(0);
@@ -30,14 +20,14 @@ function AuthHeroSlides() {
     ).matches;
     if (reduce) return;
     const id = window.setInterval(() => {
-      setIndex((current) => (current + 1) % HERO_IMAGES.length);
-    }, 5200);
+      setIndex((current) => (current + 1) % INTERIOR_HERO_SLIDES.length);
+    }, INTERIOR_HERO_SLIDE_MS);
     return () => window.clearInterval(id);
   }, []);
 
   return (
     <div className={styles.heroMedia} aria-hidden="true">
-      {HERO_IMAGES.map((src, i) => (
+      {INTERIOR_HERO_SLIDES.map((src, i) => (
         <img
           key={src}
           className={`${styles.heroImg} ${i === index ? styles.heroImgOn : ""}`}
@@ -83,7 +73,11 @@ export function AuthChrome({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className={styles.split}>
+    <div
+      className={styles.split}
+      data-route-paint="auth"
+      data-route-path={pathname}
+    >
       <aside className={styles.hero}>
         <AuthHeroSlides />
         <div className={styles.heroShade} />
