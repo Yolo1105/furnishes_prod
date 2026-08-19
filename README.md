@@ -16,7 +16,7 @@ Deploy / ops: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md),
 
 ## Requirements
 
-- Node **24.13.0** (`.nvmrc` / `.node-version`)
+- Node **24.x** (`engines` in `package.json`; Vercel selects the current 24.x). Local pin: **24.13.0** (`.nvmrc` / `.node-version`)
 - pnpm **9.15.9** via Corepack
 - Docker (local PostgreSQL via `docker compose`)
 
