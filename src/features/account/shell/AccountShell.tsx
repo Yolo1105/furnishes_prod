@@ -5,6 +5,7 @@ type AccountShellProps = {
   user: {
     email: string;
     displayName: string | null;
+    imageUrl?: string | null;
   };
   children: ReactNode;
   className?: string;

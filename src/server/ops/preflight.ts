@@ -7,6 +7,7 @@
  * only documents that fact in the boot snapshot.
  */
 
+import { resolvedPublicOrigin } from "@/server/app-origin";
 import { logOps } from "@/server/ops/log";
 
 type PreflightLevel = "error" | "warn";
@@ -42,11 +43,18 @@ function isTestRuntime(env: PreflightEnv): boolean {
 }
 
 function isLocalAppOrigin(env: PreflightEnv): boolean {
-  const origin = trim(env, "APP_ORIGIN").toLowerCase();
+  const origin = resolvedPublicOrigin(env).toLowerCase();
   return (
     origin.length === 0 ||
     origin.includes("localhost") ||
     origin.includes("127.0.0.1")
+  );
+}
+
+function clerkConfigured(env: PreflightEnv): boolean {
+  return Boolean(
+    trim(env, "CLERK_SECRET_KEY") &&
+    trim(env, "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"),
   );
 }
 
@@ -158,14 +166,16 @@ export function collectPreflightIssues(
       // reset silently never reach the user while signup still reports success.
       if (!trim(env, "SMTP_HOST")) {
         issues.push({
-          level: "error",
+          // Clerk delivers Google / email auth mail. Custom forgot-password
+          // still logs until SMTP is set.
+          level: clerkConfigured(env) ? "warn" : "error",
           code: "smtp_not_configured",
           message:
             "SMTP_HOST is required in production; without it verification and reset mail is only logged.",
         });
       }
 
-      const appOrigin = trim(env, "APP_ORIGIN");
+      const appOrigin = resolvedPublicOrigin(env);
       if (!appOrigin) {
         issues.push({
           level: "error",

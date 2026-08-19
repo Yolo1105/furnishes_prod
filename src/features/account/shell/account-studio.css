@@ -570,6 +570,18 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
+.furnishes-account .account__av img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+.furnishes-account .account__av--photo {
+  overflow: hidden;
+  padding: 0;
+  background: transparent;
+}
 .furnishes-account .account__name {
   font-size: 17.25px;
   font-weight: 400;

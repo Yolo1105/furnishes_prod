@@ -1,18 +1,16 @@
 import type { MetadataRoute } from "next";
 import { routes } from "@/lib/contracts/routes";
+import { resolvedPublicOrigin } from "@/server/app-origin";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   if (process.env.NEXT_PUBLIC_ALLOW_INDEXING !== "1") {
     return [];
   }
   const origin = (
-    process.env.APP_ORIGIN ??
-    process.env.PUBLIC_APP_URL ??
-    process.env.NEXT_PUBLIC_APP_URL ??
-    ""
-  )
-    .trim()
-    .replace(/\/$/, "");
+    process.env.PUBLIC_APP_URL?.trim() ||
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    resolvedPublicOrigin()
+  ).replace(/\/$/, "");
   if (!origin) return [];
   const paths = [
     routes.home,

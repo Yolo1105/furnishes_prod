@@ -19,6 +19,10 @@ export function e2eEnv(from = process.env) {
     ...from,
     NEXT_PUBLIC_E2E: "1",
     NEXT_TELEMETRY_DISABLED: "1",
+    // Cookie auth is the E2E/CI path. Empty strings beat .env.local Clerk keys
+    // so `next build` cannot enable ClerkProvider and break session-cookie tests.
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "",
+    CLERK_SECRET_KEY: "",
     DATABASE_URL: from.DATABASE_URL ?? DEFAULT_E2E_DATABASE_URL,
     AUTH_SECRET: from.AUTH_SECRET ?? "e2e-auth-secret-phase2-32chars-min",
     APP_ORIGIN: from.APP_ORIGIN ?? `http://127.0.0.1:${E2E_PORT}`,

@@ -81,6 +81,19 @@ describe("collectPreflightIssues", () => {
     );
   });
 
+  it("warns instead of failing SMTP when Clerk is configured", () => {
+    const issues = collectPreflightIssues({
+      ...productionEnv,
+      SMTP_HOST: "",
+      CLERK_SECRET_KEY: "sk_test_x",
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_x",
+    });
+    expect(issues).toContainEqual(
+      expect.objectContaining({ level: "warn", code: "smtp_not_configured" }),
+    );
+    expect(issues.filter((i) => i.level === "error")).toEqual([]);
+  });
+
   it("requires an https APP_ORIGIN in production", () => {
     expect(
       collectPreflightIssues({ ...productionEnv, APP_ORIGIN: "" }).some(
@@ -93,6 +106,16 @@ describe("collectPreflightIssues", () => {
         APP_ORIGIN: "http://furnishes.example",
       }).some((i) => i.code === "app_origin_insecure"),
     ).toBe(true);
+  });
+
+  it("accepts the Vercel production host when APP_ORIGIN is unset", () => {
+    const issues = collectPreflightIssues({
+      ...productionEnv,
+      APP_ORIGIN: "",
+      VERCEL_URL: "furnishes-prod.vercel.app",
+    });
+    expect(issues.some((i) => i.code === "app_origin_missing")).toBe(false);
+    expect(issues.filter((i) => i.level === "error")).toEqual([]);
   });
 
   it("fails http image generation in production without creds", () => {

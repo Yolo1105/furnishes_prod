@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { currentUser } from "@clerk/nextjs/server";
 import { AccountShell } from "@/features/account/shell/AccountShell";
 import { requireCurrentSession } from "@/server/auth/session";
 import { isCommerceEnabled } from "@/server/commerce/commerce-config";
@@ -17,13 +18,20 @@ export default async function AccountLayout({
   children: React.ReactNode;
 }) {
   const session = await requireCurrentSession();
+  const clerkUser = process.env.CLERK_SECRET_KEY
+    ? await currentUser().catch(() => null)
+    : null;
+  const clerkName = clerkUser
+    ? [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ").trim()
+    : "";
 
   return (
     <AccountShell
       commerceEnabled={isCommerceEnabled()}
       user={{
         email: session.user.email,
-        displayName: session.user.displayName,
+        displayName: clerkName || session.user.displayName,
+        imageUrl: clerkUser?.imageUrl ?? null,
       }}
     >
       {children}

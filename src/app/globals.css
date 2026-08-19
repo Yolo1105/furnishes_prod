@@ -28,14 +28,10 @@ select {
   font: inherit;
 }
 
-/* No system-blue focus ring or caret anywhere. */
-*:focus {
-  outline: none;
-}
-
+/* No system or custom focus ring. */
+*:focus,
 *:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: none;
 }
 
 input,

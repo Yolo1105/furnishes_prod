@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { forwardRef, type ReactNode, type RefObject } from "react";
+import { Show } from "@clerk/nextjs";
+import { clerkEnabled } from "@/features/auth/clerk-custom";
 import styles from "./public-shell.module.css";
 
 type PublicHeaderProps = {
@@ -84,7 +86,26 @@ export const PublicHeader = forwardRef<HTMLElement, PublicHeaderProps>(
           furnishes.
         </button>
         {endAction ??
-          (signedInLabel ? (
+          (clerkEnabled ? (
+            <>
+              <Show when="signed-out">
+                <Link className={styles.headerButton} href={loginHref}>
+                  login
+                </Link>
+              </Show>
+              <Show when="signed-in">
+                {signedInLabel ? (
+                  <Link className={styles.headerGreeting} href={accountHref}>
+                    Hello, {signedInLabel}
+                  </Link>
+                ) : (
+                  <Link className={styles.headerButton} href={accountHref}>
+                    account
+                  </Link>
+                )}
+              </Show>
+            </>
+          ) : signedInLabel ? (
             <Link className={styles.headerGreeting} href={accountHref}>
               Hello, {signedInLabel}
             </Link>

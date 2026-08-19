@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 import type { User } from "@prisma/client";
 import { prisma } from "@/server/db";
 import { createRandomToken, digestToken } from "@/server/auth/crypto";
@@ -30,6 +31,8 @@ type CurrentSession = {
   expiresAt: Date;
 };
 
+export type { CurrentSession };
+
 type ActiveSessionItem = {
   id: string;
   current: boolean;
@@ -43,6 +46,7 @@ function cookieSecure(): boolean {
   if (process.env.AUTH_COOKIE_SECURE != null) {
     return process.env.AUTH_COOKIE_SECURE === "1";
   }
+  if (process.env.VERCEL === "1") return true;
   const origin = process.env.APP_ORIGIN ?? "";
   return origin.startsWith("https://");
 }
@@ -154,6 +158,9 @@ export async function clearSessionCookie(): Promise<void> {
 }
 
 export async function getOptionalCurrentSession(): Promise<CurrentSession | null> {
+  if (!process.env.DATABASE_URL?.trim()) {
+    return null;
+  }
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
   if (!token) {
@@ -212,6 +219,14 @@ export async function requireCurrentSession(options?: {
 }): Promise<CurrentSession> {
   const session = await getOptionalCurrentSession();
   if (!session) {
+    if (process.env.CLERK_SECRET_KEY) {
+      try {
+        const { userId } = await auth();
+        if (userId) redirect("/api/auth/clerk-callback");
+      } catch {
+        /* Clerk unavailable; send the user to login. */
+      }
+    }
     const next = options?.redirectTo ?? routes.login;
     redirect(`${next}?next=${encodeURIComponent(routes.account)}`);
   }

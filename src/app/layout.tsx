@@ -1,8 +1,11 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Archivo, Space_Mono } from "next/font/google";
 import { RouteHandoff } from "@/components/route-handoff/RouteHandoff";
+import { ClerkSessionBridge } from "@/features/auth/ClerkSessionBridge";
 import { LANDING_FREEZE_BOOT_SCRIPT } from "@/features/landing/landing-freeze";
+import { resolvedPublicOrigin } from "@/server/app-origin";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -20,6 +23,7 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(resolvedPublicOrigin() || "http://localhost:3000"),
   title: {
     default: "Furnishes",
     template: "%s | Furnishes",
@@ -37,13 +41,28 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const app = <RouteHandoff>{children}</RouteHandoff>;
+
   return (
     <html lang="en" className={`${archivo.variable} ${spaceMono.variable}`}>
       <body>
         <Script id="landing-freeze-boot" strategy="beforeInteractive">
           {LANDING_FREEZE_BOOT_SCRIPT}
         </Script>
-        <RouteHandoff>{children}</RouteHandoff>
+        {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
+          <ClerkProvider
+            signInUrl="/login"
+            signUpUrl="/signup"
+            signInFallbackRedirectUrl="/api/auth/clerk-callback"
+            signUpFallbackRedirectUrl="/api/auth/clerk-callback"
+            afterSignOutUrl="/api/auth/logout"
+          >
+            <ClerkSessionBridge />
+            {app}
+          </ClerkProvider>
+        ) : (
+          app
+        )}
       </body>
     </html>
   );

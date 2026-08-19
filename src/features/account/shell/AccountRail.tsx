@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useUser } from "@clerk/nextjs";
 import { accountRequest } from "@/features/account/account-api";
 import {
   accountNavigationFor,
@@ -15,6 +16,7 @@ import {
 import { accountDisplayParts } from "./account-display";
 import type { AccountShellUser } from "./account-shell-user";
 import { useChatWorkspace } from "../conversations/chat-workspace-context";
+import { clerkEnabled } from "@/features/auth/clerk-custom";
 
 type RecentItem = { id: string; title: string; projectId: string | null };
 type ProjectOption = { id: string; name: string };
@@ -33,7 +35,6 @@ export function AccountRail({
   const pathname = usePathname();
   const router = useRouter();
   const chatMode = isConversationWorkspacePath(pathname);
-  const { full, av } = accountDisplayParts(user.displayName, user.email);
   const tagline = accountTagline(pathname);
   const [recents, setRecents] = useState<RecentItem[]>([]);
   const [creating, setCreating] = useState(false);
@@ -574,15 +575,47 @@ export function AccountRail({
         <span className="hr-short" aria-hidden="true" />
         <h2 className="railfoot__title disp">{tagline}</h2>
         <p className="railfoot__cr">©2026, Furnishes Studio Inc.</p>
-        <Link
-          href="/account/settings"
-          className="account"
-          aria-label={`Account settings for ${full}`}
-        >
-          <span className="account__av">{av}</span>
-          <span className="account__name">{full}</span>
-        </Link>
+        <AccountChip user={user} />
       </div>
     </aside>
+  );
+}
+
+function AccountChip({ user }: { user: AccountShellUser }) {
+  if (clerkEnabled) return <ClerkAccountChip user={user} />;
+  return <AccountChipView user={user} />;
+}
+
+function ClerkAccountChip({ user }: { user: AccountShellUser }) {
+  const { user: clerkUser } = useUser();
+  return (
+    <AccountChipView
+      user={{
+        email: clerkUser?.primaryEmailAddress?.emailAddress || user.email,
+        displayName: clerkUser?.fullName?.trim() || user.displayName,
+        imageUrl: clerkUser?.imageUrl || user.imageUrl || null,
+      }}
+    />
+  );
+}
+
+function AccountChipView({ user }: { user: AccountShellUser }) {
+  const { full, av } = accountDisplayParts(user.displayName, user.email);
+  const photo = user.imageUrl?.trim() || null;
+  return (
+    <Link
+      href="/account/settings"
+      className="account"
+      aria-label={`Account settings for ${full}`}
+    >
+      {photo ? (
+        <span className="account__av account__av--photo">
+          <img src={photo} alt="" />
+        </span>
+      ) : (
+        <span className="account__av">{av}</span>
+      )}
+      <span className="account__name">{full}</span>
+    </Link>
   );
 }

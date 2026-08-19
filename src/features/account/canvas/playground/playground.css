@@ -568,28 +568,6 @@
   animation: guided-row-in 0.3s ease;
 }
 
-/* ─── Focus rings ─────────────────────────────────────────────
-   Replace browsers' default blue focus ring with our brand
-   orange. Applied to all buttons + interactive surfaces so that
-   keyboard navigation is visible without looking like an
-   accessibility tester forgot to theme it.
-   :focus-visible (vs :focus) means mouse-clicks don't get rings
-   — only keyboard tab navigation does. */
-*:focus {
-  outline: none;
-}
-button:focus-visible,
-[role="button"]:focus-visible,
-a:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible,
-[tabindex]:focus-visible {
-  outline: 2px solid #FF5A1F;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
 /* Tour-mode progress dot pulse. */
 @keyframes tour-pulse {
   0%, 100% { opacity: 1;   transform: scale(1); }

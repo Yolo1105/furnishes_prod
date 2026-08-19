@@ -5,6 +5,7 @@ import { createContext, useContext, type ReactNode } from "react";
 export type AccountShellUser = {
   email: string;
   displayName: string | null;
+  imageUrl?: string | null;
 };
 
 const AccountShellUserContext = createContext<AccountShellUser | null>(null);

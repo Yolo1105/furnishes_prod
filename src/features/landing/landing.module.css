@@ -2676,15 +2676,6 @@
   }
 }
 
-.cookieBtnGhost:focus-visible,
-.cookieBtnSecondary:focus-visible,
-.cookieBtnPrimary:focus-visible,
-.cookieRowInteractive:focus-visible,
-.cookieClose:focus-visible {
-  outline: 1px solid var(--landing-orange);
-  outline-offset: 2px;
-}
-
 .cookieRow {
   display: flex;
   align-items: flex-start;
