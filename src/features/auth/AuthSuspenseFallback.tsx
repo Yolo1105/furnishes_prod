@@ -1,6 +1,11 @@
 import styles from "./auth.module.css";
 
-/** Quiet fill inside the persistent auth panel. */
+/** Sized placeholder so loading/Suspense do not collapse then expand the panel. */
 export function AuthSuspenseFallback() {
-  return <div className={styles.formWrap} aria-hidden="true" />;
+  return (
+    <div
+      className={`${styles.formWrap} ${styles.formPending}`}
+      aria-hidden="true"
+    />
+  );
 }

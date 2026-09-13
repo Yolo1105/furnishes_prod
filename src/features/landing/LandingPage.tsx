@@ -31,6 +31,7 @@ export function LandingPage({
       return;
     }
     if (!heroReady) {
+      // SPA return (e.g. login→home): boot script does not re-run.
       ensureLandingFreezePaint();
       return;
     }

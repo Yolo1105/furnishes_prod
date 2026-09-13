@@ -25,6 +25,8 @@ export default async function LoginPage({
       /* Clerk unavailable during this request; show the form. */
     }
   }
+
+  // Suspense only for useSearchParams inside the form — fallback matches chrome.
   return (
     <Suspense fallback={<AuthSuspenseFallback />}>
       <LoginForm />

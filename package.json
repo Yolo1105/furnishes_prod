@@ -22,7 +22,7 @@
     "test:e2e:account:chat-memory": "node scripts/run-e2e.mjs e2e/account-chat-personas-preferences.spec.ts --workers=1",
     "test:e2e:account:creative": "node scripts/run-e2e.mjs e2e/account-image-generation.spec.ts e2e/account-inspiration.spec.ts",
     "test:e2e:account:visual": "node scripts/run-e2e.mjs e2e/account-architecture-baseline.spec.ts --workers=1",
-    "test:e2e:landing": "node scripts/run-e2e.mjs e2e/landing-ui.spec.ts e2e/landing-webgl.spec.ts e2e/routes.spec.ts",
+    "test:e2e:landing": "node scripts/run-e2e.mjs e2e/landing-ui.spec.ts e2e/landing-webgl.spec.ts e2e/landing-auth-handoff.spec.ts e2e/routes.spec.ts",
     "db:migrate": "prisma migrate deploy",
     "db:migrate:pooled": "DATABASE_URL=\"$DIRECT_URL\" prisma migrate deploy",
     "db:seed": "prisma db seed",

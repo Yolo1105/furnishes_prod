@@ -53,8 +53,15 @@ export function handoffCoverColor(toPathname: string, fromPathname?: string) {
   return surfaceColor(toPathname);
 }
 
-function isAuthPath(pathname: string) {
+export function isAuthPath(pathname: string) {
   return AUTH_PATHS.has(pathname);
+}
+
+/** Clear auth scroll locks left on html/body when leaving /login. */
+export function clearAuthScrollLock() {
+  if (typeof document === "undefined") return;
+  document.documentElement.style.overflow = "";
+  document.body.style.overflow = "";
 }
 
 function isApiPath(pathname: string) {

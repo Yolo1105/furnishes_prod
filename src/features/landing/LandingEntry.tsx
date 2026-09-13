@@ -14,6 +14,9 @@ import {
 /**
  * Client gate for the first-visit loader. Skip is per tab (sessionStorage).
  * Closing the page clears it so the intro plays again. `?intro=skip` is E2E only.
+ *
+ * skipLoader may flip true after mount (sessionStorage). LandingShell syncs that
+ * so the hero still mounts on login→home.
  */
 export function LandingEntry({
   userLabel = null,

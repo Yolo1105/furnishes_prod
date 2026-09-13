@@ -2383,7 +2383,8 @@ export function createLandingHeroScene(
   );
 
   const dispose = () => {
-    captureFreeze();
+    // Skip sync JPEG freeze here — periodic/pagehide capture already ran, and
+    // encode+sessionStorage on leave stalls auth→home handoff.
     if (lostTimer) window.clearTimeout(lostTimer);
     renderer.setAnimationLoop(null);
     demandRender = null;

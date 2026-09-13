@@ -13,16 +13,21 @@ import styles from "./auth.module.css";
 
 function AuthHeroSlides() {
   const [index, setIndex] = useState(0);
+  const [crossfade, setCrossfade] = useState(false);
 
   useEffect(() => {
     const reduce = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
     if (reduce) return;
+    const arm = window.setTimeout(() => setCrossfade(true), 50);
     const id = window.setInterval(() => {
       setIndex((current) => (current + 1) % INTERIOR_HERO_SLIDES.length);
     }, INTERIOR_HERO_SLIDE_MS);
-    return () => window.clearInterval(id);
+    return () => {
+      window.clearTimeout(arm);
+      window.clearInterval(id);
+    };
   }, []);
 
   return (
@@ -30,9 +35,11 @@ function AuthHeroSlides() {
       {INTERIOR_HERO_SLIDES.map((src, i) => (
         <img
           key={src}
-          className={`${styles.heroImg} ${i === index ? styles.heroImgOn : ""}`}
+          className={`${styles.heroImg}${crossfade ? ` ${styles.heroImgFade}` : ""}${i === index ? ` ${styles.heroImgOn}` : ""}`}
           src={src}
           alt=""
+          loading={i === 0 ? "eager" : "lazy"}
+          fetchPriority={i === 0 ? "high" : "auto"}
         />
       ))}
     </div>
@@ -47,7 +54,7 @@ function switchClass(from: string, to: string) {
   if (from === "/signup" && to === "/login") {
     return `${styles.formSwitch} ${styles.formSwitchFromSignup}`;
   }
-  return `${styles.formSwitch} ${styles.formSwitchFade}`;
+  return styles.formSwitch;
 }
 
 /** Persistent photo + peach column. Form pages swap inside the panel. */

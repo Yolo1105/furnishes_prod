@@ -5,7 +5,9 @@ import {
   PEACH_HANDOFF_BG,
   QUIZ_HANDOFF_BG,
   LANDING_PAINTED_SELECTORS,
+  clearAuthScrollLock,
   handoffCoverColor,
+  isAuthPath,
   routePaintSelector,
   shouldHandoff,
 } from "./route-handoff-logic";
@@ -31,6 +33,20 @@ describe("shouldHandoff", () => {
 
   it("covers legal ↔ legal so the unstyled public swap does not flash", () => {
     expect(shouldHandoff("/terms", "/privacy-policy")).toBe(true);
+  });
+});
+
+describe("isAuthPath", () => {
+  it("marks login and signup as auth surfaces", () => {
+    expect(isAuthPath("/login")).toBe(true);
+    expect(isAuthPath("/signup")).toBe(true);
+    expect(isAuthPath("/")).toBe(false);
+  });
+});
+
+describe("clearAuthScrollLock", () => {
+  it("is exported for leaving auth chrome", () => {
+    expect(typeof clearAuthScrollLock).toBe("function");
   });
 });
 

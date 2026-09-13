@@ -12,7 +12,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { registerRouteHandoff } from "./start-route-handoff";
 import {
   PEACH_HANDOFF_BG,
+  clearAuthScrollLock,
   handoffCoverColor,
+  isAuthPath,
   paintDocumentBg,
   routePainted,
   shouldHandoff,
@@ -58,6 +60,9 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
     lockRef.current = true;
     setCoverOn(true);
     window.dispatchEvent(new Event("furnishes:route-handoff-start"));
+    if (isAuthPath(fromPathname ?? pathnameRef.current)) {
+      clearAuthScrollLock();
+    }
     window.setTimeout(() => {
       pendingToRef.current = null;
       lockRef.current = false;
@@ -181,6 +186,7 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
       <div
         className={`${styles.cover}${coverOn ? ` ${styles.coverOn}` : ""}`}
         style={{ backgroundColor: coverBg }}
+        id="furnishes-route-handoff-cover"
         data-route-handoff={coverOn ? "on" : "off"}
         aria-hidden="true"
       />

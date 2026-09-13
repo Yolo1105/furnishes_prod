@@ -6,7 +6,7 @@ export function registerRouteHandoff(fn: HandoffGo | null) {
   go = fn;
 }
 
-/** Fade through the destination-colored cover, then navigate. Returns false if no handoff. */
+/** Run the natural route crossfade. Returns false if no handoff applies. */
 export function startRouteHandoff(
   href: string,
   options?: { replace?: boolean },

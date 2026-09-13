@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { AuthSuspenseFallback } from "@/features/auth/AuthSuspenseFallback";
 import { SignupForm } from "@/features/auth/SignupForm";
 import { routes } from "@/lib/contracts/routes";
 
@@ -18,5 +20,10 @@ export default async function SignupPage() {
       /* Clerk unavailable during this request; show the form. */
     }
   }
-  return <SignupForm />;
+
+  return (
+    <Suspense fallback={<AuthSuspenseFallback />}>
+      <SignupForm />
+    </Suspense>
+  );
 }

@@ -76,6 +76,9 @@
   object-fit: cover;
   object-position: center;
   opacity: 0;
+}
+
+.heroImgFade {
   transition: opacity 2.2s ease;
 }
 
@@ -188,6 +191,10 @@
   color: var(--ink);
 }
 
+.formPending {
+  min-height: 28rem;
+}
+
 .formSwitch {
   width: 100%;
   min-width: 0;
@@ -238,7 +245,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .heroImg {
+  .heroImgFade {
     transition: none;
   }
 
