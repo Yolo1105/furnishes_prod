@@ -45,7 +45,7 @@ export function LandingPage({
       data-route-path={heroReady ? "/" : undefined}
       data-hero-ready={heroReady ? "1" : "0"}
     >
-      <LandingDocumentPaint active={heroReady} />
+      <LandingDocumentPaint active />
       <LandingShell
         skipLoader={skipLoader}
         skipIntro={skipIntro}

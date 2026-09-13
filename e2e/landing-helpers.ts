@@ -24,6 +24,17 @@ async function seedCookieConsent(page: Page) {
   }, E2E_COOKIE_CONSENT);
 }
 
+/** Same tab already saw the % loader — refresh / login→home skip it. */
+export async function seedLandingIntroSeen(page: Page) {
+  await page.addInitScript(() => {
+    try {
+      sessionStorage.setItem("furnishes-landing-intro-seen", "1");
+    } catch {
+      /* private mode */
+    }
+  });
+}
+
 export function landingHero(page: Page) {
   return page.locator("#landing-hero-scene");
 }

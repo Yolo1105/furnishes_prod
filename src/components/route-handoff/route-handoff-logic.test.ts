@@ -4,6 +4,7 @@ import {
   LANDING_HANDOFF_BG,
   PEACH_HANDOFF_BG,
   QUIZ_HANDOFF_BG,
+  LANDING_PAINTED_SELECTORS,
   handoffCoverColor,
   routePaintSelector,
   shouldHandoff,
@@ -37,6 +38,15 @@ describe("routePaintSelector", () => {
   it("targets the destination path marker", () => {
     expect(routePaintSelector("/quiz")).toBe('[data-route-path="/quiz"]');
     expect(routePaintSelector("/")).toBe('[data-route-path="/"]');
+  });
+});
+
+describe("LANDING_PAINTED_SELECTORS", () => {
+  it("treats the hero island as painted before WebGL reports ready", () => {
+    expect(LANDING_PAINTED_SELECTORS).toContain("#landing-hero-scene");
+    expect(LANDING_PAINTED_SELECTORS).toContain(
+      '[aria-label="Loading Furnishes"]',
+    );
   });
 });
 

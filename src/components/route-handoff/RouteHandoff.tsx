@@ -58,7 +58,6 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
     lockRef.current = true;
     setCoverOn(true);
     window.setTimeout(() => {
-      if (!pendingToRef.current) return;
       pendingToRef.current = null;
       lockRef.current = false;
       setCoverOn(false);
@@ -181,6 +180,7 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
       <div
         className={`${styles.cover}${coverOn ? ` ${styles.coverOn}` : ""}`}
         style={{ backgroundColor: coverBg }}
+        data-route-handoff={coverOn ? "on" : "off"}
         aria-hidden="true"
       />
     </>

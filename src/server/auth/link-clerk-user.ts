@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { currentUser, type User as ClerkUser } from "@clerk/nextjs/server";
-import { prisma } from "@/server/db";
+import { isDatabaseUnreachable, prisma } from "@/server/db";
+import { logOps } from "@/server/ops/log";
 import { digestToken } from "@/server/auth/crypto";
 import {
   createSession,
@@ -45,46 +46,54 @@ export async function ensureSessionForClerkUser(): Promise<CurrentSession | null
         row.verification?.status === "verified",
     ) || Boolean(clerkUser.primaryEmailAddress?.verification?.status);
 
-  const user = await prisma.user.upsert({
-    where: { email },
-    update: verified
-      ? { deletedAt: null, displayName, emailVerifiedAt: new Date() }
-      : { deletedAt: null, displayName },
-    create: {
-      email,
-      passwordHash: CLERK_PASSWORD_PLACEHOLDER,
-      displayName,
-      emailVerifiedAt: verified ? new Date() : null,
-      styleProfile: { create: { displayName, styleWords: "" } },
-      budget: { create: { currency: "SGD" } },
-      notificationPrefs: { create: {} },
-    },
-  });
+  try {
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: verified
+        ? { deletedAt: null, displayName, emailVerifiedAt: new Date() }
+        : { deletedAt: null, displayName },
+      create: {
+        email,
+        passwordHash: CLERK_PASSWORD_PLACEHOLDER,
+        displayName,
+        emailVerifiedAt: verified ? new Date() : null,
+        styleProfile: { create: { displayName, styleWords: "" } },
+        budget: { create: { currency: "SGD" } },
+        notificationPrefs: { create: {} },
+      },
+    });
 
-  const requestHeaders = await headers();
-  const session = await createSession({
-    userId: user.id,
-    userAgent: requestHeaders.get("user-agent"),
-    ipAddress:
-      requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
-  });
-  await setSessionCookie(session.token, session.expiresAt);
+    const requestHeaders = await headers();
+    const session = await createSession({
+      userId: user.id,
+      userAgent: requestHeaders.get("user-agent"),
+      ipAddress:
+        requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+    });
+    await setSessionCookie(session.token, session.expiresAt);
 
-  return {
-    sessionId: (
-      await prisma.session.findUniqueOrThrow({
-        where: { tokenDigest: digestToken(session.token) },
-      })
-    ).id,
-    user: {
-      id: user.id,
-      email: user.email,
-      displayName: user.displayName,
-      emailVerifiedAt: user.emailVerifiedAt,
-      memoryEnabled: user.memoryEnabled,
-      currency: user.currency,
-      createdAt: user.createdAt,
-    },
-    expiresAt: session.expiresAt,
-  };
+    return {
+      sessionId: (
+        await prisma.session.findUniqueOrThrow({
+          where: { tokenDigest: digestToken(session.token) },
+        })
+      ).id,
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName,
+        emailVerifiedAt: user.emailVerifiedAt,
+        memoryEnabled: user.memoryEnabled,
+        currency: user.currency,
+        createdAt: user.createdAt,
+      },
+      expiresAt: session.expiresAt,
+    };
+  } catch (error) {
+    if (!isDatabaseUnreachable(error)) throw error;
+    logOps("warn", "clerk_session_db_unreachable", {
+      message: error instanceof Error ? error.message.slice(0, 160) : "unknown",
+    });
+    return null;
+  }
 }

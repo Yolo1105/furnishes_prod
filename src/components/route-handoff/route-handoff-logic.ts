@@ -80,13 +80,24 @@ export function routePaintSelector(pathname: string) {
   return `[data-route-path="${escaped}"]`;
 }
 
+/**
+ * Home is painted once the landing stage (hero island or % loader) is in the
+ * tree. Waiting for WebGL `hero-ready` leaves the peach cover up for seconds
+ * after /login → / — a blank cream page.
+ */
+export const LANDING_PAINTED_SELECTORS = [
+  "#landing-hero-scene",
+  '[aria-label="Loading Furnishes"]',
+  '[data-hero-ready="1"]',
+  '[data-renderer-state="webgl"]',
+  '[data-renderer-state="fallback"]',
+] as const;
+
 export function routePainted(pathname: string) {
   if (typeof document === "undefined") return false;
   if (pathname === "/") {
-    return Boolean(
-      document.querySelector('[data-hero-ready="1"]') ||
-      document.querySelector('[data-renderer-state="webgl"]') ||
-      document.querySelector('[data-renderer-state="fallback"]'),
+    return LANDING_PAINTED_SELECTORS.some((selector) =>
+      Boolean(document.querySelector(selector)),
     );
   }
   return Boolean(document.querySelector(routePaintSelector(pathname)));

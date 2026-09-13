@@ -19,10 +19,11 @@ export function ClerkSessionBridge() {
       return;
     }
     if (SKIP.has(pathname) || syncedFor.current === "signed-in") return;
-    syncedFor.current = "signed-in";
     void fetch("/api/auth/clerk-sync", {
       method: "POST",
       credentials: "include",
+    }).then((res) => {
+      if (res.ok) syncedFor.current = "signed-in";
     });
   }, [isLoaded, isSignedIn, pathname]);
 

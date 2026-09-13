@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { startRouteHandoff } from "@/components/route-handoff/start-route-handoff";
 import { PublicShell } from "@/components/public-shell";
@@ -268,11 +268,24 @@ export function LandingShell({
   const [loaderReleased, setLoaderReleased] = useState(skipLoader);
   const [heroReady, setHeroReady] = useState(false);
   const [forceRelease, setForceRelease] = useState(false);
+  const [revealArmed, setRevealArmed] = useState(skipLoader);
   const releasedOnceRef = useRef(false);
   const goneOnceRef = useRef(false);
   const heroReadyOnceRef = useRef(false);
   const onHeroReadyRef = useRef(onHeroReady);
   onHeroReadyRef.current = onHeroReady;
+
+  /* skipLoader is decided after mount (sessionStorage). If we only read it in
+     useState, returning from /login leaves the loader dismissed and the house
+     unmounted — a solid orange stage. */
+  useLayoutEffect(() => {
+    if (!skipLoader) return;
+    releasedOnceRef.current = true;
+    goneOnceRef.current = true;
+    setLoaderReleased(true);
+    setIntroGone(true);
+    setRevealArmed(true);
+  }, [skipLoader]);
 
   useEffect(() => {
     if (skipLoader) return;
@@ -292,7 +305,6 @@ export function LandingShell({
     };
   }, [skipLoader]);
 
-  const [revealArmed, setRevealArmed] = useState(skipLoader);
   useEffect(() => {
     if (skipLoader) return;
     if (!loaderReleased) return;
@@ -309,7 +321,7 @@ export function LandingShell({
 
   return (
     <>
-      {loaderReleased ? (
+      {loaderReleased || skipLoader ? (
         <LandingMain
           skipIntro={skipIntro}
           e2eMode={e2eMode}

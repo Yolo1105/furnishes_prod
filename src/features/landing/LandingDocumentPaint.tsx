@@ -2,8 +2,8 @@
 
 /**
  * Document-level styles that live only while `/` (the Landing) is mounted.
- * Orange html/body paint waits until the house is on screen — applying it
- * earlier is the full red-orange flash before WebGL.
+ * Orange html/body overrides the peach handoff paint so login → home cannot
+ * leave a blank cream document behind the stage.
  */
 export function LandingDocumentPaint({ active = true }: { active?: boolean }) {
   return (

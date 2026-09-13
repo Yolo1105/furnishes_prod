@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   }
   const session = await ensureSessionForClerkUser();
   if (!session) {
-    return jsonError(500, "auth_failed", "Could not finish sign-in.");
+    return jsonError(503, "unavailable", "Could not finish sign-in.");
   }
   return jsonOk({ ok: true });
 }

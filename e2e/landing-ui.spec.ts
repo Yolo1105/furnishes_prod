@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { waitForLandingUi } from "./landing-helpers";
+import {
+  disableWebGL,
+  seedLandingIntroSeen,
+  SETTLED_READY_MS,
+  waitForLandingUi,
+} from "./landing-helpers";
 
 test.describe("Landing UI", () => {
   test("menu opens, traps focus, closes on Escape, restores trigger", async ({
@@ -54,6 +59,24 @@ test.describe("Landing UI", () => {
       );
     });
     expect(focusInsideClosedMenu).toBe(false);
+  });
+
+  test("login wordmark returns to the house after the intro was seen", async ({
+    page,
+  }) => {
+    await disableWebGL(page);
+    await seedLandingIntroSeen(page);
+    await page.goto("/login", { waitUntil: "domcontentloaded" });
+    await page.getByRole("link", { name: /furnishes/i }).click();
+    await expect(page).toHaveURL(/\/(?:\?.*)?$/);
+    await expect(page.getByRole("button", { name: "Menu" })).toBeVisible({
+      timeout: SETTLED_READY_MS,
+    });
+    await expect(page.locator('[data-route-handoff="on"]')).toHaveCount(0, {
+      timeout: SETTLED_READY_MS,
+    });
+    await expect(page.locator("#landing-hero-scene")).toBeVisible();
+    await expect(page.locator("h1")).toContainText("Interior");
   });
 
   test("footer is reachable", async ({ page }) => {
