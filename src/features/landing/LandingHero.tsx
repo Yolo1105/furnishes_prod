@@ -25,12 +25,24 @@ const E2E_ROOM_POSITIONS = [
   { left: "76%", top: "43%" },
 ] as const;
 
-function HouseFallback() {
+function HouseFallback({
+  placeholder = false,
+  hidden = false,
+}: {
+  placeholder?: boolean;
+  hidden?: boolean;
+}) {
   return (
     <div
-      className={styles.houseFallback}
-      role="img"
-      aria-label="Illustration of a furnished house. The interactive 3D model is unavailable in this browser."
+      className={`${styles.houseFallback}${placeholder ? ` ${styles.housePlaceholder}` : ""}`}
+      data-hero-placeholder-ready={placeholder ? "" : undefined}
+      role={hidden ? undefined : "img"}
+      aria-hidden={hidden ? "true" : undefined}
+      aria-label={
+        hidden
+          ? undefined
+          : "Illustration of a furnished house. The interactive 3D model is unavailable in this browser."
+      }
     >
       <svg
         viewBox="0 0 320 240"
@@ -69,6 +81,7 @@ export function LandingHero({
   const onReadyRef = useRef(onReady);
   const skipIntroRef = useRef(skipIntro);
   const e2eModeRef = useRef(e2eMode);
+  const leavingRef = useRef(false);
   const introDoneFiredRef = useRef(false);
   const readyFiredRef = useRef(false);
   const [activeRoom, setActiveRoom] = useState<number | null>(null);
@@ -96,6 +109,23 @@ export function LandingHero({
   useEffect(() => {
     e2eModeRef.current = e2eMode;
   }, [e2eMode]);
+
+  useEffect(() => {
+    const stopForRouteHandoff = () => {
+      leavingRef.current = true;
+      sceneHandleRef.current?.setPaused(true);
+    };
+    window.addEventListener(
+      "furnishes:route-handoff-start",
+      stopForRouteHandoff,
+    );
+    return () => {
+      window.removeEventListener(
+        "furnishes:route-handoff-start",
+        stopForRouteHandoff,
+      );
+    };
+  }, []);
 
   const fireIntroDone = useCallback(() => {
     if (introDoneFiredRef.current) return;
@@ -125,7 +155,7 @@ export function LandingHero({
 
     void import("./three/createLandingHeroScene")
       .then(({ createLandingHeroScene }) => {
-        if (disposed) return;
+        if (disposed || leavingRef.current) return;
         handle = createLandingHeroScene({
           mount,
           skipIntro: skipIntroRef.current,
@@ -226,6 +256,7 @@ export function LandingHero({
         <HouseFallback />
       ) : (
         <>
+          <HouseFallback placeholder hidden={rendererState === "webgl"} />
           <div
             ref={mountRef}
             className={styles.heroCanvas}

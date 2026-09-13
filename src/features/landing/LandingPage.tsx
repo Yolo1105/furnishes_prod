@@ -2,7 +2,10 @@
 
 import { useEffect, useLayoutEffect, useState } from "react";
 import styles from "./landing.module.css";
-import { clearLandingFreezePaint } from "./landing-freeze";
+import {
+  clearLandingFreezePaint,
+  ensureLandingFreezePaint,
+} from "./landing-freeze";
 import { LandingDocumentPaint } from "./LandingDocumentPaint";
 import { LandingShell } from "./LandingShell";
 
@@ -27,7 +30,10 @@ export function LandingPage({
       clearLandingFreezePaint();
       return;
     }
-    if (!heroReady) return;
+    if (!heroReady) {
+      ensureLandingFreezePaint();
+      return;
+    }
     clearLandingFreezePaint();
   }, [heroReady, skipLoader]);
 

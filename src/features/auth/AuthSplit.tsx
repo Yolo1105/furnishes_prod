@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { routes } from "@/lib/contracts/routes";
 import {
   INTERIOR_HERO_SLIDE_MS,
@@ -53,12 +53,17 @@ function switchClass(from: string, to: string) {
 /** Persistent photo + peach column. Form pages swap inside the panel. */
 export function AuthChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const prevPath = useRef(pathname);
   const motionRef = useRef(styles.formSwitch);
   if (prevPath.current !== pathname) {
     motionRef.current = switchClass(prevPath.current, pathname);
     prevPath.current = pathname;
   }
+
+  useEffect(() => {
+    router.prefetch(routes.home);
+  }, [router]);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -125,7 +130,7 @@ export function AuthSplit({
   footer?: ReactNode;
 }) {
   return (
-    <div className={styles.formWrap}>
+    <div className={styles.formWrap} data-auth-content-ready="">
       <p className={styles.kicker}>
         <span className={styles.kickerMark} aria-hidden="true">
           [

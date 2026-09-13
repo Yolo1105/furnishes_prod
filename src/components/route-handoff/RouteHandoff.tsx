@@ -57,6 +57,7 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
     pendingToRef.current = toPathname;
     lockRef.current = true;
     setCoverOn(true);
+    window.dispatchEvent(new Event("furnishes:route-handoff-start"));
     window.setTimeout(() => {
       pendingToRef.current = null;
       lockRef.current = false;

@@ -1,12 +1,13 @@
 "use client";
 
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { LandingPage } from "./LandingPage";
 import {
   forgetPersistentIntroSeen,
   hasSeenLandingIntroThisVisit,
   isLandingIntroReplayQuery,
+  markLandingIntroSeen,
   shouldSkipLandingLoader,
 } from "./landing-intro";
 
@@ -37,6 +38,20 @@ export function LandingEntry({
     }
     setSkipLoader(skipIntro || hasSeenLandingIntroThisVisit());
   }, [replay, skipIntro]);
+
+  useEffect(() => {
+    const rememberVisitBeforeLeaving = () => markLandingIntroSeen();
+    window.addEventListener(
+      "furnishes:route-handoff-start",
+      rememberVisitBeforeLeaving,
+    );
+    return () => {
+      window.removeEventListener(
+        "furnishes:route-handoff-start",
+        rememberVisitBeforeLeaving,
+      );
+    };
+  }, []);
 
   return (
     <LandingPage

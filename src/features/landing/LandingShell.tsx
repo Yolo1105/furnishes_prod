@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { startRouteHandoff } from "@/components/route-handoff/start-route-handoff";
 import { PublicShell } from "@/components/public-shell";
@@ -50,6 +56,11 @@ function LandingMain({
   const pendingActionRef = useRef<(() => void) | null>(null);
   const menuWasOpenRef = useRef(false);
   const activeSection = useLandingSectionSpy();
+
+  useEffect(() => {
+    router.prefetch("/login");
+    router.prefetch("/signup");
+  }, [router]);
 
   useLandingReveal(
     rootRef,
@@ -323,7 +334,7 @@ export function LandingShell({
     <>
       {loaderReleased || skipLoader ? (
         <LandingMain
-          skipIntro={skipIntro}
+          skipIntro={skipIntro || skipLoader}
           e2eMode={e2eMode}
           userLabel={userLabel}
           onHeroReady={() => {

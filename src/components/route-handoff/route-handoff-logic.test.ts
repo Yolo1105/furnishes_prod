@@ -48,6 +48,15 @@ describe("LANDING_PAINTED_SELECTORS", () => {
       '[aria-label="Loading Furnishes"]',
     );
   });
+
+  it("does not wait for freeze or placeholder to lift the cover", () => {
+    expect(LANDING_PAINTED_SELECTORS.join(" ")).not.toContain(
+      "furnishes-landing-freeze-style",
+    );
+    expect(LANDING_PAINTED_SELECTORS.join(" ")).not.toContain(
+      "data-hero-placeholder-ready",
+    );
+  });
 });
 
 describe("handoffCoverColor", () => {

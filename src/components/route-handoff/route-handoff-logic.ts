@@ -53,6 +53,10 @@ export function handoffCoverColor(toPathname: string, fromPathname?: string) {
   return surfaceColor(toPathname);
 }
 
+function isAuthPath(pathname: string) {
+  return AUTH_PATHS.has(pathname);
+}
+
 function isApiPath(pathname: string) {
   return pathname === "/api" || pathname.startsWith("/api/");
 }
@@ -98,6 +102,13 @@ export function routePainted(pathname: string) {
   if (pathname === "/") {
     return LANDING_PAINTED_SELECTORS.some((selector) =>
       Boolean(document.querySelector(selector)),
+    );
+  }
+  if (isAuthPath(pathname)) {
+    return Boolean(
+      document.querySelector(
+        `${routePaintSelector(pathname)} [data-auth-content-ready]`,
+      ),
     );
   }
   return Boolean(document.querySelector(routePaintSelector(pathname)));

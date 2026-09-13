@@ -2,6 +2,8 @@ import { LANDING_INTRO_SEEN_KEY } from "./landing-intro";
 
 export const LANDING_FREEZE_KEY = "furnishes-landing-freeze-v3";
 export const LANDING_FREEZE_STYLE_ID = "furnishes-landing-freeze-style";
+/** Below RouteHandoff cover (2147483000) so the peach fade stays visible. */
+export const LANDING_FREEZE_Z_INDEX = 2147482900;
 
 const MAX_BYTES = 3_500_000;
 
@@ -36,7 +38,7 @@ export const LANDING_FREEZE_BOOT_SCRIPT = `(function(){
     var data = sessionStorage.getItem("${LANDING_FREEZE_KEY}");
     if (!data || data.indexOf("data:image") !== 0) return;
     if (document.getElementById("${LANDING_FREEZE_STYLE_ID}")) return;
-    var css = 'html::before{content:"";position:fixed;inset:0;z-index:2147483646;pointer-events:none;background:url(' + JSON.stringify(data) + ') center / cover no-repeat;}';
+    var css = 'html::before{content:"";position:fixed;inset:0;z-index:${LANDING_FREEZE_Z_INDEX};pointer-events:none;background:url(' + JSON.stringify(data) + ') center / cover no-repeat;}';
     var style = document.createElement("style");
     style.id = "${LANDING_FREEZE_STYLE_ID}";
     style.textContent = css;
@@ -115,4 +117,29 @@ export function saveLandingFreezeFromCanvas(canvas: HTMLCanvasElement) {
 export function clearLandingFreezePaint() {
   if (typeof document === "undefined") return;
   document.getElementById(LANDING_FREEZE_STYLE_ID)?.remove();
+}
+
+/**
+ * Client navigations to `/` do not re-run the SSR boot script. Re-apply the
+ * last house frame under the cover — never used as a cover-lift gate.
+ */
+export function ensureLandingFreezePaint() {
+  if (typeof document === "undefined") return;
+  if (document.getElementById(LANDING_FREEZE_STYLE_ID)) return;
+  try {
+    if (sessionStorage.getItem(LANDING_INTRO_SEEN_KEY) !== "1") return;
+    const data = sessionStorage.getItem(LANDING_FREEZE_KEY);
+    if (!data || !data.startsWith("data:image")) return;
+    const style = document.createElement("style");
+    style.id = LANDING_FREEZE_STYLE_ID;
+    style.textContent =
+      'html::before{content:"";position:fixed;inset:0;z-index:' +
+      LANDING_FREEZE_Z_INDEX +
+      ";pointer-events:none;background:url(" +
+      JSON.stringify(data) +
+      ") center / cover no-repeat;}";
+    (document.head || document.documentElement).appendChild(style);
+  } catch {
+    /* quota, private mode */
+  }
 }

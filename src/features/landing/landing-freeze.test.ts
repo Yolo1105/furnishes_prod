@@ -3,6 +3,7 @@ import {
   LANDING_FREEZE_BOOT_SCRIPT,
   LANDING_FREEZE_KEY,
   LANDING_FREEZE_STYLE_ID,
+  LANDING_FREEZE_Z_INDEX,
   freezePixelIsHouseContent,
 } from "./landing-freeze";
 
@@ -15,11 +16,21 @@ describe("landing freeze boot", () => {
       "furnishes-landing-intro-seen",
     );
     expect(LANDING_FREEZE_BOOT_SCRIPT).toContain("sessionStorage.getItem");
+    expect(LANDING_FREEZE_BOOT_SCRIPT).toContain(
+      String(LANDING_FREEZE_Z_INDEX),
+    );
     expect(LANDING_FREEZE_BOOT_SCRIPT).not.toContain(
       "background-color:#e83200",
     );
     expect(LANDING_FREEZE_BOOT_SCRIPT).not.toContain("classList");
     expect(LANDING_FREEZE_BOOT_SCRIPT).not.toContain("root.style");
+  });
+});
+
+describe("ensureLandingFreezePaint", () => {
+  it("is exported for SPA returns to home", async () => {
+    const mod = await import("./landing-freeze");
+    expect(typeof mod.ensureLandingFreezePaint).toBe("function");
   });
 });
 
