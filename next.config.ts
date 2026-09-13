@@ -73,13 +73,15 @@ const nextConfig: NextConfig = {
   ...(process.env.VERCEL === "1" || process.env.FURNISHES_E2E_BUILD === "1"
     ? {}
     : { output: "standalone" as const }),
-  // A lockfile in the home directory made Turbopack treat ~ as the workspace
-  // root and watch the whole machine — that is the hitch-pause-continue loop
-  // in `pnpm dev`. Pin both roots to this repo.
-  outputFileTracingRoot: projectRoot,
-  turbopack: {
-    root: projectRoot,
-  },
+  // Pin Turbopack roots locally so a home-directory lockfile does not watch
+  // the whole machine. On Vercel the injected adapter owns tracing — a pinned
+  // root there has been omitting server files and 500ing every route.
+  ...(process.env.VERCEL === "1"
+    ? {}
+    : {
+        outputFileTracingRoot: projectRoot,
+        turbopack: { root: projectRoot },
+      }),
   outputFileTracingIncludes: {
     "/*": ["./prisma/**/*"],
   },

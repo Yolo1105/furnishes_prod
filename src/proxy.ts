@@ -3,16 +3,27 @@ import { NextResponse } from "next/server";
 
 const clerkEnabled = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
-export default clerkEnabled
-  ? clerkMiddleware()
-  : function passThrough() {
-      return NextResponse.next();
-    };
+function passThrough() {
+  return NextResponse.next();
+}
+
+const clerk = clerkEnabled ? clerkMiddleware() : null;
+
+export default async function proxy(
+  ...args: Parameters<NonNullable<typeof clerk>>
+) {
+  if (!clerk) return passThrough();
+  try {
+    return await clerk(...args);
+  } catch {
+    return passThrough();
+  }
+}
 
 export const config = {
   matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    "/(api|trpc)(.*)",
+    "/((?!_next|api/health|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/(api(?!/health)|trpc)(.*)",
     "/__clerk/(.*)",
   ],
 };

@@ -5,10 +5,17 @@ export async function register() {
     if (process.env.NEXT_PHASE === "phase-production-build") {
       return;
     }
-    const { runBootPreflight } = await import("@/server/ops/preflight");
-    await runBootPreflight();
-
     const { logOps } = await import("@/server/ops/log");
+    try {
+      const { runBootPreflight } = await import("@/server/ops/preflight");
+      await runBootPreflight();
+    } catch (error) {
+      // A fatal preflight must not take down every Vercel route with a 500.
+      logOps("error", "preflight_boot_failed", {
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+
     logOps("info", "app_boot", {
       nodeEnv: process.env.NODE_ENV ?? null,
       version: process.env.APP_VERSION?.trim() || null,
