@@ -45,9 +45,17 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
   const prevPathRef = useRef(pathname);
   const pendingToRef = useRef<string | null>(null);
   const lockRef = useRef(false);
+  const navTimerRef = useRef<number | null>(null);
+  const safetyTimerRef = useRef<number | null>(null);
   const [coverOn, setCoverOn] = useState(false);
   const [coverBg, setCoverBg] = useState(PEACH_HANDOFF_BG);
   pathnameRef.current = pathname;
+
+  const clearNavTimer = useCallback(() => {
+    if (navTimerRef.current === null) return;
+    window.clearTimeout(navTimerRef.current);
+    navTimerRef.current = null;
+  }, []);
 
   const armCover = useCallback((toPathname: string, fromPathname?: string) => {
     const bg = handoffCoverColor(
@@ -63,10 +71,14 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
     if (isAuthPath(fromPathname ?? pathnameRef.current)) {
       clearAuthScrollLock();
     }
-    window.setTimeout(() => {
+    if (safetyTimerRef.current !== null) {
+      window.clearTimeout(safetyTimerRef.current);
+    }
+    safetyTimerRef.current = window.setTimeout(() => {
       pendingToRef.current = null;
       lockRef.current = false;
       setCoverOn(false);
+      safetyTimerRef.current = null;
     }, SAFETY_MS);
   }, []);
 
@@ -81,30 +93,45 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
       }
       if (url.origin !== window.location.origin) return false;
       if (!shouldHandoff(from, url.pathname)) return false;
-      if (lockRef.current) return true;
+
+      // A locked handoff used to return true without navigating, which
+      // preventDefault'd the wordmark and left /login stuck in CI.
+      clearNavTimer();
 
       const to = `${url.pathname}${url.search}`;
       armCover(url.pathname, from);
 
-      if (prefersReducedMotion()) {
+      const navigate = () => {
+        navTimerRef.current = null;
         if (replace) router.replace(to);
         else router.push(to);
+      };
+
+      if (prefersReducedMotion()) {
+        navigate();
         return true;
       }
 
-      window.setTimeout(() => {
-        if (replace) router.replace(to);
-        else router.push(to);
-      }, COVER_MS);
+      navTimerRef.current = window.setTimeout(navigate, COVER_MS);
       return true;
     },
-    [armCover, router],
+    [armCover, clearNavTimer, router],
   );
 
   useEffect(() => {
     registerRouteHandoff(go);
     return () => registerRouteHandoff(null);
   }, [go]);
+
+  useEffect(() => {
+    return () => {
+      clearNavTimer();
+      if (safetyTimerRef.current !== null) {
+        window.clearTimeout(safetyTimerRef.current);
+        safetyTimerRef.current = null;
+      }
+    };
+  }, [clearNavTimer]);
 
   useEffect(() => {
     function onClick(event: MouseEvent) {

@@ -25,8 +25,10 @@ test("landing and login crossfade without leaving the peach cover up", async ({
     timeout: SETTLED_READY_MS,
   });
 
-  await page.getByRole("link", { name: /furnishes/i }).click();
-  await expect(page).toHaveURL(/\/(?:\?.*)?$/);
+  const homeLink = page.getByRole("link", { name: /furnishes/i });
+  await expect(homeLink).toBeVisible();
+  await homeLink.click();
+  await expect(page).toHaveURL(/\/(?:\?.*)?$/, { timeout: SETTLED_READY_MS });
   await expect(page.getByRole("button", { name: "Menu" })).toBeVisible({
     timeout: SETTLED_READY_MS,
   });
