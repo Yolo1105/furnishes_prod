@@ -1,6 +1,9 @@
 import { Suspense } from "react";
 import { LandingEntry } from "@/features/landing/LandingEntry";
-import { shouldSkipLandingLoader } from "@/features/landing/landing-intro";
+import {
+  firstSearchParam,
+  shouldSkipLandingLoader,
+} from "@/features/landing/landing-intro";
 import { getOptionalCurrentSession } from "@/server/auth/session";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +11,10 @@ export const dynamic = "force-dynamic";
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ intro?: string; e2e?: string }>;
+  searchParams: Promise<{
+    intro?: string | string[];
+    e2e?: string | string[];
+  }>;
 }) {
   const session = await getOptionalCurrentSession();
   const userLabel =
@@ -17,13 +23,19 @@ export default async function HomePage({
     null;
 
   const params = await searchParams;
-  const skipLoader = shouldSkipLandingLoader({
-    introQuery: params.intro ?? null,
-  });
+  const introQuery = firstSearchParam(params.intro);
+  const skipFromQuery = shouldSkipLandingLoader({ introQuery });
+  const e2eMode =
+    process.env.NEXT_PUBLIC_E2E === "1" && firstSearchParam(params.e2e) === "1";
 
   return (
     <Suspense fallback={null}>
-      <LandingEntry userLabel={userLabel} skipLoader={skipLoader} />
+      <LandingEntry
+        userLabel={userLabel}
+        skipLoader={skipFromQuery}
+        skipIntro={skipFromQuery}
+        e2eMode={e2eMode}
+      />
     </Suspense>
   );
 }

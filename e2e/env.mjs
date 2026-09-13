@@ -18,6 +18,7 @@ export function e2eEnv(from = process.env) {
   return {
     ...from,
     NEXT_PUBLIC_E2E: "1",
+    FURNISHES_E2E_BUILD: "1",
     NEXT_TELEMETRY_DISABLED: "1",
     // Cookie auth is the E2E/CI path. Empty strings beat .env.local Clerk keys
     // so `next build` cannot enable ClerkProvider and break session-cookie tests.

@@ -68,7 +68,11 @@ const nextConfig: NextConfig = {
   // Hide the Next.js compile badge during client navigations.
   devIndicators: false,
   // Enables `node .next/standalone/server.js` and the production Dockerfile.
-  output: "standalone",
+  // Next 16.3+ warns that `next start` does not work with standalone; E2E
+  // uses `next start`, so skip that output there.
+  ...(process.env.FURNISHES_E2E_BUILD === "1"
+    ? {}
+    : { output: "standalone" as const }),
   // A lockfile in the home directory made Turbopack treat ~ as the workspace
   // root and watch the whole machine — that is the hitch-pause-continue loop
   // in `pnpm dev`. Pin both roots to this repo.

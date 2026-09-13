@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { shouldSkipLandingLoader } from "./landing-intro";
+import { firstSearchParam, shouldSkipLandingLoader } from "./landing-intro";
 
 describe("shouldSkipLandingLoader", () => {
   it("plays on a first visit (no query)", () => {
@@ -13,5 +13,13 @@ describe("shouldSkipLandingLoader", () => {
   it("still skips for E2E ?intro=skip", () => {
     expect(shouldSkipLandingLoader({ introQuery: "skip" })).toBe(true);
     expect(shouldSkipLandingLoader({ introQuery: "SKIP" })).toBe(true);
+  });
+});
+
+describe("firstSearchParam", () => {
+  it("returns the first non-empty value from a string[]", () => {
+    expect(firstSearchParam(["skip"])).toBe("skip");
+    expect(firstSearchParam(["", "skip"])).toBe("skip");
+    expect(firstSearchParam(undefined)).toBe(null);
   });
 });

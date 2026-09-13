@@ -115,7 +115,10 @@ test.describe("Landing WebGL", () => {
     await expect(remountedHero.locator("canvas")).toHaveCount(1, {
       timeout: RENDERER_READY_MS,
     });
-    expect(pageErrors).toEqual([]);
+    expect(
+      pageErrors,
+      pageErrors.map((error) => error.message).join("\n") || "page errors",
+    ).toEqual([]);
   });
 
   test("reload during loader still completes handoff", async ({ page }) => {

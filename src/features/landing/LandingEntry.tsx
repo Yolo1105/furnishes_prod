@@ -21,16 +21,22 @@ import {
 export function LandingEntry({
   userLabel = null,
   skipLoader: skipLoaderFromServer = false,
+  skipIntro: skipIntroFromServer = false,
+  e2eMode: e2eModeFromServer = false,
 }: {
   userLabel?: string | null;
   skipLoader?: boolean;
+  skipIntro?: boolean;
+  e2eMode?: boolean;
 }) {
   const params = useSearchParams();
   const introQuery = params.get("intro");
   const replay = isLandingIntroReplayQuery(introQuery);
-  const skipIntro = shouldSkipLandingLoader({ introQuery });
+  const skipIntro =
+    skipIntroFromServer || shouldSkipLandingLoader({ introQuery });
   const e2eMode =
-    process.env.NEXT_PUBLIC_E2E === "1" && params.get("e2e") === "1";
+    e2eModeFromServer ||
+    (process.env.NEXT_PUBLIC_E2E === "1" && params.get("e2e") === "1");
   const [skipLoader, setSkipLoader] = useState(skipLoaderFromServer);
 
   useLayoutEffect(() => {

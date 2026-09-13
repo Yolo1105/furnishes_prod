@@ -22,6 +22,17 @@ export function hasSeenLandingIntroThisVisit(): boolean {
   }
 }
 
+/** First value from App Router searchParams (`string` or `string[]`). */
+export function firstSearchParam(
+  value: string | string[] | undefined | null,
+): string | null {
+  if (Array.isArray(value)) {
+    const first = value.find((item) => item.trim().length > 0);
+    return first ?? null;
+  }
+  return value ?? null;
+}
+
 /** Replay the first-visit 3D loader even when this tab already saw it. */
 export function isLandingIntroReplayQuery(
   raw: string | null | undefined,
