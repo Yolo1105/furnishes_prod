@@ -67,10 +67,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Hide the Next.js compile badge during client navigations.
   devIndicators: false,
-  // Enables `node .next/standalone/server.js` and the production Dockerfile.
-  // Next 16.3+ warns that `next start` does not work with standalone; E2E
-  // uses `next start`, so skip that output there.
-  ...(process.env.FURNISHES_E2E_BUILD === "1"
+  // Standalone is for Docker (`node .next/standalone/server.js`). Skip it on
+  // Vercel (adapter + standalone 500s every route on Next 16.3) and E2E
+  // (`next start` is unsupported with standalone).
+  ...(process.env.VERCEL === "1" || process.env.FURNISHES_E2E_BUILD === "1"
     ? {}
     : { output: "standalone" as const }),
   // A lockfile in the home directory made Turbopack treat ~ as the workspace
