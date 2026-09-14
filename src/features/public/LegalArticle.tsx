@@ -34,7 +34,7 @@ export const LEGAL_PAGES = {
   },
   contact: {
     path: routes.contact,
-    title: "Contact",
+    title: "Contact Us",
     body: [
       "Furnishes — a design studio for modern interiors.",
       "Email: hello@furnish-es.com",

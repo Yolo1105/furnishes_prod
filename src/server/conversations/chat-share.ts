@@ -8,7 +8,8 @@
  * - Flag CHAT_SHARE_ENABLED=0
  */
 
-import { prisma } from "@/server/db";
+import { isDatabaseUnreachable, prisma } from "@/server/db";
+import { logOps } from "@/server/ops/log";
 import { err, ok, type ServiceResult } from "@/server/result";
 
 const SHARE_ID_CHARS =
@@ -124,35 +125,47 @@ export async function revokeConversationShare(input: {
 export async function getSharedConversation(
   shareId: string,
 ): Promise<ServiceResult<SharedConversationPayload, "not_found">> {
-  const shared = await prisma.sharedProject.findUnique({
-    where: { shareId },
-    include: {
-      conversation: {
-        select: {
-          title: true,
-          messages: {
-            orderBy: { createdAt: "asc" },
-            take: 200,
-            select: { role: true, content: true, createdAt: true },
+  if (!isChatShareEnabled()) {
+    return err("not_found", "Share link not found.");
+  }
+
+  try {
+    const shared = await prisma.sharedProject.findUnique({
+      where: { shareId },
+      include: {
+        conversation: {
+          select: {
+            title: true,
+            messages: {
+              orderBy: { createdAt: "asc" },
+              take: 200,
+              select: { role: true, content: true, createdAt: true },
+            },
           },
         },
       },
-    },
-  });
+    });
 
-  if (!shared) return err("not_found", "Share link not found.");
-  if (shared.expiresAt && shared.expiresAt < new Date()) {
-    return err("not_found", "Share link expired.");
+    if (!shared) return err("not_found", "Share link not found.");
+    if (shared.expiresAt && shared.expiresAt < new Date()) {
+      return err("not_found", "Share link expired.");
+    }
+
+    return ok({
+      shareId: shared.shareId,
+      title: shared.conversation.title || "Shared conversation",
+      messages: shared.conversation.messages.map((message) => ({
+        role: message.role,
+        content: message.content,
+        createdAt: message.createdAt.toISOString(),
+      })),
+      expiresAt: shared.expiresAt?.toISOString() ?? null,
+    });
+  } catch (error) {
+    if (!isDatabaseUnreachable(error)) throw error;
+    logOps("warn", "share_get_db_unreachable", {
+      message: error instanceof Error ? error.message.slice(0, 160) : "unknown",
+    });
+    return err("not_found", "Share link not found.");
   }
-
-  return ok({
-    shareId: shared.shareId,
-    title: shared.conversation.title || "Shared conversation",
-    messages: shared.conversation.messages.map((message) => ({
-      role: message.role,
-      content: message.content,
-      createdAt: message.createdAt.toISOString(),
-    })),
-    expiresAt: shared.expiresAt?.toISOString() ?? null,
-  });
 }

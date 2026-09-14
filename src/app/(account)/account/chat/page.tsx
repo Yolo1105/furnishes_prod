@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { requireCurrentSession } from "@/server/auth/session";
 import {
@@ -6,6 +7,10 @@ import {
 } from "@/server/conversations/service";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Chat",
+};
 
 /**
  * Workspace Chat [03] entry — open the latest thread, or start a new one.

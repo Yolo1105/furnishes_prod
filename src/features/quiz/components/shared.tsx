@@ -223,7 +223,7 @@ export function useInjectQuizCss() {
     }
     el.textContent = QUIZ_CSS;
     return () => {
-      /* keep stylesheet while quiz remounts; next mount refreshes textContent */
+      el?.remove();
     };
   }, []);
 }

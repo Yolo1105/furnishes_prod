@@ -1,3 +1,9 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Conversation Not Found",
+};
+
 export default function ConversationNotFound() {
   return (
     <div>

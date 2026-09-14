@@ -9,12 +9,15 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { markLandingIntroSeen } from "@/features/landing/landing-intro";
 import { registerRouteHandoff } from "./start-route-handoff";
 import {
   PEACH_HANDOFF_BG,
   clearAuthScrollLock,
+  clearQuizDocumentLock,
   handoffCoverColor,
   isAuthPath,
+  isQuizPath,
   paintDocumentBg,
   routePainted,
   shouldHandoff,
@@ -68,8 +71,13 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
     lockRef.current = true;
     setCoverOn(true);
     window.dispatchEvent(new Event("furnishes:route-handoff-start"));
-    if (isAuthPath(fromPathname ?? pathnameRef.current)) {
+    const from = fromPathname ?? pathnameRef.current;
+    if (isAuthPath(from)) {
       clearAuthScrollLock();
+    }
+    if (isQuizPath(from)) {
+      clearQuizDocumentLock();
+      markLandingIntroSeen();
     }
     if (safetyTimerRef.current !== null) {
       window.clearTimeout(safetyTimerRef.current);
@@ -161,6 +169,9 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
     const from = prevPathRef.current;
     if (from !== pathname) {
       prevPathRef.current = pathname;
+      if (isQuizPath(from)) {
+        clearQuizDocumentLock();
+      }
     }
 
     if (

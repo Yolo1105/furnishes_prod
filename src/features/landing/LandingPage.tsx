@@ -48,6 +48,7 @@ export function LandingPage({
     <div
       className={styles.landingRoot}
       data-landing-root=""
+      data-skip-loader={skipLoader ? "1" : "0"}
       data-route-paint="landing"
       data-route-path={heroReady ? "/" : undefined}
       data-hero-ready={heroReady ? "1" : "0"}

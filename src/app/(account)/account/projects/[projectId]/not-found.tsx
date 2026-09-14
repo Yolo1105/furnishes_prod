@@ -1,3 +1,9 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Project Not Found",
+};
+
 export default function ProjectNotFound() {
   return (
     <div>

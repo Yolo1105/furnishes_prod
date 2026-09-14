@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import { getSharedConversation } from "@/server/conversations/chat-share";
 import { notFound } from "next/navigation";
 
 type Params = { params: Promise<{ shareId: string }> };
+
+export const metadata: Metadata = {
+  title: "Shared Conversation",
+};
 
 /**
  * Minimal anonymous shared-conversation page.

@@ -286,9 +286,8 @@ export function LandingShell({
   const onHeroReadyRef = useRef(onHeroReady);
   onHeroReadyRef.current = onHeroReady;
 
-  /* skipLoader is decided after mount (sessionStorage). If we only read it in
-     useState, returning from /login leaves the loader dismissed and the house
-     unmounted — a solid orange stage. */
+  /* skipLoader can flip true after hydration (sessionStorage). Sync the
+     loader/house gates from that prop only — LandingEntry owns the skip. */
   useLayoutEffect(() => {
     if (!skipLoader) return;
     releasedOnceRef.current = true;

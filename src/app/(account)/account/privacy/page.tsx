@@ -13,5 +13,5 @@ export default async function AccountPrivacyRoute() {
 }
 
 export const metadata: Metadata = {
-  title: "Eva's Memory & Data",
+  title: "Memory & Data",
 };

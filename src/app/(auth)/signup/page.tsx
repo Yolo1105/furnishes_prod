@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -6,6 +7,10 @@ import { SignupForm } from "@/features/auth/SignupForm";
 import { routes } from "@/lib/contracts/routes";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Create Account",
+};
 
 export default async function SignupPage() {
   if (process.env.CLERK_SECRET_KEY) {

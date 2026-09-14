@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
   generateShareId,
+  getSharedConversation,
   isChatShareEnabled,
   shareLinkTtlDays,
 } from "./chat-share";
@@ -13,6 +14,15 @@ afterEach(() => {
 describe("chat share helpers", () => {
   it("defaults off", () => {
     expect(isChatShareEnabled()).toBe(false);
+  });
+
+  it("treats public share reads as missing while the flag is off", async () => {
+    const result = await getSharedConversation("does-not-exist");
+    expect(result).toEqual({
+      ok: false,
+      error: "not_found",
+      message: "Share link not found.",
+    });
   });
 
   it("defaults TTL to 7 days and clamps", () => {

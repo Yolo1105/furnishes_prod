@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -6,6 +7,10 @@ import { LoginForm } from "@/features/auth/LoginForm";
 import { sanitizeNext } from "@/features/auth/clerk-custom";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Sign In",
+};
 
 export default async function LoginPage({
   searchParams,

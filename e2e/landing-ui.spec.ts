@@ -41,6 +41,28 @@ test.describe("Landing UI", () => {
     ).toBeVisible();
   });
 
+  test("quiz wordmark returns to the house", async ({ page }) => {
+    await waitForLandingUi(page);
+
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByRole("button", { name: "Quiz" }).click();
+    await expect(page).toHaveURL(/\/quiz$/);
+    await expect(
+      page.getByRole("link", { name: "Back to Furnishes home" }),
+    ).toBeVisible();
+
+    await page.getByRole("link", { name: "Back to Furnishes home" }).click();
+    await expect(page).toHaveURL(/\/(?:\?.*)?$/, { timeout: SETTLED_READY_MS });
+    await expect(page.getByRole("button", { name: "Menu" })).toBeVisible({
+      timeout: SETTLED_READY_MS,
+    });
+    await expect(page.locator('[data-route-handoff="on"]')).toHaveCount(0, {
+      timeout: SETTLED_READY_MS,
+    });
+    await expect(page.locator("#landing-hero-scene")).toBeVisible();
+    await expect(page.locator("h1")).toContainText("Interior");
+  });
+
   test("closed menu controls are not keyboard-focusable", async ({ page }) => {
     await waitForLandingUi(page);
 

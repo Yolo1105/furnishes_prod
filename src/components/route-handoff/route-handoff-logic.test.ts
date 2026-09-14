@@ -6,8 +6,10 @@ import {
   QUIZ_HANDOFF_BG,
   LANDING_PAINTED_SELECTORS,
   clearAuthScrollLock,
+  clearQuizDocumentLock,
   handoffCoverColor,
   isAuthPath,
+  isQuizPath,
   routePaintSelector,
   shouldHandoff,
 } from "./route-handoff-logic";
@@ -50,6 +52,19 @@ describe("clearAuthScrollLock", () => {
   });
 });
 
+describe("quiz document lock", () => {
+  it("marks the public quiz as its own surface", () => {
+    expect(isQuizPath("/quiz")).toBe(true);
+    expect(isQuizPath("/quiz/extra")).toBe(true);
+    expect(isQuizPath("/account/quiz")).toBe(false);
+    expect(isQuizPath("/")).toBe(false);
+  });
+
+  it("is exported so leaving /quiz can restore document overflow", () => {
+    expect(typeof clearQuizDocumentLock).toBe("function");
+  });
+});
+
 describe("routePaintSelector", () => {
   it("targets the destination path marker", () => {
     expect(routePaintSelector("/quiz")).toBe('[data-route-path="/quiz"]');
@@ -58,7 +73,8 @@ describe("routePaintSelector", () => {
 });
 
 describe("LANDING_PAINTED_SELECTORS", () => {
-  it("treats the hero island as painted before WebGL reports ready", () => {
+  it("treats the landing root as painted before WebGL reports ready", () => {
+    expect(LANDING_PAINTED_SELECTORS).toContain("[data-landing-root]");
     expect(LANDING_PAINTED_SELECTORS).toContain("#landing-hero-scene");
     expect(LANDING_PAINTED_SELECTORS).toContain(
       '[aria-label="Loading Furnishes"]',

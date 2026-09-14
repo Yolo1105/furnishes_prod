@@ -54,10 +54,6 @@ function QuizErrorScreen({ onRetry }: { onRetry: () => void }) {
       <style>{`
         html, body {
           background-color: #1a1714 !important;
-          height: 100%;
-          width: 100%;
-          overflow: hidden;
-          overscroll-behavior: none;
         }
       `}</style>
       <QuizBgSlides />

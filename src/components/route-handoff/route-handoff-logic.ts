@@ -20,9 +20,13 @@ const AUTH_PATHS = new Set([
 export type RouteSurface =
   "landing" | "quiz" | "account" | "canvas" | "auth" | "shared" | "public";
 
+export function isQuizPath(pathname: string) {
+  return pathname === "/quiz" || pathname.startsWith("/quiz/");
+}
+
 function routeSurface(pathname: string): RouteSurface {
   if (pathname === "/") return "landing";
-  if (pathname === "/quiz" || pathname.startsWith("/quiz/")) return "quiz";
+  if (isQuizPath(pathname)) return "quiz";
   if (pathname.startsWith("/account/canvas")) return "canvas";
   if (pathname.startsWith("/account")) return "account";
   if (AUTH_PATHS.has(pathname)) return "auth";
@@ -64,6 +68,16 @@ export function clearAuthScrollLock() {
   document.body.style.overflow = "";
 }
 
+/** Quiz locks html/body overflow; that must not follow the visitor home. */
+export function clearQuizDocumentLock() {
+  if (typeof document === "undefined") return;
+  document.documentElement.style.overflow = "";
+  document.body.style.overflow = "";
+  document.documentElement.style.height = "";
+  document.body.style.height = "";
+  document.querySelector("style[data-furnishes-quiz]")?.remove();
+}
+
 function isApiPath(pathname: string) {
   return pathname === "/api" || pathname.startsWith("/api/");
 }
@@ -97,6 +111,7 @@ export function routePaintSelector(pathname: string) {
  * after /login → / — a blank cream page.
  */
 export const LANDING_PAINTED_SELECTORS = [
+  "[data-landing-root]",
   "#landing-hero-scene",
   '[aria-label="Loading Furnishes"]',
   '[data-hero-ready="1"]',
