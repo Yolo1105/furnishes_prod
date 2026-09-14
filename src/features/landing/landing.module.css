@@ -1160,6 +1160,7 @@
 
 /* Archive-style inline thumbs — desktop only (matches furnishes_prod). */
 .manifestoThumb {
+  position: relative;
   display: none;
 }
 

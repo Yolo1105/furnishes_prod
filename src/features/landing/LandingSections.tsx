@@ -150,7 +150,11 @@ function WhoAreWe() {
             const img = landingContent.aboutManifesto.images[part.index];
             if (!img) return null;
             return (
-              <span key={`img-${partIdx}`} className={styles.manifestoThumb}>
+              <span
+                key={`img-${partIdx}`}
+                className={styles.manifestoThumb}
+                style={{ position: "relative" }}
+              >
                 <Image
                   src={img.src}
                   alt={img.alt}
