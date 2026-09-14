@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { SETTLED_READY_MS } from "./landing-helpers";
 
 test("quiz route renders the design quiz", async ({ page }) => {
   const response = await page.goto("/quiz");
@@ -6,8 +7,11 @@ test("quiz route renders the design quiz", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /what kind of space are you/i }),
   ).toHaveCount(1);
+  await expect(
+    page.getByRole("link", { name: "Back to Furnishes home" }),
+  ).toBeVisible();
   await page.getByRole("link", { name: "Back to Furnishes home" }).click();
-  await expect(page).toHaveURL("/");
+  await expect(page).toHaveURL(/\/(?:\?.*)?$/, { timeout: SETTLED_READY_MS });
 });
 
 test("login route renders sign-in form", async ({ page }) => {

@@ -3,6 +3,7 @@
 "use client";
 
 import { QUIZ_PAD_X, Icon, hexA, pressFx } from "./shared";
+import { startRouteHandoff } from "@/components/route-handoff/start-route-handoff";
 import { answerStatus } from "@/features/quiz/engine/sequence";
 import { LayoutBudgetResult } from "./layouts";
 import { FadeIn } from "./results-helpers";
@@ -12,6 +13,9 @@ export function QuizHomeLink({ color = "#fff" }: any) {
     <a
       href="/"
       aria-label="Back to Furnishes home"
+      onClick={(event) => {
+        if (startRouteHandoff("/")) event.preventDefault();
+      }}
       style={{
         display: "inline-flex",
         alignItems: "center",

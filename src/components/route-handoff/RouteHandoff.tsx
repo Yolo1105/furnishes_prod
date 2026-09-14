@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { flushSync } from "react-dom";
 import { usePathname, useRouter } from "next/navigation";
 import { markLandingIntroSeen } from "@/features/landing/landing-intro";
 import { registerRouteHandoff } from "./start-route-handoff";
@@ -24,13 +25,8 @@ import {
 } from "./route-handoff-logic";
 import styles from "./route-handoff.module.css";
 
-const COVER_MS = 280;
 const PAINT_HOLD_MS = 8000;
 const SAFETY_MS = 10000;
-
-function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 function arrivedAt(pathname: string, pending: string) {
   return pathname === pending;
@@ -48,17 +44,10 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
   const prevPathRef = useRef(pathname);
   const pendingToRef = useRef<string | null>(null);
   const lockRef = useRef(false);
-  const navTimerRef = useRef<number | null>(null);
   const safetyTimerRef = useRef<number | null>(null);
   const [coverOn, setCoverOn] = useState(false);
   const [coverBg, setCoverBg] = useState(PEACH_HANDOFF_BG);
   pathnameRef.current = pathname;
-
-  const clearNavTimer = useCallback(() => {
-    if (navTimerRef.current === null) return;
-    window.clearTimeout(navTimerRef.current);
-    navTimerRef.current = null;
-  }, []);
 
   const armCover = useCallback((toPathname: string, fromPathname?: string) => {
     const bg = handoffCoverColor(
@@ -76,7 +65,6 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
       clearAuthScrollLock();
     }
     if (isQuizPath(from)) {
-      clearQuizDocumentLock();
       markLandingIntroSeen();
     }
     if (safetyTimerRef.current !== null) {
@@ -102,28 +90,17 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
       if (url.origin !== window.location.origin) return false;
       if (!shouldHandoff(from, url.pathname)) return false;
 
-      // A locked handoff used to return true without navigating, which
-      // preventDefault'd the wordmark and left /login stuck in CI.
-      clearNavTimer();
-
+      // Paint the cover before push. A delayed timer used to be cleared on
+      // remount, which preventDefault'd the quiz wordmark and left CI on /quiz.
       const to = `${url.pathname}${url.search}`;
-      armCover(url.pathname, from);
-
-      const navigate = () => {
-        navTimerRef.current = null;
-        if (replace) router.replace(to);
-        else router.push(to);
-      };
-
-      if (prefersReducedMotion()) {
-        navigate();
-        return true;
-      }
-
-      navTimerRef.current = window.setTimeout(navigate, COVER_MS);
+      flushSync(() => {
+        armCover(url.pathname, from);
+      });
+      if (replace) router.replace(to);
+      else router.push(to);
       return true;
     },
-    [armCover, clearNavTimer, router],
+    [armCover, router],
   );
 
   useEffect(() => {
@@ -133,13 +110,12 @@ export function RouteHandoff({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     return () => {
-      clearNavTimer();
       if (safetyTimerRef.current !== null) {
         window.clearTimeout(safetyTimerRef.current);
         safetyTimerRef.current = null;
       }
     };
-  }, [clearNavTimer]);
+  }, []);
 
   useEffect(() => {
     function onClick(event: MouseEvent) {
