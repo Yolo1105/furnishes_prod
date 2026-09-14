@@ -25,24 +25,12 @@ const E2E_ROOM_POSITIONS = [
   { left: "76%", top: "43%" },
 ] as const;
 
-function HouseFallback({
-  placeholder = false,
-  hidden = false,
-}: {
-  placeholder?: boolean;
-  hidden?: boolean;
-}) {
+function HouseFallback() {
   return (
     <div
-      className={`${styles.houseFallback}${placeholder ? ` ${styles.housePlaceholder}` : ""}`}
-      data-hero-placeholder-ready={placeholder ? "" : undefined}
-      role={hidden ? undefined : "img"}
-      aria-hidden={hidden ? "true" : undefined}
-      aria-label={
-        hidden
-          ? undefined
-          : "Illustration of a furnished house. The interactive 3D model is unavailable in this browser."
-      }
+      className={styles.houseFallback}
+      role="img"
+      aria-label="Illustration of a furnished house. The interactive 3D model is unavailable in this browser."
     >
       <svg
         viewBox="0 0 320 240"
@@ -256,7 +244,6 @@ export function LandingHero({
         <HouseFallback />
       ) : (
         <>
-          <HouseFallback placeholder hidden={rendererState === "webgl"} />
           <div
             ref={mountRef}
             className={styles.heroCanvas}

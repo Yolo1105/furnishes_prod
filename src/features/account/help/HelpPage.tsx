@@ -178,10 +178,10 @@ export function HelpPage() {
             </div>
             <div className="wf-cellbox__go">Open ↗</div>
           </button>
-          <a className="wf-cellbox" href="mailto:help@furnishes.studio">
+          <a className="wf-cellbox" href="mailto:hello@furnish-es.com">
             <div className="wf-cellbox__t">Email support</div>
             <div className="wf-cellbox__d">
-              help@furnishes.studio · a person replies within a day.
+              hello@furnish-es.com · a person replies within a day.
             </div>
             <div className="wf-cellbox__go">Email ↗</div>
           </a>

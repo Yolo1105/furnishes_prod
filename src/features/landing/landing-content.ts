@@ -431,7 +431,7 @@ export const landingContent = {
     ],
   },
   contact: {
-    emailAddress: "hello@example.invalid",
+    emailAddress: "hello@furnish-es.com",
     studioLabel: "By appointment · demo location",
     studioBlurb: "Visual development & support across the full 3D pipeline.",
     hours: [
