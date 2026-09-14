@@ -145,83 +145,43 @@ export function PublicMenu<TDestination extends string>({
         <div className={styles.menuGrid}>
           <div className={styles.menuVline} aria-hidden="true" />
 
-          <div className={styles.menuLeft}>
-            <div className={`${styles.menuBlock} ${styles.menuReveal}`}>
-              <div>
-                <p className={styles.menuEyebrow}>[ Work ]</p>
-                <p className={styles.menuHeading}>Projects</p>
-                <button
-                  type="button"
-                  className={styles.menuCta}
-                  onClick={() => onNavigate("work")}
-                >
-                  <span className={styles.menuCtaText}>See all work</span>
-                  <span className={styles.menuCtaArrow} aria-hidden="true">
-                    →
-                  </span>
-                </button>
-              </div>
-              <div className={styles.menuItems}>
-                {workItems.map((item, i) => (
-                  <div
-                    key={item.label}
-                    className={`${styles.menuItemRow} ${styles.menuReveal}`}
-                    style={{ transitionDelay: `${0.08 + i * 0.04}s` }}
-                  >
-                    <button
-                      type="button"
-                      className={styles.menuListItem}
-                      onClick={() => onNavigate(item.destination)}
-                    >
-                      {item.label}
-                    </button>
-                  </div>
-                ))}
-              </div>
+          <div
+            className={`${styles.menuBlock} ${styles.menuProjects} ${styles.menuReveal}`}
+          >
+            <div>
+              <p className={styles.menuEyebrow}>[ Work ]</p>
+              <p className={styles.menuHeading}>Projects</p>
+              <button
+                type="button"
+                className={styles.menuCta}
+                onClick={() => onNavigate("work")}
+              >
+                <span className={styles.menuCtaText}>See all work</span>
+                <span className={styles.menuCtaArrow} aria-hidden="true">
+                  →
+                </span>
+              </button>
             </div>
-
-            <div
-              className={`${styles.menuBlock} ${styles.menuBlockStudio} ${styles.menuReveal}`}
-              style={{ transitionDelay: "0.18s" }}
-            >
-              <div>
-                <p className={styles.menuEyebrow}>[ Studio ]</p>
-                <p className={styles.menuHeading}>Furnishes</p>
-                <button
-                  type="button"
-                  className={styles.menuCta}
-                  onClick={() => onNavigate("studio")}
+            <div className={styles.menuItems}>
+              {workItems.map((item, i) => (
+                <div
+                  key={item.label}
+                  className={`${styles.menuItemRow} ${styles.menuReveal}`}
+                  style={{ transitionDelay: `${0.08 + i * 0.04}s` }}
                 >
-                  <span className={styles.menuCtaText}>About the studio</span>
-                  <span className={styles.menuCtaArrow} aria-hidden="true">
-                    →
-                  </span>
-                </button>
-              </div>
-              <div className={styles.menuItems}>
-                {studioItems.map((item, i) => (
-                  <div
-                    key={item.label}
-                    className={`${styles.menuItemRow} ${styles.menuReveal}`}
-                    style={{ transitionDelay: `${0.22 + i * 0.04}s` }}
+                  <button
+                    type="button"
+                    className={styles.menuListItem}
+                    onClick={() => onNavigate(item.destination)}
                   >
-                    <button
-                      type="button"
-                      className={styles.menuListItem}
-                      onClick={() => onNavigate(item.destination)}
-                    >
-                      {item.label}
-                    </button>
-                    {item.tag ? (
-                      <span className={styles.menuTag}>{item.tag}</span>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
+                    {item.label}
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className={styles.menuRight}>
+          <nav className={styles.menuNavCol} aria-label="Page">
             {navItems.map((item, i) => (
               <button
                 key={item.label}
@@ -234,7 +194,49 @@ export function PublicMenu<TDestination extends string>({
                 {item.label}
               </button>
             ))}
+          </nav>
 
+          <div
+            className={`${styles.menuBlock} ${styles.menuStudio} ${styles.menuReveal}`}
+            style={{ transitionDelay: "0.18s" }}
+          >
+            <div>
+              <p className={styles.menuEyebrow}>[ Studio ]</p>
+              <p className={styles.menuHeading}>Furnishes</p>
+              <button
+                type="button"
+                className={styles.menuCta}
+                onClick={() => onNavigate("studio")}
+              >
+                <span className={styles.menuCtaText}>About the studio</span>
+                <span className={styles.menuCtaArrow} aria-hidden="true">
+                  →
+                </span>
+              </button>
+            </div>
+            <div className={styles.menuItems}>
+              {studioItems.map((item, i) => (
+                <div
+                  key={item.label}
+                  className={`${styles.menuItemRow} ${styles.menuReveal}`}
+                  style={{ transitionDelay: `${0.22 + i * 0.04}s` }}
+                >
+                  <button
+                    type="button"
+                    className={styles.menuListItem}
+                    onClick={() => onNavigate(item.destination)}
+                  >
+                    {item.label}
+                  </button>
+                  {item.tag ? (
+                    <span className={styles.menuTag}>{item.tag}</span>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.menuConnectCol}>
             <p
               className={`${styles.menuEyebrow} ${styles.menuConnect} ${styles.menuReveal}`}
               style={{ transitionDelay: "0.42s" }}

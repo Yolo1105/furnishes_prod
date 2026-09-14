@@ -13,13 +13,14 @@
   --public-shell-pad: clamp(14px, 2vw, 28px);
   --public-nav-h: 56px;
   /* Below-the-fold sections: wider inset than the home header/MENU. */
-  --landing-section-pad-x: clamp(20px, 3.4vw, 48px);
+  --landing-section-pad-x: clamp(28px, 6vw, 96px);
   --landing-maxw: 1440px;
   --landing-font-sans: var(--font-archivo), "Archivo", sans-serif;
   --landing-font-mono:
     var(--font-space-mono), "Space Mono", ui-monospace, monospace;
-  /* Bracketed labels: [ Experience ], [ Hours ], etc. */
-  --landing-bracket-label-size: clamp(13px, 1vw, 16px);
+  /* Body copy + bracketed labels: [ Experience ], [ Hours ], etc. */
+  --landing-body-size: clamp(17px, 1.4vw, 21px);
+  --landing-bracket-label-size: clamp(14px, 1.1vw, 17px);
   min-height: 100vh;
   /* Top matches the hero band so loader→landing never flashes paper cream. */
   background: var(--landing-orange-top);
@@ -125,7 +126,7 @@
   margin: 0 0 0 auto;
   color: #fff6e9;
   font-family: var(--landing-font-mono);
-  font-size: clamp(10px, 0.86vw, 13px);
+  font-size: clamp(12px, 1vw, 15px);
   letter-spacing: 0.16em;
   line-height: 1.8;
   text-align: right;
@@ -495,7 +496,7 @@
 }
 
 .sideNavLb {
-  font-size: 16px;
+  font-size: 17px;
   letter-spacing: 0.02em;
   transition:
     color 0.3s,
@@ -507,7 +508,7 @@
 .sideNavDesc {
   margin: 1px 0 2px;
   max-width: 158px;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.42;
   letter-spacing: 0.01em;
   animation: landingSideNavFade 0.35s ease both;
@@ -521,7 +522,7 @@
 
 .sideNavLight .sideNavLb[data-active="true"] {
   opacity: 1;
-  font-size: 18px;
+  font-size: 19px;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
@@ -537,7 +538,7 @@
 
 .sideNavDark .sideNavLb[data-active="true"] {
   color: #6b2c12;
-  font-size: 18px;
+  font-size: 19px;
 }
 
 .sideNavDark .sideNavDesc {
@@ -659,7 +660,7 @@
   font-family: var(--landing-font-sans);
   font-weight: 400;
   font-stretch: 64%;
-  font-size: clamp(20px, 2.9vw, 41px);
+  font-size: clamp(22px, 3.1vw, 44px);
   letter-spacing: -0.02em;
   line-height: 0.9;
   text-shadow: 0 1px 10px rgba(255, 246, 233, 0.4);
@@ -677,7 +678,7 @@
   color: var(--landing-ink);
   font-family: var(--landing-font-mono);
   font-weight: 400;
-  font-size: clamp(21px, 2.7vw, 39px);
+  font-size: clamp(23px, 2.9vw, 42px);
   line-height: 1;
 }
 
@@ -742,6 +743,14 @@
   z-index: 1;
 }
 
+@media (min-width: 761px) {
+  .block,
+  .waitlist {
+    /* Keep copy clear of the fixed Home / About / Studio rail. */
+    padding-left: max(var(--landing-section-pad-x), clamp(200px, 16vw, 240px));
+  }
+}
+
 .blockExp {
   justify-content: flex-start;
   gap: 0;
@@ -793,7 +802,7 @@
   font-weight: 410;
   font-stretch: 78%;
   line-height: 1.55;
-  font-size: clamp(15px, 1.15vw, 18px);
+  font-size: clamp(16px, 1.3vw, 20px);
   color: var(--landing-ink);
   opacity: 0.78;
 }
@@ -845,7 +854,7 @@
   font-stretch: 78%;
   letter-spacing: -0.02em;
   line-height: 1.18;
-  font-size: clamp(20px, 2.4vw, 30px);
+  font-size: clamp(22px, 2.6vw, 33px);
 }
 
 .studioItemArrow {
@@ -915,7 +924,7 @@
   font-weight: 410;
   font-stretch: 78%;
   line-height: 1.7;
-  font-size: clamp(15px, 1.15vw, 17px);
+  font-size: clamp(16px, 1.3vw, 19px);
   color: var(--landing-ink);
   opacity: 0.8;
   animation: studioBodyIn 0.55s ease;
@@ -1060,7 +1069,7 @@
   font-stretch: 78%;
   letter-spacing: -0.01em;
   line-height: 1.28;
-  font-size: clamp(20px, 2.4vw, 36px);
+  font-size: clamp(22px, 2.6vw, 38px);
   white-space: nowrap;
 }
 
@@ -1146,7 +1155,7 @@
   font-weight: 410;
   font-stretch: 78%;
   line-height: 1.55;
-  font-size: clamp(16px, 1.25vw, 19px);
+  font-size: var(--landing-body-size);
   color: var(--landing-ink);
   opacity: 0.8;
   margin: 0;
@@ -1157,7 +1166,7 @@
   font-weight: 410;
   font-stretch: 78%;
   line-height: 1.55;
-  font-size: clamp(16px, 1.25vw, 19px);
+  font-size: var(--landing-body-size);
   color: var(--landing-ink);
   opacity: 0.8;
 }
@@ -1169,8 +1178,8 @@
   font-weight: 430;
   font-stretch: 78%;
   letter-spacing: -0.012em;
-  line-height: 1.85;
-  font-size: clamp(20px, 3.1vw, 40px);
+  line-height: 2.15;
+  font-size: clamp(22px, 3.3vw, 42px);
 }
 
 /* Archive-style inline thumbs — desktop only (matches furnishes_prod). */
@@ -1241,7 +1250,7 @@
   font-weight: 460;
   font-stretch: 78%;
   letter-spacing: -0.005em;
-  font-size: clamp(16px, 1.4vw, 20px);
+  font-size: clamp(19px, 1.6vw, 24px);
   color: var(--landing-ink);
 }
 
@@ -1253,7 +1262,7 @@
   line-height: 1.5;
   opacity: 0.74;
   color: var(--landing-ink);
-  font-size: clamp(16px, 1.25vw, 19px);
+  font-size: var(--landing-body-size);
 }
 
 /* About-block headers / intro */
@@ -1342,7 +1351,7 @@
   font-stretch: 78%;
   letter-spacing: -0.01em;
   line-height: 1.3;
-  font-size: clamp(22px, 2.6vw, 36px);
+  font-size: clamp(24px, 2.8vw, 38px);
   margin: 0;
   color: var(--landing-ink);
 }
@@ -1449,7 +1458,7 @@
   font-weight: 440;
   font-stretch: 78%;
   letter-spacing: -0.01em;
-  font-size: clamp(16px, 1.5vw, 22px);
+  font-size: clamp(18px, 1.65vw, 24px);
   color: var(--landing-ink);
   margin: 10px 0 0;
 }
@@ -1559,7 +1568,7 @@
   font-stretch: 78%;
   text-transform: uppercase;
   letter-spacing: 0.01em;
-  font-size: clamp(16px, 1.4vw, 20px);
+  font-size: clamp(18px, 1.55vw, 23px);
   color: var(--landing-ink);
   opacity: 0.6;
   transition:
@@ -1571,7 +1580,7 @@
 .teamRowOn .teamName {
   opacity: 1;
   font-weight: 600;
-  font-size: clamp(18px, 1.8vw, 26px);
+  font-size: clamp(20px, 2vw, 28px);
 }
 
 .teamRole {
@@ -1589,7 +1598,7 @@
   font-weight: 400;
   font-stretch: 78%;
   line-height: 1.55;
-  font-size: clamp(14px, 1.15vw, 17px);
+  font-size: clamp(16px, 1.3vw, 19px);
   color: var(--landing-ink);
   opacity: 0.78;
   animation: studioBodyIn 0.4s ease;
@@ -1666,7 +1675,7 @@
   text-transform: uppercase;
   letter-spacing: -0.005em;
   line-height: 1.25;
-  font-size: clamp(15px, 1.25vw, 18px);
+  font-size: clamp(17px, 1.4vw, 20px);
   color: var(--landing-ink);
   transition: opacity 0.25s ease;
 }
@@ -1755,7 +1764,7 @@
   font-weight: 410;
   font-stretch: 78%;
   line-height: 1.55;
-  font-size: clamp(16px, 1.25vw, 19px);
+  font-size: var(--landing-body-size);
   color: var(--landing-ink);
   opacity: 0.8;
 }
@@ -1799,7 +1808,7 @@
   font-weight: 460;
   font-stretch: 78%;
   letter-spacing: -0.012em;
-  font-size: clamp(22px, 2.6vw, 36px);
+  font-size: clamp(24px, 2.8vw, 38px);
   color: var(--landing-ink);
   line-height: 1.1;
 }
@@ -1843,7 +1852,7 @@
   font-weight: 430;
   font-stretch: 78%;
   line-height: 1.6;
-  font-size: clamp(16px, 1.25vw, 19px);
+  font-size: var(--landing-body-size);
   color: var(--landing-ink);
   opacity: 0.78;
 }
@@ -1855,7 +1864,7 @@
 }
 
 .waitlistLabel {
-  font-size: 0.82rem;
+  font-size: 0.95rem;
 }
 
 .waitlistRow {
@@ -1875,7 +1884,7 @@
   color: inherit;
   padding: 10px 0;
   font-family: var(--landing-font-mono);
-  font-size: clamp(14px, 1.15vw, 16px);
+  font-size: clamp(15px, 1.25vw, 18px);
 }
 
 .waitlistInput:focus {
@@ -2364,12 +2373,12 @@
 
 @media (max-width: 720px) {
   .sideNavLb {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .sideNavLight .sideNavLb[data-active="true"],
   .sideNavDark .sideNavLb[data-active="true"] {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .sideNavDesc {
@@ -2394,11 +2403,11 @@
   }
 
   .heroTagline {
-    font-size: clamp(16px, 4.3vh, 38px);
+    font-size: clamp(18px, 4.5vh, 40px);
   }
 
   .heroTagMark {
-    font-size: clamp(18px, 3.9vh, 34px);
+    font-size: clamp(20px, 4.1vh, 36px);
   }
 }
 
@@ -2413,8 +2422,9 @@
   --landing-terra: oklch(0.605 0.176 41);
   --landing-line: rgba(110, 24, 16, 0.16);
   --landing-maxw: 1440px;
-  --landing-section-pad-x: clamp(20px, 3.4vw, 48px);
-  --landing-bracket-label-size: clamp(13px, 1vw, 16px);
+  --landing-section-pad-x: clamp(28px, 6vw, 96px);
+  --landing-body-size: clamp(17px, 1.4vw, 21px);
+  --landing-bracket-label-size: clamp(14px, 1.1vw, 17px);
   --landing-font-sans: var(--font-archivo), "Archivo", sans-serif;
   --landing-font-mono:
     var(--font-space-mono), "Space Mono", ui-monospace, monospace;
@@ -2531,7 +2541,7 @@
 
 .cookieBody {
   margin: 4px 0 0;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.55;
   font-weight: 375;
 }
