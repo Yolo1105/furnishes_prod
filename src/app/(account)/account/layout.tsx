@@ -3,6 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { AccountShell } from "@/features/account/shell/AccountShell";
 import { requireCurrentSession } from "@/server/auth/session";
 import { isCommerceEnabled } from "@/server/commerce/commerce-config";
+import { NOINDEX_ROBOTS } from "@/lib/seo";
 import "@/features/account/shell/account-studio.css";
 
 export const metadata: Metadata = {
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
     template: "%s · Furnishes Studio",
     default: "Account · Furnishes Studio",
   },
+  robots: NOINDEX_ROBOTS,
 };
 
 export default async function AccountLayout({

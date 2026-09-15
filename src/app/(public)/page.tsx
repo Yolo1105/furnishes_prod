@@ -5,15 +5,17 @@ import {
   isLandingIntroReplayQuery,
   shouldSkipLandingLoader,
 } from "@/features/landing/landing-intro";
+import { PUBLIC_PAGE_SEO, publicPageMetadata } from "@/lib/seo";
 import { getOptionalCurrentSession } from "@/server/auth/session";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: {
-    absolute: "Furnishes | Interior Design Studio",
-  },
-};
+export const metadata: Metadata = publicPageMetadata({
+  title: PUBLIC_PAGE_SEO.home.title,
+  description: PUBLIC_PAGE_SEO.home.description,
+  path: PUBLIC_PAGE_SEO.home.path,
+  absoluteTitle: true,
+});
 
 export default async function HomePage({
   searchParams,

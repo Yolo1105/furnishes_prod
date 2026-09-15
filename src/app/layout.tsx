@@ -2,9 +2,11 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Archivo, Space_Mono } from "next/font/google";
 import { RouteHandoff } from "@/components/route-handoff/RouteHandoff";
+import { SiteJsonLd } from "@/components/seo/SiteJsonLd";
 import { ClerkSessionBridge } from "@/features/auth/ClerkSessionBridge";
 import { LandingFreezeBoot } from "@/features/landing/LandingFreezeBoot";
 import { resolvedPublicOrigin } from "@/server/app-origin";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, siteRobots } from "@/lib/seo";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -23,16 +25,26 @@ const spaceMono = Space_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(resolvedPublicOrigin() || "http://localhost:3000"),
+  applicationName: SITE_NAME,
   title: {
-    default: "Furnishes",
+    default: SITE_NAME,
     template: "%s | Furnishes",
   },
-  description:
-    "Furnishes is an interior design studio for modern living. Concept, planning, and 3D visualization that turn clear plans into calm, lasting spaces.",
-  robots:
-    process.env.NEXT_PUBLIC_ALLOW_INDEXING === "1"
-      ? { index: true, follow: true }
-      : { index: false, follow: false },
+  description: SITE_DESCRIPTION,
+  category: "interior design",
+  robots: siteRobots(),
+  openGraph: {
+    type: "website",
+    locale: "en_SG",
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
@@ -46,6 +58,7 @@ export default function RootLayout({
     <html lang="en" className={`${archivo.variable} ${spaceMono.variable}`}>
       <body>
         <LandingFreezeBoot />
+        <SiteJsonLd />
         {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
           <ClerkProvider
             signInUrl="/login"

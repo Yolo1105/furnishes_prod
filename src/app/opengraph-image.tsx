@@ -21,7 +21,7 @@ export default function OpenGraphImage() {
     >
       <div>furnishes.</div>
       <div style={{ fontSize: 32, marginTop: 24, fontWeight: 400 }}>
-        A room thinks with you
+        Interior design studio for modern living
       </div>
     </div>,
     size,

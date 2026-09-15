@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { getSharedConversation } from "@/server/conversations/chat-share";
 import { notFound } from "next/navigation";
+import { NOINDEX_ROBOTS } from "@/lib/seo";
 
 type Params = { params: Promise<{ shareId: string }> };
 
 export const metadata: Metadata = {
   title: "Shared Conversation",
+  robots: NOINDEX_ROBOTS,
 };
 
 /**

@@ -4,7 +4,8 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Furnishes",
     short_name: "Furnishes",
-    description: "A design studio for modern interiors.",
+    description:
+      "Interior design studio for modern living — concept, planning, and 3D visualization.",
     start_url: "/",
     display: "standalone",
     background_color: "#fff2e5",
