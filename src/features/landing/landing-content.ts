@@ -1,3 +1,23 @@
+import { formatMoney } from "@/lib/commerce/money";
+import { SITE_EMAIL } from "@/lib/seo";
+
+/**
+ * What the sections below quote: lead times, prices and the home visit.
+ * Placeholders, the same as furnishes_v0's, until the owner confirms them.
+ */
+const FACTS = {
+  readyWeeks: "8–12 weeks",
+  partsWeeks: "6–8 weeks",
+  builtWeeks: "8–10 weeks",
+  readyFromCents: 28000,
+  modularFromCents: 18000,
+  visitMinutes: 60,
+  visitFeeCents: 12000,
+  board: "18 mm",
+} as const;
+
+const sgd = (cents: number) => formatMoney(cents, "SGD");
+
 /**
  * Canonical Landing copy mirrored from the frozen reference
  * (`reference/2026-07-16/landing.jsx`). Demo / unverified
@@ -18,7 +38,7 @@ export const landingContent = {
     titleLead: "Be",
     titleAccent: "first",
     titleTrail: "through the door.",
-    lead: "Be first to configure Plinth, Wedge, and Cylinder in Bone & Moss. One note the day it opens, nothing more.",
+    lead: "Be first to order ready-made and modular pieces online, sized to your room. One note the day it opens, nothing more.",
     placeholder: "you@studio.com",
     idleNote: "No spam, unsubscribe anytime.",
   },
@@ -112,88 +132,115 @@ export const landingContent = {
     titleLead: "For",
     titleAccent: "modern",
     titleTrail: "living.",
-    lead: "Good design should feel natural in daily life: easy to live with, calm to look at, genuinely pleasant to use. We work with people who understand how a space is really lived in, so every room stays thoughtful, durable and honest from first sketch to final frame.",
-    philosophyTitle: "Futuristic &\nminimalist.",
+    lead: "Furniture should fit the room you have and the way you use it: easy to live with, calm to look at, made to last. We make ready-made and modular pieces for HDB homes and small offices in Singapore.",
+    philosophyTitle: "Sized to\nyour room.",
     philosophyLabel: "[ Our philosophy ]",
-    philosophyBody:
-      "What you see on screen is what gets built. Every project is led by specialists who care about proportion, light, and the honest use of materials. They stay close to the work until the last detail feels right, with clear updates along the way and finishes that age well.",
+    philosophyBody: `Modular pieces are cut from ${FACTS.board} birch plywood to your wall's width and height, in birch, walnut or red. Ready-made pieces come in the sizes listed. Either way, our partner factory makes it after you order, and we tell you when it ships.`,
     philosophyImage: {
       src: "/images/hero/lute-Fv5GnGntvcg-unsplash.jpg",
       alt: "Modern minimalist living room with natural light",
     },
-    quote: "A space should feel right long before it's real.",
+    quote: "A room should fit the people in it, not the other way round.",
     features: [
       {
-        title: "Concept & lookdev",
-        body: "We develop the look, mood and material language of a space long before a single wall is built.",
+        title: "Made after you order",
+        body: "Our partner factory in China makes the piece in the size and finish you chose.",
         icon: "layers" as const,
       },
       {
-        title: "Lighting & mood",
-        body: "Light, shadow and surface tuned frame by frame until every room reads true to life.",
-        icon: "sun" as const,
+        title: "Shipped to Singapore",
+        body: "Packed with its parts and steps, and we email you when it moves.",
+        icon: "box" as const,
       },
       {
-        title: "Final frames",
-        body: "Production-ready stills and motion, delivered for film, games and architecture.",
-        icon: "frame" as const,
+        title: "Carried into your room",
+        body: "Delivered at a time you choose, built where you want it or left in parts.",
+        icon: "home" as const,
       },
     ],
   },
   studio: {
-    /** Archive Material / Our Services layout, mapped onto the Studio section. */
-    eyebrow: "Our services",
-    titlePrimary: "Crafted ",
-    titleAccent: "interiors",
+    /** Archive Material / Our Services layout, holding the three kinds of furniture. */
+    eyebrow: "What we sell",
+    titlePrimary: "Three kinds of ",
+    titleAccent: "furniture",
     intro:
-      "Room refresh or full build: clear plans, trusted trades, spaces that feel easy to live in.",
+      "Ready-made pieces, modular pieces sized to your wall, or a room you design yourself in 3D.",
     services: [
       {
-        title: "Construction Management",
+        title: "Ready-made",
         description:
-          "We coordinate contractors, suppliers, and inspections from walkthrough to punch list, flag clashes early, and keep updates and quality checks steady through handover.",
+          "Sofas, desks, chairs, tables and storage in the sizes listed, ready to use as they arrive.",
+        facts: `From ${sgd(FACTS.readyFromCents)} · ${FACTS.readyWeeks}`,
         image: {
           src: "/images/landing-banner-1.jpg",
-          alt: "Interior build with coordinated trades",
+          alt: "A living room with a sofa, a low table and a chair",
         },
       },
       {
-        title: "Interior Design Consultant",
+        title: "Modular",
         description:
-          "We shape layout, materials, and fixtures to how you live, using samples so decisions stay clear. When code or budget push back, we adjust without losing the idea.",
-        image: {
-          src: "/images/landing-banner-3.jpg",
-          alt: "Consultant with samples and layout notes",
-        },
-      },
-      {
-        title: "Interior Space Planning",
-        description:
-          "We plan circulation, storage, and light before locking walls and joinery, balance privacy and flow, and leave room for services and future change.",
-        image: {
-          src: "/images/landing-banner-4.jpg",
-          alt: "Living space with clear flow and storage",
-        },
-      },
-      {
-        title: "Sustainable Building Solutions",
-        description:
-          "We pick materials and systems that age well and suit your air quality goals, with efficient lighting, responsible timber, and reuse when it fits. Priorities are set early so green choices stay realistic on site.",
-        image: {
-          src: "/images/landing-banner.jpg",
-          alt: "Natural materials in a calm interior",
-        },
-      },
-      {
-        title: "Renovation and Remodeling",
-        description:
-          "We work with the structure and character you already have, phase the work cleanly, and run kitchens, baths, or whole home jobs from strip out to finish with clear scope and progress.",
+          "Shelves, storage and separator walls in birch, cut to your wall's size and colour. Built, or in parts you put together.",
+        facts: `From ${sgd(FACTS.modularFromCents)} · ${FACTS.partsWeeks} in parts, ${FACTS.builtWeeks} built`,
         image: {
           src: "/images/hero/markus-spiske-OOZxVR65q3c-unsplash.jpg",
-          alt: "Renovated room with new joinery and surfaces",
+          alt: "A living room with a tall bookcase between two windows",
+        },
+      },
+      {
+        title: "Design your own",
+        description:
+          "Draw your room in 3D, place our pieces, set each one's size and finish, and see it before you order.",
+        facts: "Priced and timed with your design",
+        image: {
+          src: "/images/landing-banner-4.jpg",
+          alt: "A furnished living room seen from above",
         },
       },
     ] as const,
+  },
+  /** From order to your home, in five steps on one line. */
+  order: {
+    label: "How it reaches you",
+    titleBefore: "From order to",
+    titleAccent: "your home",
+    titleAfter: `: ${FACTS.partsWeeks} in parts, ${FACTS.builtWeeks} built.`,
+    steps: [
+      {
+        name: "You order",
+        line: "You choose the piece, its size and finish, and how it arrives.",
+      },
+      {
+        name: "It is made",
+        line: "Our partner factory in China makes the version you chose.",
+      },
+      {
+        name: "It is packed",
+        line: "Packed with its parts and, if in parts, its steps.",
+      },
+      {
+        name: "It ships",
+        line: "From China to Singapore. We email you when it moves.",
+      },
+      {
+        name: "It arrives",
+        line: "Carried into your room at a time you choose.",
+      },
+    ],
+  },
+  /** The home visit; its fee is taken off the order. */
+  visit: {
+    label: "Home visits",
+    titleBefore: "Not sure what",
+    titleAccent: "fits",
+    titleAfter: "? We come to your room.",
+    line: `${FACTS.visitMinutes} minutes in your home or office: we measure, answer your questions and suggest pieces. ${sgd(FACTS.visitFeeCents)}, taken off your order if you buy.`,
+    cta: "Book a visit",
+    href: `mailto:${SITE_EMAIL}?subject=${encodeURIComponent("Book a home visit")}`,
+    image: {
+      src: "/images/landing-main-5.jpg",
+      alt: "A small kitchen with a round table and chairs",
+    },
   },
   aboutIntro: {
     label: "Who we are",

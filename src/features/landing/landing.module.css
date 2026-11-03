@@ -2816,3 +2816,142 @@
     transform: none;
   }
 }
+
+/* -- What we sell: each kind's price and lead time under its words -- */
+.studioPreviewFacts {
+  margin: 14px 0 0;
+  font-family: var(--landing-font-mono);
+  font-size: var(--landing-bracket-label-size);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--landing-accent-hi);
+  animation: studioBodyIn 0.55s ease;
+}
+
+/* -- From order to your home: five steps on one thin line -- */
+.orderSteps {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  margin: 0;
+  padding: 0 0 0 22px;
+  list-style: none;
+}
+
+/* the line, laid along the steps' edge on purpose: down their left on
+   phones, across their top from 900px */
+.orderSteps::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 1px;
+  background: var(--landing-accent-hi);
+  transform-origin: top;
+  content: "";
+}
+
+.orderStep {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+
+.orderNo {
+  margin: 0 0 6px;
+  font-family: var(--landing-font-mono);
+  font-size: var(--landing-bracket-label-size);
+  letter-spacing: 0.18em;
+  color: var(--landing-accent-hi);
+}
+
+.orderStep .expFeatP {
+  margin: 0;
+}
+
+@media (min-width: 900px) {
+  .orderSteps {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 32px);
+    padding: 24px 0 0;
+  }
+
+  .orderSteps::before {
+    inset: 0 0 auto;
+    width: auto;
+    height: 1px;
+    transform-origin: left;
+  }
+}
+
+/* the line draws in as the steps scroll into view, where the browser can */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .orderSteps::before {
+      animation: orderDrawDown linear both;
+      animation-range: entry 20% cover 45%;
+      animation-timeline: view();
+    }
+
+    @media (min-width: 900px) {
+      .orderSteps::before {
+        animation-name: orderDrawAcross;
+      }
+    }
+  }
+}
+
+@keyframes orderDrawDown {
+  from {
+    scale: 1 0;
+  }
+}
+
+@keyframes orderDrawAcross {
+  from {
+    scale: 0 1;
+  }
+}
+
+/* -- Home visits: a photo beside the words, stacked on phones -- */
+.visitGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+}
+
+/* the same frame as the services photo */
+.visitMedia {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--landing-ink) 6%, transparent);
+}
+
+.visitCopy {
+  display: grid;
+  gap: clamp(16px, 2vw, 24px);
+  justify-items: start;
+}
+
+.visitCopy .sectionEyebrow {
+  margin: 0;
+}
+
+/* the heritage link's look, without its place in the heritage grid */
+.visitCta {
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.visitCopy .sectionBody {
+  max-width: 46ch;
+  margin: 0;
+}
+
+@media (min-width: 900px) {
+  .visitGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}

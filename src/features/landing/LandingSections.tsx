@@ -28,7 +28,7 @@ const ABOUT_CHAR_START = (() => {
   });
 })();
 
-function ExpGlyph({ type }: { type: "layers" | "sun" | "frame" }) {
+function ExpGlyph({ type }: { type: "layers" | "box" | "home" }) {
   const common = {
     width: 26,
     height: 26,
@@ -49,19 +49,18 @@ function ExpGlyph({ type }: { type: "layers" | "sun" | "frame" }) {
       </svg>
     );
   }
-  if (type === "sun") {
+  if (type === "box") {
     return (
       <svg {...common}>
-        <circle cx="12" cy="12" r="4" />
-        <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" />
+        <path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z" />
+        <path d="M3 7.5 12 12l9-4.5M12 12v9" />
       </svg>
     );
   }
   return (
     <svg {...common}>
-      <rect x="3" y="4" width="18" height="16" rx="1.5" />
-      <path d="M3 9h18M8 4v16" />
-      <path d="M13 11.5l4 2.5-4 2.5z" />
+      <path d="M4 10.5 12 4l8 6.5V20H4z" />
+      <path d="M9.5 20v-5.5h5V20" />
     </svg>
   );
 }
@@ -529,6 +528,87 @@ function StudioSection() {
           <p key={active.title} className={styles.studioPreviewBody}>
             {active.description}
           </p>
+          <p
+            key={`${active.title}-facts`}
+            className={styles.studioPreviewFacts}
+          >
+            {active.facts}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** From order to your home: five steps on one line, which draws across as it scrolls into view. */
+function OrderSteps() {
+  const { order } = landingContent;
+  return (
+    <section
+      className={`${styles.block} ${styles.blockAb}`}
+      id="order"
+      aria-labelledby="order-title"
+    >
+      <header className={`${styles.abHead} ${styles.reveal}`}>
+        <p className={styles.sectionEyebrow}>
+          <BracketedText>{order.label}</BracketedText>
+        </p>
+        <h2 id="order-title" className={styles.abHeadH}>
+          {order.titleBefore}{" "}
+          <span className={styles.accent}>{order.titleAccent}</span>
+          {order.titleAfter}
+        </h2>
+      </header>
+      <ol className={`${styles.orderSteps} ${styles.reveal}`}>
+        {order.steps.map((step, index) => (
+          <li key={step.name} className={styles.orderStep}>
+            <p className={styles.orderNo}>
+              {String(index + 1).padStart(2, "0")}
+            </p>
+            <h3 className={styles.expFeatH}>{step.name}</h3>
+            <p className={styles.expFeatP}>{step.line}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+/** The home visit: a photo beside the title, the fee, and an email to book. */
+function VisitBand() {
+  const { visit } = landingContent;
+  return (
+    <section
+      className={`${styles.block} ${styles.blockAb}`}
+      id="visit"
+      aria-labelledby="visit-title"
+    >
+      <div className={styles.visitGrid}>
+        <div className={`${styles.visitMedia} ${styles.reveal}`}>
+          <Image
+            src={visit.image.src}
+            alt={visit.image.alt}
+            fill
+            sizes="(max-width: 900px) 100vw, 50vw"
+            className={styles.studioPreviewImg}
+          />
+        </div>
+        <div className={`${styles.visitCopy} ${styles.reveal}`}>
+          <p className={styles.sectionEyebrow}>
+            <BracketedText>{visit.label}</BracketedText>
+          </p>
+          <h2 id="visit-title" className={styles.abHeadH}>
+            {visit.titleBefore}{" "}
+            <span className={styles.accent}>{visit.titleAccent}</span>
+            {visit.titleAfter}
+          </h2>
+          <p className={styles.sectionBody}>{visit.line}</p>
+          <a
+            className={`${styles.heritageCta} ${styles.visitCta}`}
+            href={visit.href}
+          >
+            <BracketedText>{visit.cta}</BracketedText>
+          </a>
         </div>
       </div>
     </section>
@@ -629,6 +709,7 @@ export function LandingSections({ onContact }: LandingSectionsProps) {
       <WhoAreWe />
       <ExperienceSection />
       <StudioSection />
+      <OrderSteps />
 
       <section
         className={`${styles.block} ${styles.blockAb}`}
@@ -713,6 +794,8 @@ export function LandingSections({ onContact }: LandingSectionsProps) {
           ))}
         </div>
       </section>
+
+      <VisitBand />
 
       <HeritageSection onContact={onContact} />
     </div>

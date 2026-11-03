@@ -4,6 +4,8 @@ export type LandingSectionId =
   | "about"
   | "experience"
   | "studio"
+  | "order"
+  | "visit"
   | "about-intro"
   | "about-projects"
   | "about-teams"
