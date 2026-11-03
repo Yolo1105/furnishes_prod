@@ -16,7 +16,7 @@ export const landingWorkItems = [
 
 export const landingStudioItems = [
   { label: "About", destination: "studio" },
-  { label: "Journal", destination: "journal", tag: "[ new ]" },
+  { label: "Guides", destination: "journal", tag: "[ new ]" },
   { label: "Process", destination: "studio-process" },
   { label: "Clients", destination: "studio-clients" },
   { label: "Careers", destination: "studio-careers" },
@@ -37,7 +37,7 @@ export const landingNavItems = [
     active: false,
   },
   { ix: "[04]", label: "Studio", destination: "studio", active: false },
-  { ix: "[05]", label: "Journal", destination: "journal", active: false },
+  { ix: "[05]", label: "Guides", destination: "journal", active: false },
   { ix: "[06]", label: "Contact", destination: "contact", active: false },
   { ix: "[07]", label: "Quiz", destination: "quiz", active: false },
 ] as const satisfies ReadonlyArray<{

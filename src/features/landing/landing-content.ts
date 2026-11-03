@@ -401,41 +401,42 @@ export const landingContent = {
     ],
   },
   journal: {
-    label: "Blog",
-    titleBefore: "Insights shaped by our exploration of",
-    titleAccent: "space",
-    titleAfter: "and design.",
+    /** Guides for buyers; the cards don't open an article yet. */
+    label: "Guides",
+    titleBefore: "Guides for furnishing a Singapore",
+    titleAccent: "home",
+    titleAfter: "before you order.",
     entries: [
       {
-        title: "Scandinavian minimalism at home",
+        title: "How to measure before you order",
         read: "3 min read",
         image: {
-          src: "/images/landing-main-6.jpg",
-          alt: "Scandinavian minimalist living room with light wood",
+          src: "/images/landing-main-1.jpg",
+          alt: "A living room seen from above, with a sofa, rug and low table",
         },
       },
       {
-        title: "Materials that age well indoors",
-        read: "5 min read",
+        title: "Getting furniture into an HDB flat",
+        read: "4 min read",
         image: {
           src: "/images/landing-main-7.jpg",
-          alt: "Natural interior materials and finishes",
+          alt: "A warm orange living room with armchairs and plants",
         },
       },
       {
-        title: "Lighting plans for calm evenings",
-        read: "6 min read",
-        image: {
-          src: "/images/landing-main-1.jpg",
-          alt: "Warm evening lighting in a modern interior",
-        },
-      },
-      {
-        title: "Small-space layouts that still feel open",
+        title: "Ready-made or modular: which suits you",
         read: "4 min read",
         image: {
           src: "/images/landing-main-4.jpg",
-          alt: "Compact open-plan interior layout",
+          alt: "An armchair beside an open shelving unit",
+        },
+      },
+      {
+        title: "Keeping birch plywood looking new",
+        read: "3 min read",
+        image: {
+          src: "/images/landing-main-6.jpg",
+          alt: "Wooden wardrobe shelves holding clothes and baskets",
         },
       },
     ],
